@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerStore.Application", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerStore.Infrastructure", "PowerStore.Infrastructure\PowerStore.Infrastructure.csproj", "{8E2F63C6-9401-4051-B5F6-C9191607F606}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PowerStore.Domain", "PowerStore.Domain\PowerStore.Domain.csproj", "{C4EA5E02-5641-4FBB-AA8A-1D9F95D7B888}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8E2F63C6-9401-4051-B5F6-C9191607F606}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E2F63C6-9401-4051-B5F6-C9191607F606}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E2F63C6-9401-4051-B5F6-C9191607F606}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4EA5E02-5641-4FBB-AA8A-1D9F95D7B888}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4EA5E02-5641-4FBB-AA8A-1D9F95D7B888}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4EA5E02-5641-4FBB-AA8A-1D9F95D7B888}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4EA5E02-5641-4FBB-AA8A-1D9F95D7B888}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

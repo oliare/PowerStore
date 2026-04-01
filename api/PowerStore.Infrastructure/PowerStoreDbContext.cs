@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PowerStore.Domain
+namespace PowerStore.Infrastructure
 {
-    public class Class1
+    internal class PowerStoreDbContext
     {
     }
 }
