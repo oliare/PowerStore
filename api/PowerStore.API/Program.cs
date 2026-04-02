@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using PowerStore.Domain.Entities;
-using PowerStore.Infrastructure;
+using PowerStore.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +11,7 @@ builder.Services.AddDbContext<PowerStoreDbContext>(opt =>
 });
 
 // Add services to the container.
-
+builder.Services.AddScoped<DbSeeder>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -32,6 +32,24 @@ builder.Services.AddIdentity<UserEntity, RoleEntity>(options =>
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PowerStoreDbContext>();
+    var seeder = scope.ServiceProvider.GetRequiredService<DbSeeder>();
+
+    try
+    {
+        await db.Database.MigrateAsync();
+        await seeder.SeedAsync();
+        Console.WriteLine("Database ready");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during DB initialization: {ex.Message}");
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

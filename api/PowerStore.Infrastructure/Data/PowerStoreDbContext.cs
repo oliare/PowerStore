@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using PowerStore.Domain.Entities;
 
-namespace PowerStore.Infrastructure;
+namespace PowerStore.Infrastructure.Data;
 
 public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Guid>
 {
