@@ -1,7 +1,12 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using PowerStore.Application.Interfaces;
+using PowerStore.Application.Services;
 using PowerStore.Domain.Entities;
 using PowerStore.Infrastructure.Data;
+using PowerStore.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +16,13 @@ builder.Services.AddDbContext<PowerStoreDbContext>(opt =>
 });
 
 // Add services to the container.
+builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<DbSeeder>();
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IMapper, Mapper>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
