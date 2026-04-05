@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using PowerStore.Application.Interfaces;
 using PowerStore.Application.Services;
 using PowerStore.Domain.Entities;
@@ -21,6 +20,7 @@ builder.Services.AddScoped<DbSeeder>();
 
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IMapper, Mapper>();
 
 builder.Services.AddControllers();
