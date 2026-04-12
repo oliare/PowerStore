@@ -13,6 +13,7 @@ export default {
           primary: "#1C4D8D",
           accent: "#4988C4",
           light: "#BDE8F5",
+          bg: "#E1EEFF",
         },
       },
     },

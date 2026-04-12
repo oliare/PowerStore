@@ -96,7 +96,7 @@ export default function Header() {
       </div>
 
       <nav
-        className={`border-b text-gray-800 px-6 py-3 transition-all duration-300 ${
+        className={`border-b text-white px-6 py-3 transition-all duration-300 bg-brand-primary ${
           isScrolled
             ? "-translate-y-full opacity-0 absolute w-full"
             : "relative"

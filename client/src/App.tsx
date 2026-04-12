@@ -1,7 +1,7 @@
-import { Routes, Route } from "react-router-dom"; // Імпортуємо і Routes, і Route звідси
+import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import AppLayout from "./components/layout/AppLayout";
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/HomePage/HomePage";
 
 function App() {
   return (
