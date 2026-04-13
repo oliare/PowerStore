@@ -4,6 +4,7 @@ import AppLayout from "./components/layout/AppLayout";
 import HomePage from "./pages/HomePage/HomePage";
 import { LoginPage } from "./pages/auth/LoginPage";
 import { RegistrationPage } from "./pages/auth/RegistrationPage";
+import { UserProfilePage } from "./pages/UserProfilePage";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/profile" element={<UserProfilePage />} />
       </Route>
     </Routes>
   );
