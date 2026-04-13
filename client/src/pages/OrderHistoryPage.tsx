@@ -1,5 +1,6 @@
 import { Table } from "antd";
 import { ProfileSidebar } from "../common/ProfileSidebar";
+import { MailingSection } from "./HomePage/mailingSection";
 
 export const OrderHistoryPage = () => {
   const dataSource = [
@@ -140,6 +141,7 @@ export const OrderHistoryPage = () => {
           </div>
         </div>
       </main>
+      <MailingSection />
     </div>
   );
 };

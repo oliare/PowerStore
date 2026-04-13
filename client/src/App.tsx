@@ -6,6 +6,7 @@ import { LoginPage } from "./pages/auth/LoginPage";
 import { RegistrationPage } from "./pages/auth/RegistrationPage";
 import { UserProfilePage } from "./pages/UserProfilePage";
 import { OrderHistoryPage } from "./pages/OrderHistoryPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 
 function App() {
   return (
@@ -16,9 +17,11 @@ function App() {
         <Route path="register" element={<RegistrationPage />} />
         <Route path="profile" element={<UserProfilePage />} />
         <Route path="history" element={<OrderHistoryPage />} />
+        <Route path="404" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
 }
+
 
 export default App;
