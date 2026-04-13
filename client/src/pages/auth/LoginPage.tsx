@@ -19,7 +19,6 @@ export const LoginPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* Стилі для підсвітки бордерів та кастомізації повідомлень про помилки */}
       <style>{`
         .ant-form-item-has-error input, 
         .ant-form-item-has-error .ant-input-password {
@@ -52,7 +51,7 @@ export const LoginPage = () => {
               },
               components: {
                 Form: {
-                  itemMarginBottom: 20, // Відступ між полями
+                  itemMarginBottom: 20,
                 },
               },
             }}
@@ -63,7 +62,6 @@ export const LoginPage = () => {
               requiredMark={false}
               onFinish={(values) => console.log("Login Success:", values)}
             >
-              {/* Email Field */}
               <Form.Item
                 name="email"
                 rules={[
@@ -79,7 +77,6 @@ export const LoginPage = () => {
                 />
               </Form.Item>
 
-              {/* Password Field */}
               <Form.Item
                 name="password"
                 rules={[
@@ -87,7 +84,7 @@ export const LoginPage = () => {
                 ]}
               >
                 <Input.Password
-                  placeholder="Password"
+                  placeholder="Пароль"
                   variant="borderless"
                   style={commonInputStyle}
                   iconRender={(visible) =>
@@ -127,7 +124,7 @@ export const LoginPage = () => {
 
               <button
                 type="submit"
-                className="w-full py-3.5 rounded-full bg-brand-primary text-white font-bold hover:bg-brand-dark shadow-lg shadow-brand-primary/25 transition-all active:scale-[0.98]"
+                className="w-full py-3.5 rounded-full bg-brand-primary text-white font-semibold tracking-wide hover:bg-brand-dark shadow-lg shadow-brand-primary/25 transition-all active:scale-[0.98]"
               >
                 Увійти
               </button>
@@ -139,7 +136,7 @@ export const LoginPage = () => {
               Немає аккаунту?
               <a
                 href="/register"
-                className="text-brand-primary font-bold hover:underline ml-2"
+                className="text-brand-primary font-semibold hover:underline ml-2"
               >
                 Зареєструватися
               </a>
