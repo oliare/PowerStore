@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Handbag, HeartIcon, MapPin, Phone, Search } from "lucide-react";
 import Select from "antd/es/select";
+import { Link } from "react-router-dom";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,8 +16,8 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="w-full">
-      <div className="border-b border-gray-200 text-sm">
+    <header className="w-full text-sm">
+      <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-2 text-gray-500">
             <MapPin size={16} />
@@ -37,7 +38,7 @@ export default function Header() {
               <Select
                 defaultValue="UAH"
                 bordered={false}
-                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:shadow-none [&_.ant-select-selector]:bg-transparent"
+                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:bg-transparent"
               >
                 <Select.Option value="UAH">ГРН</Select.Option>
                 <Select.Option value="USD">USD</Select.Option>
@@ -48,7 +49,8 @@ export default function Header() {
             <div className="h-4 w-[1px] bg-gray-300"></div>
 
             <div className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer transition-colors">
-              <a href="/login">Увійти / Зареєструватися</a>
+              <Link to="/login">Увійти</Link>
+              <Link to="/register">/ Зареєструватися</Link>
             </div>
           </div>
         </div>
@@ -59,13 +61,15 @@ export default function Header() {
         }`}
       >
         <div className="max-w-7xl mx-auto h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img
-              src="public/header-logo.png"
-              alt="logo"
-              className="h-16 w-auto"
-            />
-          </div>
+          <Link to={"/"}>
+            <div className="flex items-center gap-2">
+              <img
+                src="public/header-logo.png"
+                alt="logo"
+                className="h-16 w-auto"
+              />
+            </div>
+          </Link>
 
           <div className="hidden md:flex flex-1 mx-12">
             <div className="relative w-full">
@@ -104,7 +108,9 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <ul className="flex gap-9">
-            <li>Головна</li>
+            <li>
+              <Link to={"/"}>Головна</Link>
+            </li>
             <li>Магазин</li>
             <li>Сторінки</li>
             <li>Блог</li>

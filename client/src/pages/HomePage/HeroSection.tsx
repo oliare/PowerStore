@@ -60,7 +60,7 @@ export const HeroSection = () => {
 
           <div className="flex flex-col items-start gap-6 pl-4">
             <span className="text-brand-primary uppercase font-bold text-sm tracking-widest">
-              Welcome to PowerStore
+              Вітаємо в PowerStore
             </span>
             <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight">
               Все для енергії <br />
@@ -72,11 +72,11 @@ export const HeroSection = () => {
               Знижки на автоматику до
               <span className="text-orange-500 font-extrabold">30% OFF</span>
             </p>
-            <p className="text-gray-500 text-lg max-w-md">
+            <p className="text-gray-500 text-lg tracking-wide max-w-md">
               Надійне електрообладнання для вашої безпеки. Безкоштовна доставка
               на всі замовлення.
             </p>
-            <button className="flex items-center gap-3 px-10 py-4 rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
+            <button className="flex items-center gap-3 px-10 py-2 rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
               <span className="text-white font-bold text-lg">До покупок</span>
               <ArrowRight
                 color="white"

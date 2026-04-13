@@ -1,11 +1,12 @@
 import { MapPin, PhoneCall, Mail } from "lucide-react";
+import { MailingSection } from "./mailingSection";
 
 export const ContactSection = () => {
   return (
     <div className="">
       <section className="bg-white py-12 px-4 border-t border-gray-100">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-           <div className="flex flex-col items-center justify-center gap-5 p-6 text-center">
+          <div className="flex flex-col items-center justify-center gap-5 p-6 text-center">
             <div className="relative w-[60px] overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
               <img
                 src="light-blue-bg.png"
@@ -48,7 +49,7 @@ export const ContactSection = () => {
             </div>
           </div>
 
-           <div className="flex flex-col items-center justify-center gap-5 p-6 text-center">
+          <div className="flex flex-col items-center justify-center gap-5 p-6 text-center">
             <div className="relative w-[60px] overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
               <img
                 src="light-blue-bg.png"
@@ -71,34 +72,7 @@ export const ContactSection = () => {
         </div>
       </section>
 
-      <section className="bg-[#F2F2F2] py-10 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="text-center lg:text-left">
-            <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Підпишіться на розсилку
-            </h3>
-            <p className="text-gray-500 text-sm mt-1">
-              Отримуйте актуальні новини та акції.
-            </p>
-          </div>
-
-          <form
-            className="relative w-full max-w-xl flex items-center"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <div className="relative w-full">
-              <input
-                type="email"
-                placeholder="Ваша електронна адреса"
-                className="w-full pl-6 pr-40 py-4 rounded-full bg-white border border-gray-200 outline-none focus:ring-2 focus:ring-brand-primary/20 transition-all text-gray-800"
-              />
-              <button className="absolute right-1.5 top-1/2 -translate-y-1/2 px-8 py-3 rounded-full bg-brand-primary text-white font-bold text-sm hover:bg-brand-dark transition-all active:scale-95 shadow-md">
-                Підписатися
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
+      <MailingSection />
     </div>
   );
 };
