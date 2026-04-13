@@ -1,17 +1,7 @@
-import { useState, type JSX } from "react";
+import { useState } from "react";
 import { Table, Input } from "antd";
-import {
-  LayoutDashboard,
-  History,
-  Heart,
-  ShoppingCart,
-  LogOut,
-  User,
-  Mail,
-  Calendar,
-  Phone,
-  SquarePen,
-} from "lucide-react";
+import { User, Mail, Calendar, Phone, SquarePen } from "lucide-react";
+import { ProfileSidebar } from "../common/ProfileSidebar";
 
 export const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -76,22 +66,7 @@ export const UserProfilePage = () => {
     <div className="flex flex-col min-h-screen bg-gray-50 font-montserrat">
       <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="w-full lg:w-1/4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit">
-            <h2 className="p-6 text-lg font-semibold border-b border-gray-50">
-              Навігація
-            </h2>
-            <nav className="flex flex-col text-sm">
-              <NavItem
-                icon={<LayoutDashboard size={20} />}
-                label="Панель керування"
-                active
-              />
-              <NavItem icon={<History size={20} />} label="Історія замовлень" />
-              <NavItem icon={<Heart size={20} />} label="Улюблені" />
-              <NavItem icon={<ShoppingCart size={20} />} label="Кошик" />
-              <NavItem icon={<LogOut size={20} />} label="Вийти" />
-            </nav>
-          </aside>
+          <ProfileSidebar activeKey="dashboard" />
 
           <div className="w-full lg:w-3/4 space-y-6">
             <div className="grid md:grid-cols-[1fr_2fr] gap-6">
@@ -220,27 +195,3 @@ export const UserProfilePage = () => {
     </div>
   );
 };
-
-const NavItem = ({
-  icon,
-  label,
-  active = false,
-}: {
-  icon: JSX.Element;
-  label: string;
-  active?: boolean;
-}) => (
-  <a
-    href="#"
-    className={`flex items-center gap-3 px-6 py-4 transition-all border-l-4 ${
-      active
-        ? "bg-gray-50 border-brand-primary text-gray-900 font-semibold"
-        : "border-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-700"
-    }`}
-  >
-    <span className={active ? "text-brand-primary" : "text-gray-400"}>
-      {icon}
-    </span>
-    {label}
-  </a>
-);
