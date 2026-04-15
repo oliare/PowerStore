@@ -48,9 +48,24 @@ export default function Header() {
 
             <div className="h-4 w-[1px] bg-gray-300"></div>
 
-            <div className="flex items-center gap-2 text-gray-600 hover:text-black cursor-pointer transition-colors">
-              <Link to="/login">Увійти</Link>
-              <Link to="/register">/ Зареєструватися</Link>
+            <div className="flex items-center gap-4">
+              <Link
+                to="/login"
+                className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
+              >
+                Увійти
+                <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+              </Link>
+
+              <div className="h-4 w-[1px] bg-gray-300"></div>
+
+              <Link
+                to="/register"
+                className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
+              >
+                Зареєструватися
+                <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+              </Link>
             </div>
           </div>
         </div>
