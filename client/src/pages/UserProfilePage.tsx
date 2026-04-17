@@ -11,7 +11,9 @@ export const UserProfilePage = () => {
     lastName: "Russell",
     email: "dainne.ressell@gmail.com",
     phone: "(671) 555-0110",
-    registrationDate: "12 May, 2021",
+    registrationDate: "12.02.2021",
+    birthDate: "5 Apr, 1990",
+    updatedAt: "13 May, 2021",
   });
 
   const handleSave = () => {
@@ -152,19 +154,27 @@ export const UserProfilePage = () => {
                     </div>
                   </div>
 
-                  <div className="space-y-1 opacity-70">
-                    <label className="text-gray-400 text-xs">
-                      Дата реєстрації
-                    </label>
-                    <div className="font-medium text-gray-600 flex items-center gap-2">
-                      <Calendar size={14} /> {userData.registrationDate}
-                    </div>
-                  </div>
-
                   <div className="space-y-1">
                     <label className="text-gray-400 text-xs">Телефон</label>
                     <div className="font-medium text-gray-500/80 flex items-center gap-2">
                       <Phone size={14} /> {userData.phone}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 opacity-70">
+                    <label className="text-gray-400 text-xs">
+                      Дата народження
+                    </label>
+                    <div className="font-medium text-gray-600 flex items-center gap-2">
+                      <Calendar size={14} /> {userData.birthDate}
+                    </div>
+                  </div>
+                  <div className="space-y-1 opacity-70">
+                    <label className="text-gray-400 text-xs">
+                      Дата реєстрації (оновлено {userData.updatedAt})
+                    </label>
+                    <div className="font-medium text-gray-600 flex items-center gap-2">
+                      <Calendar size={14} /> {userData.registrationDate} 
                     </div>
                   </div>
                 </div>
