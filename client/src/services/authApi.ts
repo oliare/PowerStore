@@ -1,10 +1,10 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQuery } from "../api/api";
 import type { LoginRequest, LoginResponse, RegisterRequest } from "../types/user/auth";
+import { createBaseQuery } from "../api/api";
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: baseQuery,
+  baseQuery: createBaseQuery,
   tagTypes: ["Auth"],
   endpoints: (builder) => ({
     register: builder.mutation<void, RegisterRequest>({

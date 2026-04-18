@@ -48,7 +48,6 @@ public class DbSeeder
 
         var admin = new UserEntity
         {
-            Id = Guid.NewGuid(),
             UserName = "Admin",
             Email = "admin@gmail.com",
             FirstName = "Doris",
@@ -59,7 +58,6 @@ public class DbSeeder
 
         var user = new UserEntity
         {
-            Id = Guid.NewGuid(),
             UserName = "User",
             Email = "user@gmail.com",
             FirstName = "Test",

@@ -1,10 +1,53 @@
 import { useEffect, useState } from "react";
-import { Handbag, HeartIcon, MapPin, Phone, Search } from "lucide-react";
+import {
+  Handbag,
+  HeartIcon,
+  LogOut,
+  MapPin,
+  Phone,
+  Search,
+  Settings,
+  User,
+} from "lucide-react";
 import Select from "antd/es/select";
 import { Link } from "react-router-dom";
+import { useGetMeQuery } from "../../services/userApi";
+import type { MenuProps } from "antd/es/menu/menu";
+import Dropdown from "antd/es/dropdown/dropdown";
+import Avatar from "antd/es/avatar/Avatar";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const { data: user } = useGetMeQuery();
+
+  const handleLogout = () => {
+    // dispatch(logOut());
+    // navigate("/login");
+  };
+
+  const userMenuItems: MenuProps["items"] = [
+    {
+      key: "profile",
+      label: <Link to="/profile">Мій профіль</Link>,
+      icon: <Settings size={16} />,
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "logout",
+      label: "Вийти",
+      icon: <LogOut size={16} />,
+      danger: true,
+      onClick: handleLogout,
+    },
+  ];
+
+  const getInitials = () => {
+    if (!user) return "";
+    return `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +57,8 @@ export default function Header() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  console.log("Current user:", user);
 
   return (
     <header className="w-full text-sm">
@@ -49,23 +94,49 @@ export default function Header() {
             <div className="h-4 w-[1px] bg-gray-300"></div>
 
             <div className="flex items-center gap-4">
-              <Link
-                to="/login"
-                className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
-              >
-                Увійти
-                <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-              </Link>
+              {user ? (
+                <Dropdown
+                  menu={{ items: userMenuItems }}
+                  placement="bottomRight"
+                  arrow
+                >
+                  <div className="flex items-center gap-2 cursor-pointer group">
+                    <Avatar
+                      style={{
+                        backgroundColor: "#00B207",
+                        verticalAlign: "middle",
+                      }}
+                      size="medium"
+                      className="group-hover:opacity-80 transition-opacity"
+                    >
+                      {getInitials() || <User size={16} />}
+                    </Avatar>
+                    <span className="text-gray-700 font-medium group-hover:text-brand-primary">
+                      {user.firstName}
+                    </span>
+                  </div>
+                </Dropdown>
+              ) : (
+                <div className="flex items-center gap-4">
+                  <Link
+                    to="/login"
+                    className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
+                  >
+                    Увійти
+                    <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                  </Link>
 
-              <div className="h-4 w-[1px] bg-gray-300"></div>
+                  <div className="h-4 w-[1px] bg-gray-300"></div>
 
-              <Link
-                to="/register"
-                className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
-              >
-                Зареєструватися
-                <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
-              </Link>
+                  <Link
+                    to="/register"
+                    className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
+                  >
+                    Зареєструватися
+                    <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

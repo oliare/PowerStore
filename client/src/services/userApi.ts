@@ -1,14 +1,14 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQuery } from "../api/api";
+import { createBaseQuery } from "../api/api";
 import type { UserProfile } from "../types/user/user";
 
 export const usersApi = createApi({
   reducerPath: "usersApi",
-  baseQuery: baseQuery,
+  baseQuery: createBaseQuery,
   tagTypes: ["Users"],
   endpoints: (builder) => ({
     getMe: builder.query<UserProfile, void>({
-      query: () => "/users/me",
+      query: () => "/Users/me",
       providesTags: ["Users"],
     }),
   }),

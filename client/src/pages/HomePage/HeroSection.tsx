@@ -69,7 +69,7 @@ export const HeroSection = () => {
               </span>
             </h1>
             <p className="text-3xl font-semibold text-gray-800">
-              Знижки на автоматику до
+              Знижки на автоматику до{" "}
               <span className="text-orange-500 font-extrabold">30% OFF</span>
             </p>
             <p className="text-gray-500 text-lg tracking-wide max-w-md">

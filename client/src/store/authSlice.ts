@@ -6,7 +6,7 @@ const ACCESS_TOKEN = "accessToken";
 const token = localStorage.getItem(ACCESS_TOKEN);
 
 const initialState: AuthState = {
-  token: token || null,
+  accessToken: token || null,
   auth: {
     isAdmin: false,
     isUser: false,
@@ -19,19 +19,19 @@ const userSlice = createSlice({
   name: "account",
   initialState,
   reducers: {
-    setCredentials: (state, action: PayloadAction<{ token: string }>) => {
-      const { token } = action.payload;
+    setCredentials: (state, action: PayloadAction<{ accessToken: string }>) => {
+      const { accessToken } = action.payload;
 
-      localStorage.setItem(ACCESS_TOKEN, token);
+      localStorage.setItem(ACCESS_TOKEN, accessToken);
 
-      state.token = token;
+      state.accessToken = accessToken;
       state.auth.isAuth = true;
     },
 
     logOut: (state) => {
       localStorage.removeItem(ACCESS_TOKEN);
 
-      state.token = null;
+      state.accessToken = null;
       state.auth = {
         isAdmin: false,
         isUser: false,
@@ -42,8 +42,7 @@ const userSlice = createSlice({
   },
 });
 
-export const getToken = (state: { account: AuthState }) =>
-  state.account.token;
+export const getToken = (state: { account: AuthState }) => state.account.accessToken;
 
 export const { setCredentials, logOut } = userSlice.actions;
 export default userSlice.reducer;

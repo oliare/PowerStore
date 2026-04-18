@@ -1,7 +1,3 @@
-export type JwtPayload = {
-  token: string;
-};
-
 export type LoginRequest = {
   email: string;
   password: string;
@@ -9,7 +5,7 @@ export type LoginRequest = {
 
 export type LoginResponse = {
   email: string;
-  token: JwtPayload;
+  accessToken: string;
 };
 
 export type RegisterRequest = {
@@ -22,7 +18,7 @@ export type RegisterRequest = {
 
 export type AuthState = {
   // user: User | null;
-  token: string | null;
+  accessToken: string | null;
   auth: UserAuth;
   refreshToken?: string | null;
   isLoggingOut?: boolean;
@@ -36,5 +32,5 @@ export type UserAuth = {
 };
 
 // export type LogoutRequest = {
-//   token: string;
+//   accessToken: string;
 // }

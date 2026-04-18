@@ -5,9 +5,12 @@ import { Eye, EyeOffIcon, Loader2 } from "lucide-react";
 import { useLoginMutation } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../../types/user/auth";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../store/authSlice";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [login, { isLoading, error }] = useLoginMutation();
   const [form] = Form.useForm();
 
@@ -25,7 +28,9 @@ export const LoginPage = () => {
 
   const onFinish = async (values: LoginRequest) => {
     try {
-      await login(values).unwrap();
+      const result = await login(values).unwrap();
+      dispatch(setCredentials({ accessToken: result.accessToken }));
+      console.log("Login successful, token stored in Redux:", result.accessToken);
       navigate("/");
     } catch (err) {
       console.error("Login Error:", err);
