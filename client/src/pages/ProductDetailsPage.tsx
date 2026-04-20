@@ -3,8 +3,12 @@ import { Link, useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../services/productApi";
 import { ShoppingCart, Star, Heart, Plus, Minus } from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
+import type { ProductDto } from "../types/user/product";
+import { addToCart } from "../store/cartSlice";
+import { useDispatch } from "react-redux";
 
 const ProductDetailsPage = () => {
+  const dispatch = useDispatch();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useGetProductDetailsQuery(id!);
 
@@ -26,6 +30,10 @@ const ProductDetailsPage = () => {
     );
 
   const { product, relatedProducts } = data;
+
+  const handleAddToCart = (product: ProductDto) => {
+    dispatch(addToCart(product));
+  };
 
   return (
     <div className="bg-white font-manrope">
@@ -135,7 +143,10 @@ const ProductDetailsPage = () => {
                 </button>
               </div>
 
-              <button className="flex-1 h-12 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors">
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="flex-1 h-12 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
+              >
                 Покласти в кошик <ShoppingCart size={18} />
               </button>
 

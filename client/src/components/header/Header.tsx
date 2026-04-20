@@ -15,9 +15,13 @@ import { useGetMeQuery } from "../../services/userApi";
 import type { MenuProps } from "antd/es/menu/menu";
 import Dropdown from "antd/es/dropdown/dropdown";
 import Avatar from "antd/es/avatar/Avatar";
+import type { RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { openCartSidebar } from "../../store/uiSlice";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const dispatch = useDispatch();
 
   const { data: user } = useGetMeQuery();
 
@@ -43,6 +47,13 @@ export default function Header() {
       onClick: handleLogout,
     },
   ];
+
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
 
   const getInitials = () => {
     if (!user) return "";
@@ -175,11 +186,22 @@ export default function Header() {
             <HeartIcon size={24} strokeWidth={1.5} />
             <div className="h-4 w-[1px] bg-gray-300"></div>
 
-            <Handbag size={24} strokeWidth={1.5} />
-
+            <button
+              onClick={() => dispatch(openCartSidebar())}
+              className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <Handbag size={24} strokeWidth={1.5} />
+              {totalItems > 0 && (
+                <span className="absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
+                  {totalItems}
+                </span>
+              )}
+            </button>
             <div className="flex flex-col leading-tight">
               <p className="text-xs text-gray-500">Кошик:</p>
-              <p className="text-base font-semibold text-black">₴ 0.00</p>
+              <p className="text-base font-semibold text-black">
+                ₴ {totalPrice.toFixed(2)}
+              </p>
             </div>
           </div>
         </div>

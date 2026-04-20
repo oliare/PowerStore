@@ -12,6 +12,7 @@ import type { SerializedError } from "@reduxjs/toolkit/react";
 import { openAuthModal } from "../../store/uiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
+import { addToCart } from "../../store/cartSlice";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -49,14 +50,16 @@ export const ProductsSection = ({
     }
   };
 
-  const handleCartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleCartClick = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    product: ProductDto,
+  ) => {
     e.preventDefault();
-    if (!user) {
-      dispatch(openAuthModal("Додайте до кошика"));
-      return;
-    }
-  };
+    e.stopPropagation();
 
+    dispatch(addToCart(product));
+  };
+  
   return (
     <section className="relative">
       <div className="absolute top-0 -right-0">
@@ -147,7 +150,7 @@ export const ProductsSection = ({
                         </div>
                         <button
                           className="p-3 rounded-full bg-gray-100 hover:text-white hover:bg-brand-primary transition-colors flex-shrink-0"
-                          onClick={handleCartClick}
+                          onClick={(e) => handleCartClick(e, product)}
                         >
                           <ShoppingCart size={20} />
                         </button>
