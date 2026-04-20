@@ -5,8 +5,15 @@ import { ContactSection } from "./ContactSection";
 import { BlogSection } from "./BlogSection";
 import { HeroSection } from "./HeroSection";
 import { ProductsSection } from "./ProductsSection";
+import { useGetProductsQuery } from "../../services/productApi";
 
 const HomePage = () => {
+  const {
+    data: products,
+    isLoading,
+    error,
+  } = useGetProductsQuery({ limit: 5 });
+
   const categories = [
     {
       name: "Освітлення",
@@ -34,49 +41,15 @@ const HomePage = () => {
     },
   ];
 
-  const products = [
-    {
-      id: 1,
-      name: "Smart LED Лампа 15W",
-      price: "₴ 299",
-      image:
-        "https://images.unsplash.com/photo-1550985616-10810253b84d?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: 2,
-      name: "Мультиметр Digital Pro",
-      price: "₴ 1 250",
-      image:
-        "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: 3,
-      name: "Набір викруток (24 шт)",
-      price: "₴ 850",
-      image:
-        "https://images.unsplash.com/photo-1530124560676-41bc1275d82e?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: 4,
-      name: "Контролер Arduino Uno",
-      price: "₴ 450",
-      image:
-        "https://images.unsplash.com/photo-1553406830-ef2513450d76?q=80&w=400&auto=format&fit=crop",
-    },
-    {
-      id: 5,
-      name: "Реле напруги ZUBR",
-      price: "₴ 1 100",
-      image:
-        "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=400&auto=format&fit=crop",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-[#F8F8F8] text-gray-900 font-manrope">
       <HeroSection />
       <FeaturesSection />
-      <ProductsSection products={products} />
+      <ProductsSection
+        products={products || []}
+        isLoading={isLoading}
+        error={error}
+      />
       <CategoriesSection categories={categories} />
       <StatsSection />
       <BlogSection />

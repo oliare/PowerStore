@@ -16,9 +16,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? limit)
     {
-        var products = await _productService.GetAllAsync();
+        var products = await _productService.GetAllAsync(limit);
         return Ok(products);
     }
 
@@ -28,6 +28,13 @@ public class ProductsController : ControllerBase
         var product = await _productService.GetByIdAsync(id);
         if (product == null) return NotFound();
         return Ok(product);
+    }
+
+    [HttpGet("details/{id}")]
+    public async Task<ActionResult<ProductDetailsDto>> GetProductDetails(Guid id)
+    {
+        var details = await _productService.GetProductDetailsAsync(id);
+        return Ok(details);
     }
 
     [HttpPost]

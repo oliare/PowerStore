@@ -17,9 +17,12 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetAllAsync()
+    public async Task<IEnumerable<ProductDto>> GetAllAsync(int? limit = null)
     {
-        return await _repo.Query()
+        var query = _repo.Query();
+        if (limit.HasValue)  query = query.Take(limit.Value);
+
+        return await query
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
@@ -30,6 +33,28 @@ public class ProductService : IProductService
             .Where(p => p.Id == id)
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<ProductDetailsDto> GetProductDetailsAsync(Guid id)
+    {
+        var product = await _repo.Query()
+            .Include(p => p.Category)
+            .Include(p => p.Images)
+            .FirstOrDefaultAsync(p => p.Id == id)
+            ?? throw new KeyNotFoundException("Товар не знайдено");
+
+        var relatedProducts = await _repo.Query()
+            .Where(p => p.CategoryId == product.CategoryId && p.Id != id)
+            .OrderByDescending(p => p.CreatedAt)
+            .Take(4)
+            .Include(p => p.Images)
+            .ToListAsync();
+
+        return new ProductDetailsDto
+        {
+            Product = _mapper.Map<ProductDto>(product),
+            RelatedProducts = _mapper.Map<List<ProductDto>>(relatedProducts)
+        };
     }
 
     public async Task<ProductDto> CreateAsync(ProductCreateDto dto)

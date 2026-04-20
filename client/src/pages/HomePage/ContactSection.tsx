@@ -1,5 +1,5 @@
 import { MapPin, PhoneCall, Mail } from "lucide-react";
-import { MailingSection } from "./mailingSection";
+import { MailingSection } from "./MailingSection";
 
 export const ContactSection = () => {
   return (
@@ -43,7 +43,7 @@ export const ContactSection = () => {
               <h4 className="text-xs font-medium uppercase text-gray-400 tracking-widest">
                 Гаряча лінія 24/7
               </h4>
-              <p className="text-lg font-black text-brand-primary mt-0.5">
+              <p className="text-gray-900 font-semibold mt-0.5">
                 +380 (97) 123 45 67
               </p>
             </div>

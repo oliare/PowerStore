@@ -38,7 +38,7 @@ export const CategoriesSection = ({
               <div
                 className="bg-white p-4 py-6 rounded-md shadow-sm border border-gray-100 transition-all 
                       hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 
-                      hover:border-brand-primary/70 text-center flex flex-col w-full h-full"
+                      hover:border-brand-primary/70 text-center flex flex-col w-full h-full z-10"
               >
                 <div className="aspect-square w-full flex items-center justify-center text-white mx-auto mb-4 overflow-hidden">
                   <img
