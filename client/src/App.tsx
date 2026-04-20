@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "./store/store";
 import { closeAuthModal } from "./store/uiSlice";
 import { CartSidebar } from "./common/CartSidebar";
+import { WishlistPage } from "./pages/WishlistPage";
+import { CartPage } from "./pages/CartPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -31,6 +33,8 @@ function App() {
           <Route path="product/:id" element={<ProductDetailsPage />} />
 
           <Route element={<ProtectedRoute />}>
+            <Route path="wishlist" element={<WishlistPage />} />
+            <Route path="cart" element={<CartPage />} />
             <Route path="profile" element={<UserProfilePage />} />
             <Route path="history" element={<OrderHistoryPage />} />
           </Route>
