@@ -4,16 +4,35 @@ import { Eye, EyeOffIcon, Loader2 } from "lucide-react";
 import { useLoginMutation } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../../types/user/auth";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../store/authSlice";
 import { MailingSection } from "../HomePage/MailingSection";
 import { baseApi } from "../../api/baseApi";
+import type { RootState } from "../../store/store";
+import { useSyncCartMutation } from "../../services/cartApi";
+import { setCartItems } from "../../store/cartSlice";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [login, { isLoading, error }] = useLoginMutation();
   const [form] = Form.useForm();
+  const { items } = useSelector((state: RootState) => state.cart);
+  const [syncCart] = useSyncCartMutation();
+
+  const onFinish = async (values: LoginRequest) => {
+    try {
+      const result = await login(values).unwrap();
+      dispatch(setCredentials({ accessToken: result.accessToken }));
+      console.log("SYNC ITEMS:", items);
+      const cart = await syncCart({ items }).unwrap();
+      dispatch(setCartItems(cart));
+      navigate("/");
+      dispatch(baseApi.util.invalidateTags(["User"]));
+    } catch (err) {
+      console.error("Login Error:", err);
+    }
+  };
 
   const commonInputStyle: React.CSSProperties = {
     fontFamily: "Montserrat, sans-serif",
@@ -25,21 +44,6 @@ export const LoginPage = () => {
     transition: "all 0.2s ease-in-out",
 
     outline: "none",
-  };
-
-  const onFinish = async (values: LoginRequest) => {
-    try {
-      const result = await login(values).unwrap();
-      dispatch(setCredentials({ accessToken: result.accessToken }));
-      console.log(
-        "Login successful, token stored in Redux:",
-        result.accessToken,
-      );
-      navigate("/");
-      dispatch(baseApi.util.invalidateTags(["User"]));
-    } catch (err) {
-      console.error("Login Error:", err);
-    }
   };
 
   return (

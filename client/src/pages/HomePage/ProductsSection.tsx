@@ -13,6 +13,7 @@ import { openAuthModal } from "../../store/uiSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../store/store";
 import { addToCart } from "../../store/cartSlice";
+import type { CartItemDto } from "../../types/user/cart";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -56,10 +57,28 @@ export const ProductsSection = ({
   ) => {
     e.preventDefault();
     e.stopPropagation();
-
-    dispatch(addToCart(product));
+    handleAddToCart(product, 1);
   };
-  
+
+  const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
+    const image =
+      product.images && product.images.length > 0
+        ? product.images[0].image
+        : "";
+
+    const finalImage = product.image || image;
+
+    const item: CartItemDto = {
+      productId: product.id,
+      productName: product.name,
+      productImage: finalImage,
+      price: product.price,
+      quantity: selectedQuantity,
+    };
+
+    dispatch(addToCart(item));
+  };
+
   return (
     <section className="relative">
       <div className="absolute top-0 -right-0">

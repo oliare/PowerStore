@@ -6,6 +6,7 @@ import { MailingSection } from "./HomePage/MailingSection";
 import type { ProductDto } from "../types/user/product";
 import { addToCart } from "../store/cartSlice";
 import { useDispatch } from "react-redux";
+import type { CartItemDto } from "../types/user/cart";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
@@ -31,8 +32,23 @@ const ProductDetailsPage = () => {
 
   const { product, relatedProducts } = data;
 
-  const handleAddToCart = (product: ProductDto) => {
-    dispatch(addToCart(product));
+  const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
+    const image =
+      product.images && product.images.length > 0
+        ? product.images[0].image
+        : "";
+
+    const finalImage = product.image || image;
+
+    const item: CartItemDto = {
+      productId: product.id,
+      productName: product.name,
+      productImage: finalImage,
+      price: product.price,
+      quantity: selectedQuantity,
+    };
+
+    dispatch(addToCart(item));
   };
 
   return (
@@ -144,7 +160,7 @@ const ProductDetailsPage = () => {
               </div>
 
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={() => handleAddToCart(product, quantity)}
                 className="flex-1 h-12 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
               >
                 Покласти в кошик <ShoppingCart size={18} />

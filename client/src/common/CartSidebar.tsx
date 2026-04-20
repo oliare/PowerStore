@@ -6,15 +6,11 @@ import { removeFromCart } from "../store/cartSlice";
 import { closeCartSidebar } from "../store/uiSlice";
 import type { RootState } from "../store/store";
 
-interface CartSidebarProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
+export const CartSidebar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { items } = useSelector((state: RootState) => state.cart);
+  const { isCartSidebarOpen } = useSelector((state: RootState) => state.ui);
 
   const totalPrice = items.reduce(
     (sum: number, item: { price: number; quantity: number }) =>
@@ -62,31 +58,30 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
           </span>
         </div>
       }
-
       placement="right"
-      onClose={onClose}
-      open={isOpen}
+      onClose={() => dispatch(closeCartSidebar())}
+      open={isCartSidebarOpen}
       width={400}
       closeIcon={<X size={24} className="text-gray-900" />}
     >
       <div className="flex flex-col h-full font-manrope">
         <div className="flex-grow overflow-y-auto pr-2 space-y-6">
           {items.map((item) => (
-            <div key={item.id} className="flex gap-4 items-center group">
+            <div key={item.productId} className="flex gap-4 items-center group">
               <div className="w-20 h-20 bg-brand-primary/5 rounded-xl border border-gray-200 flex-shrink-0 p-2">
                 <img
                   src={
-                    item.images && item.images.length > 0
-                      ? item.images[0].image
+                    item.productImage
+                      ? item.productImage
                       : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsrGS4gCi1t_OKtlUFXwoXq0Z1yJBkNagHOsgoPa1N-A&s"
                   }
-                  alt={item.name}
+                  alt={item.productName}
                   className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-all"
                 />
               </div>
               <div className="flex-grow">
                 <h4 className="font-semibold text-gray-900 text-sm line-clamp-1">
-                  {item.name}
+                  {item.productName}
                 </h4>
                 <p className="text-gray-500 text-xs mt-1">
                   {item.quantity}x
@@ -96,7 +91,7 @@ export const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                 </p>
               </div>
               <button
-                onClick={() => dispatch(removeFromCart(item.id))}
+                onClick={() => dispatch(removeFromCart(item.productId))}
                 className="p-1.5 rounded-full border border-gray-100 text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
               >
                 <X size={16} />

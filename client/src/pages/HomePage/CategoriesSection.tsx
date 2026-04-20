@@ -58,7 +58,7 @@ export const CategoriesSection = ({
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_1.5fr_2fr] gap-4 mt-24 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_3fr] gap-4 mt-24 py-12">
           <img
             src="electrical-goods_1.png"
             alt="Electrical Goods 1"
@@ -67,13 +67,13 @@ export const CategoriesSection = ({
           <img
             src="electrical-goods_2.png"
             alt="Electrical Goods 2"
-            className="rounded h-full object-cover md:pr-8 mx-auto"
+            className="rounded h-full mx-auto"
           />
-          <div className="flex flex-col justify-between gap-4  z-10">
+          <div className="flex flex-col justify-between gap-4 z-10 pl-6">
             <p className="text-3xl md:text-4xl font-bold text-gray-950 mb-4 leading-tight md:leading-[1.3]">
               Нам довіряють: 100% Перевірений магазин
             </p>
-            <p className="flex gap-3">
+            <div className="flex gap-3">
               <Check
                 color="white"
                 className="bg-brand-primary rounded-full w-7 min-w-[1.5rem] p-1"
@@ -85,8 +85,8 @@ export const CategoriesSection = ({
                   безпеки. Гарантія на кожен прилад.
                 </span>
               </p>
-            </p>
-            <p className="flex gap-3">
+            </div>
+            <div className="flex gap-3">
               <Check
                 color="white"
                 className="bg-brand-primary rounded-full w-7 min-w-[1.5rem] p-1"
@@ -98,7 +98,7 @@ export const CategoriesSection = ({
                   проконсультують щодо підключення у будь-який час.
                 </span>
               </p>
-            </p>
+            </div>
             <button className="flex items-center justify-start gap-3 px-8 py-2 mt-4 w-min min-w-max rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
               <span className="text-white font-semibold ">До покупок</span>
               <ArrowRight
