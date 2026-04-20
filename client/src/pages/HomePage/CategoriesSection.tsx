@@ -36,7 +36,7 @@ export const CategoriesSection = ({
           {categories.map((cat, index) => (
             <div key={index} className="group cursor-pointer flex">
               <div
-                className="bg-white p-4 py-6 rounded-md shadow-sm border border-gray-100 transition-all 
+                className="bg-white p-4 py-6 rounded-lg shadow-sm border border-gray-100 transition-all 
                       hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 
                       hover:border-brand-primary/70 text-center flex flex-col w-full h-full z-10"
               >

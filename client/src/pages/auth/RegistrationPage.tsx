@@ -1,6 +1,6 @@
 import { Input, Form, ConfigProvider } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
-import { MailingSection } from "../HomePage/mailingSection";
+import { MailingSection } from "../HomePage/MailingSection";
 import { Eye, EyeOffIcon } from "lucide-react";
 
 export const RegistrationPage = () => {

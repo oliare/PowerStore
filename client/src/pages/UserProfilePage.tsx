@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table, Input } from "antd";
 import { User, Mail, Calendar, Phone, SquarePen } from "lucide-react";
 import { ProfileSidebar } from "../common/ProfileSidebar";
-import { MailingSection } from "./HomePage/mailingSection";
+import { MailingSection } from "./HomePage/MailingSection";
 
 export const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);

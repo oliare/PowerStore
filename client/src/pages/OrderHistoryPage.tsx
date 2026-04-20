@@ -1,6 +1,6 @@
 import { Table } from "antd";
 import { ProfileSidebar } from "../common/ProfileSidebar";
-import { MailingSection } from "./HomePage/mailingSection";
+import { MailingSection } from "./HomePage/MailingSection";
 
 export const OrderHistoryPage = () => {
   const dataSource = [

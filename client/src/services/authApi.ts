@@ -1,11 +1,11 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import type { LoginRequest, LoginResponse, RegisterRequest } from "../types/user/auth";
-import { createBaseQuery } from "../api/api";
+import type {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+} from "../types/user/auth";
+import { baseApi } from "../api/baseApi";
 
-export const authApi = createApi({
-  reducerPath: "authApi",
-  baseQuery: createBaseQuery,
-  tagTypes: ["Auth"],
+export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     register: builder.mutation<void, RegisterRequest>({
       query: (userRegister) => ({
@@ -22,7 +22,7 @@ export const authApi = createApi({
         method: "POST",
         body: loginCredentials,
       }),
-      invalidatesTags: ["Auth"],
+      invalidatesTags: ["Auth", "User"],
     }),
   }),
 });

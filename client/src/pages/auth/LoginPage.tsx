@@ -1,12 +1,13 @@
 import { Input, Form, ConfigProvider } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
-import { MailingSection } from "../HomePage/mailingSection";
 import { Eye, EyeOffIcon, Loader2 } from "lucide-react";
 import { useLoginMutation } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
 import type { LoginRequest } from "../../types/user/auth";
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/authSlice";
+import { MailingSection } from "../HomePage/MailingSection";
+import { baseApi } from "../../api/baseApi";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -30,8 +31,12 @@ export const LoginPage = () => {
     try {
       const result = await login(values).unwrap();
       dispatch(setCredentials({ accessToken: result.accessToken }));
-      console.log("Login successful, token stored in Redux:", result.accessToken);
+      console.log(
+        "Login successful, token stored in Redux:",
+        result.accessToken,
+      );
       navigate("/");
+      dispatch(baseApi.util.invalidateTags(["User"]));
     } catch (err) {
       console.error("Login Error:", err);
     }

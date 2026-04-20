@@ -1,11 +1,7 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { createBaseQuery } from "../api/api";
 import type { ProductDetailsDto, ProductDto } from "../types/user/product";
+import { baseApi } from "../api/baseApi";
 
-export const productApi = createApi({
-  reducerPath: "productApi",
-  baseQuery: createBaseQuery,
-  tagTypes: ["Products"],
+export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<ProductDto[], { limit: number }>({
       query: ({ limit }) => `/Products?limit=${limit}`,

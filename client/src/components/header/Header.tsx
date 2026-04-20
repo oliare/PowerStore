@@ -146,7 +146,7 @@ export default function Header() {
           isScrolled ? "fixed top-0 left-0 w-full shadow-md" : "relative"
         }`}
       >
-        <div className="max-w-7xl mx-auto h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto h-20 flex items-center justify-between px-4">
           <Link to={"/"}>
             <div className="flex items-center gap-2">
               <img
@@ -192,7 +192,7 @@ export default function Header() {
             : "relative"
         }`}
       >
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
           <ul className="flex gap-9">
             <li>
               <Link to={"/"}>Головна</Link>
