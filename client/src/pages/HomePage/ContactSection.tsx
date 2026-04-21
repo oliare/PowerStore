@@ -3,8 +3,8 @@ import { MailingSection } from "./MailingSection";
 
 export const ContactSection = () => {
   return (
-    <div className="">
-      <section className="bg-white py-12 px-4 border-t border-gray-100">
+    <>
+      <section className="bg-white py-12 px-4 border-t border-gray-100 font-montserrat">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="flex flex-col items-center justify-center gap-5 p-6 text-center">
             <div className="relative w-[60px] overflow-hidden rounded-xl transition-transform duration-300 group-hover:-translate-y-1">
@@ -73,6 +73,6 @@ export const ContactSection = () => {
       </section>
 
       <MailingSection />
-    </div>
+    </>
   );
 };

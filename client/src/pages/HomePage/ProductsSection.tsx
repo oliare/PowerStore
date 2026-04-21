@@ -65,7 +65,7 @@ export const ProductsSection = ({
   };
 
   return (
-    <section className="relative">
+    <section className="relative font-montserrat">
       <div className="absolute top-0 -right-0">
         <img
           src="horizontal.svg"
@@ -76,7 +76,7 @@ export const ProductsSection = ({
 
       <div className="max-w-7xl mx-auto px-4 py-12 mb-6">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold z-10">Рекомендовані товари</h2>
+          <h2 className="text-3xl font-semibold z-10">Рекомендовані товари</h2>
           {!isLoading && !error && (
             <Link
               to="/products"
@@ -143,7 +143,7 @@ export const ProductsSection = ({
                           <p className="text-[18px] font-semibold font-manrope text-black">
                             ₴ {product.price}
                           </p>
-                          <p className="text-xs text-brand-accent font-semibold">
+                          <p className="text-xs text-brand-accent font-medium">
                             В наявності
                           </p>
                         </div>

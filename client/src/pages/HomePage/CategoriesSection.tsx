@@ -11,7 +11,7 @@ export const CategoriesSection = ({
   categories: Category[];
 }) => {
   return (
-    <section className="bg-brand-bg relative overflow-hidden">
+    <section className="bg-brand-bg relative overflow-hidden font-montserrat">
       <div className="absolute top-36 left-10 text-[#c5d4f0] blur-[0.7px] -rotate-12 pointer-events-none">
         <Wrench size={120} strokeWidth={0.5} />
       </div>
@@ -26,7 +26,7 @@ export const CategoriesSection = ({
       </div>
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold">Популярні категорії</h2>
+          <h2 className="text-3xl font-semibold">Популярні категорії</h2>
           <button className="flex gap-2 text-brand-primary font-semibold hover:underline z-10">
             Переглянути всі
             <ArrowRight />
@@ -47,10 +47,10 @@ export const CategoriesSection = ({
                     className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105"
                   />
                 </div>
-                <p className="font-bold text-gray-800 leading-tight flex-grow flex items-center justify-center">
+                <p className="font-semibold mt-2 text-gray-800 leading-tight flex-grow flex items-center justify-center">
                   {cat.name}
                 </p>
-                <p className="font-medium text-xs text-gray-500 tracking-wide mt-auto pt-2">
+                <p className="font-normal text-xs text-gray-600 tracking-wide mt-auto pt-2">
                   10 Товарів
                 </p>
               </div>
@@ -70,7 +70,7 @@ export const CategoriesSection = ({
             className="rounded h-full mx-auto"
           />
           <div className="flex flex-col justify-between gap-4 z-10 pl-6">
-            <p className="text-3xl md:text-4xl font-bold text-gray-950 mb-4 leading-tight md:leading-[1.3]">
+            <p className="text-3xl md:text-4xl font-semibold text-gray-950 mb-4 leading-tight md:leading-[1.3]">
               Нам довіряють: 100% Перевірений магазин
             </p>
             <div className="flex gap-3">

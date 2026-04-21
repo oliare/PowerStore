@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../services/productApi";
-import { ShoppingCart, Star, Heart, Plus, Minus } from "lucide-react";
+import { ShoppingCart, Star, Plus, Minus } from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
 import type { ProductDto } from "../types/user/product";
 import { addToCart } from "../store/cartSlice";
 import { useDispatch } from "react-redux";
 import type { CartItemDto } from "../types/user/cart";
+import { FavoriteButton } from "../common/FavoriteButton";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
@@ -57,16 +58,6 @@ const ProductDetailsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex md:flex-col gap-3 order-2 md:order-1">
-              <button
-                onClick={() => setActiveImage(product.image || null)}
-                className={`w-20 h-20 border-2 rounded-xl p-1 transition-all ${activeImage === product.image ? "border-brand-primary" : "border-gray-100"}`}
-              >
-                <img
-                  src={product.image}
-                  alt="main"
-                  className="w-full h-full object-contain"
-                />
-              </button>
               {product.images?.map((img) => (
                 <button
                   key={img.id}
@@ -75,13 +66,13 @@ const ProductDetailsPage = () => {
                 >
                   <img
                     src={img.image}
-                    alt="thumb"
-                    className="w-full h-full object-contain"
+                    alt={product.name}
+                    className="w-full h-full object-contain rounded-lg"
                   />
                 </button>
               ))}
             </div>
-            <div className="flex-1 bg-white rounded-3xl border border-gray-100 p-8 flex items-center justify-center order-1 md:order-2">
+            <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-8 flex items-center justify-center order-1 md:order-2">
               <img
                 src={activeImage || ""}
                 alt={product.name}
@@ -117,7 +108,7 @@ const ProductDetailsPage = () => {
               </span>
             </div>
 
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
+            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
               {/* <span className="text-gray-400 line-through text-lg font-light">
                 ₴{oldPrice}
               </span> */}
@@ -140,8 +131,8 @@ const ProductDetailsPage = () => {
               {product.description || "Опис відсутній"}
             </p>
 
-            <div className="flex items-center gap-3 py-6 border-t border-b border-gray-100 mb-8">
-              <div className="flex items-center border border-gray-200 rounded-full h-12 bg-white">
+            <div className="flex items-center gap-3 py-6 border-t border-b border-gray-200 mb-8">
+              <div className="flex items-center border border-gray-200 rounded-full h-11 bg-white">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-10 flex justify-center text-gray-400 hover:text-black"
@@ -161,17 +152,14 @@ const ProductDetailsPage = () => {
 
               <button
                 onClick={() => handleAddToCart(product, quantity)}
-                className="flex-1 h-12 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
+                className="flex-1 h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
               >
                 Покласти в кошик <ShoppingCart size={18} />
               </button>
 
-              <button className="w-12 h-12 flex items-center justify-center rounded-full text-gray-400 border border-gray-300 hover:bg-brand-primary hover:border-brand-primary hover:text-white transition-all group">
-                <Heart
-                  size={20}
-                  className="transition-colors group-hover:fill-white"
-                />
-              </button>
+              <div className="flex gap-2">
+                <FavoriteButton product={product} className="" />
+              </div>
             </div>
 
             <div className="text-sm space-y-2">

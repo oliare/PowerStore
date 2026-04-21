@@ -42,7 +42,7 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8F8F8] text-gray-900 font-manrope">
+    <div className="min-h-screen bg-[#F8F8F8] text-gray-900 font-montserrat">
       <HeroSection />
       <FeaturesSection />
       <ProductsSection

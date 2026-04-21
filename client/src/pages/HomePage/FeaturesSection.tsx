@@ -25,7 +25,7 @@ export const FeaturesSection = () => {
   ];
 
   return (
-    <section className="max-w-7xl mx-auto px-4 py-12 border-b border-gray-300 my-6">
+    <section className="max-w-7xl mx-auto px-4 py-12 border-b border-gray-300 my-6 font-montserrat">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {featureList.map((item, index) => (
           <div
@@ -44,8 +44,10 @@ export const FeaturesSection = () => {
             </div>
 
             <div className="flex flex-col">
-              <p className="text-sm font-bold text-gray-900">{item.title}</p>
-              <p className="text-sm mt-1 text-gray-500 whitespace-nowrap">
+              <p className="text-sm font-semibold text-gray-900">
+                {item.title}
+              </p>
+              <p className="text-[13px] mt-1 text-gray-500 whitespace-nowrap">
                 {item.desc}
               </p>
             </div>

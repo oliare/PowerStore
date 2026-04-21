@@ -42,9 +42,9 @@ export const FavoriteButton = ({
       dispatch(
         toggleFavorites({
           productId: product.id,
-          name: product.name,
-          image: product.image || PLACEHOLDER_IMAGE_URL,
-          price: product.price,
+          productName: product.name,
+          productImage: product.image || PLACEHOLDER_IMAGE_URL,
+          productPrice: product.price,
         } as FavoriteItemDTO),
       );
     }
@@ -55,7 +55,7 @@ export const FavoriteButton = ({
       onClick={handleToggle}
       className={`p-2.5 rounded-full shadow-lg transition-all border border-transparent ${
         isFavorite
-          ? "bg-brand-dark text-white border-brand-dark"
+          ? "bg-brand-primary text-white border-brand-primary"
           : "bg-white text-gray-900 hover:bg-brand-primary hover:text-white"
       } ${className}`}
     >

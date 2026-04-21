@@ -53,8 +53,8 @@ export const CartSidebar = () => {
   return (
     <Drawer
       title={
-        <div className="flex justify-between items-center py-2 font-manrope">
-          <span className="text-xl font-bold text-gray-900">
+        <div className="flex justify-between items-center py-2 font-montserrat">
+          <span className="text-xl font-semibold text-gray-900">
             Кошик ({items.length})
           </span>
         </div>
@@ -65,7 +65,7 @@ export const CartSidebar = () => {
       width={400}
       closeIcon={<X size={24} className="text-gray-900" />}
     >
-      <div className="flex flex-col h-full font-manrope">
+      <div className="flex flex-col h-full font-montserrat">
         <div className="flex-grow overflow-y-auto pr-2 space-y-6">
           {items.map((item) => (
             <div key={item.productId} className="flex gap-4 items-center group">
@@ -84,9 +84,9 @@ export const CartSidebar = () => {
                 <h4 className="font-semibold text-gray-900 text-sm line-clamp-1">
                   {item.productName}
                 </h4>
-                <p className="text-gray-500 text-xs mt-1">
+                <p className="text-gray-500 text-xs mt-1 font-manrope">
                   {item.quantity}x
-                  <span className="font-bold text-gray-900 pl-2">
+                  <span className="text-base font-bold text-gray-900 pl-2">
                     ₴{item.price}
                   </span>
                 </p>
@@ -113,7 +113,7 @@ export const CartSidebar = () => {
               {items.length}{" "}
               {getPlural(items.length, "товар", "товари", "товарів")}
             </span>
-            <span className="font-bold text-xl text-brand-primary">
+            <span className="font-semibold text-xl text-brand-primary font-manrope">
               ₴{totalPrice.toFixed(2)}
             </span>
           </div>

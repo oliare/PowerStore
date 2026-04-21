@@ -30,7 +30,6 @@ const FooterLink = ({
 const CustomFooter = () => {
   return (
     <Footer className="bg-[#1a1a1a] text-gray-400 py-12 px-6 md:px-24 relative overflow-hidden">
-      {/* Декор фону */}
       <div className="absolute top-10 left-[-20px] opacity-[0.03] rotate-12 pointer-events-none">
         <ThunderboltOutlined style={{ fontSize: "180px", color: "#fff" }} />
       </div>

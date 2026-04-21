@@ -26,7 +26,7 @@ export const HeroSection = () => {
     );
 
   return (
-    <section className="bg-brand-bg py-7 relative overflow-hidden">
+    <section className="bg-brand-bg py-7 relative overflow-hidden font-montserrat">
       <div className="absolute top-10 left-[1%] text-[#c5d4f0] blur-[0.7px] rotate-12 pointer-events-none">
         <Drill size={110} strokeWidth={0.5} />
       </div>
@@ -59,25 +59,25 @@ export const HeroSection = () => {
           />
 
           <div className="flex flex-col items-start gap-6 pl-4">
-            <span className="text-brand-primary uppercase font-bold text-sm tracking-widest">
+            <span className="text-brand-primary uppercase font-semibold text-xs tracking-widest">
               Вітаємо в PowerStore
             </span>
-            <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-semibold text-gray-900 leading-tight">
               Все для енергії <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-brand-primary to-gray-900">
                 у вашому домі
               </span>
             </h1>
-            <p className="text-3xl font-semibold text-gray-800">
+            <p className="text-2xl font-semibold text-gray-800">
               Знижки на автоматику до{" "}
               <span className="text-orange-500 font-extrabold">30% OFF</span>
             </p>
-            <p className="text-gray-500 text-lg tracking-wide max-w-md">
+            <p className="text-gray-500 text-md tracking-wide max-w-md">
               Надійне електрообладнання для вашої безпеки. Безкоштовна доставка
               на всі замовлення.
             </p>
             <button className="flex items-center gap-3 px-10 py-2 rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
-              <span className="text-white font-bold text-lg">До покупок</span>
+              <span className="text-white font-semibold text-md">До покупок</span>
               <ArrowRight
                 color="white"
                 className="group-hover:translate-x-2 transition-transform"

@@ -22,7 +22,7 @@ export const StatsSection = () => {
               <span className="text-4xl md:text-5xl text-brand-accent mb-2 transition-transform duration-300 group-hover:scale-110">
                 {stat.value}
               </span>
-              <span className="text-gray-300 text-sm md:text-base font-medium text-center tracking-wider">
+              <span className="mt-3 text-gray-300 text-sm md:text-[15px] font-medium text-center tracking-wider font-montserrat">
                 {stat.label}
               </span>
             </div>

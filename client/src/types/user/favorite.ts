@@ -1,11 +1,10 @@
 export interface FavoriteItemDTO {
   id: string;
   productId: string;
-  name: string;
-  price: number;
-  image: string;
-  stockStatus: "in_stock" | "out_of_stock";
-  createdAt: string;
+  productName: string;
+  productPrice: number;
+  productImage: string;
+  addedAt: string;
 }
 
 export interface ToggleFavoriteRequestDTO {

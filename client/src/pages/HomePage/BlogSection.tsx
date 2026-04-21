@@ -52,7 +52,7 @@ export const BlogSection = () => {
   ];
 
   return (
-    <section className="py-20 relative overflow-hidden">
+    <section className="py-20 relative overflow-hidden font-montserrat">
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('/electricity-bg.svg')]"></div>
 
       <div className="max-w-7xl mx-auto px-4 relative z-10">
@@ -60,7 +60,7 @@ export const BlogSection = () => {
           <span className="text-brand-primary font-bold uppercase tracking-widest text-sm italic">
             Блог
           </span>
-          <h2 className="text-4xl font-black text-gray-900 mt-2">
+          <h2 className="text-4xl font-semibold text-gray-900 mt-2">
             Останні новини
           </h2>
         </div>
@@ -78,10 +78,10 @@ export const BlogSection = () => {
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
                 <div className="absolute bottom-4 left-4 bg-white rounded-lg p-2 px-3 shadow-lg text-center min-w-[55px] z-20">
-                  <span className="block text-lg font-bold leading-none text-gray-900">
+                  <span className="block text-lg font-semibold leading-none text-gray-900">
                     {post.date.split(" ")[0]}
                   </span>
-                  <span className="block text-[10px] uppercase font-bold text-gray-500 mt-1">
+                  <span className="block text-[10px] uppercase font-semibold text-gray-500 mt-1">
                     {post.date.split(" ")[1]}
                   </span>
                 </div>
@@ -100,12 +100,12 @@ export const BlogSection = () => {
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-bold text-gray-950 mb-2 group-hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
+                  <h3 className="text-md font-semibold text-gray-950 mb-2 group-hover:text-brand-primary transition-colors line-clamp-2 leading-snug">
                     {post.title}
                   </h3>
                 </div>
 
-                <button className="flex items-center gap-2 text-brand-primary font-bold text-sm group/btn mt-auto">
+                <button className="flex items-center gap-2 text-brand-primary font-semibold text-sm group/btn mt-auto">
                   Читати далі
                   <ArrowRight
                     size={18}

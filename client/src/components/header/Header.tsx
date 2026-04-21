@@ -18,7 +18,6 @@ import Avatar from "antd/es/avatar/Avatar";
 import type { RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { openCartSidebar } from "../../store/uiSlice";
-import { useGetFavoritesQuery } from "../../services/favoritesApi";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -34,19 +33,10 @@ export default function Header() {
     0,
   );
 
-  const accessToken = useSelector(
-    (state: RootState) => state.account.accessToken,
-  );
   const localFavorites = useSelector(
     (state: RootState) => state.favorites.items,
   );
-  const { data: serverFavorites = [] } = useGetFavoritesQuery(undefined, {
-    skip: !accessToken,
-  });
-
-  const favoritesCount = accessToken
-    ? serverFavorites.length
-    : localFavorites.length;
+  const totalFavorites = localFavorites.length || 0;
 
   const getInitials = () => {
     if (!user) return "";
@@ -70,26 +60,34 @@ export default function Header() {
   const userMenuItems: MenuProps["items"] = [
     {
       key: "profile",
-      label: <Link to="/profile">Мій профіль</Link>,
-      icon: <Settings size={16} />,
+      label: (
+        <Link className="font-montserrat" to="/profile">
+          Мій профіль
+        </Link>
+      ),
+      icon: <Settings className="text-gray-500" size={16} />,
     },
     {
       type: "divider",
     },
     {
       key: "logout",
-      label: "Вийти",
-      icon: <LogOut size={16} />,
-      danger: true,
+      label: (
+        <span className="font-montserrat text-red-600/80 group-hover:text-red-600">
+          Вийти
+        </span>
+      ),
+      icon: <LogOut size={16} className="text-red-600/80" />,
+      className: "hover:!bg-red-50",
       onClick: handleLogout,
     },
   ];
 
   return (
-    <header className="w-full text-sm">
+    <header className="w-full text-sm font-medium">
       <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-2 text-gray-500 font-normal">
             <MapPin size={16} />
             <p>Розташування: Рівне, Україна</p>
           </div>
@@ -99,7 +97,7 @@ export default function Header() {
               <Select
                 defaultValue="Укр"
                 bordered={false}
-                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:shadow-none [&_.ant-select-selector]:bg-transparent"
+                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:shadow-none [&_.ant-select-selector]:bg-transparent text-gray-500 font-normal font-montserrat"
               >
                 <Select.Option value="ukraine">Eng</Select.Option>
                 <Select.Option value="poland">Укр</Select.Option>
@@ -108,7 +106,7 @@ export default function Header() {
               <Select
                 defaultValue="UAH"
                 bordered={false}
-                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:bg-transparent"
+                className="w-fit [&_.ant-select-selector]:border-none [&_.ant-select-selector]:bg-transparent text-gray-500 font-normal font-montserrat"
               >
                 <Select.Option value="UAH">ГРН</Select.Option>
                 <Select.Option value="USD">USD</Select.Option>
@@ -202,9 +200,9 @@ export default function Header() {
               className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
               <HeartIcon size={24} strokeWidth={1.5} />
-              {favoritesCount > 0 && (
+              {totalFavorites > 0 && (
                 <span className="absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
-                  {favoritesCount}
+                  {totalFavorites}
                 </span>
               )}
             </button>
@@ -223,7 +221,7 @@ export default function Header() {
             </button>
             <div className="flex flex-col leading-tight">
               <p className="text-xs text-gray-500">Кошик:</p>
-              <p className="text-base font-semibold text-black">
+              <p className="text-base font-semibold text-black font-manrope">
                 ₴ {totalPrice.toFixed(2)}
               </p>
             </div>
@@ -243,11 +241,21 @@ export default function Header() {
             <li>
               <Link to={"/"}>Головна</Link>
             </li>
-            <li>Магазин</li>
-            <li>Сторінки</li>
-            <li>Блог</li>
-            <li>Про нас</li>
-            <li>Контакти</li>
+            <li>
+              <Link to={"/shop"}>Магазин</Link>
+            </li>
+            <li>
+              <Link to={"/pages"}>Сторінки</Link>
+            </li>
+            <li>
+              <Link to={"/blog"}>Блог</Link>
+            </li>
+            <li>
+              <Link to={"/about"}>Про нас</Link>
+            </li>
+            <li>
+              <Link to={"/contact"}>Контакти</Link>
+            </li>
           </ul>
           <div className="flex items-center gap-3">
             <Phone size={20} />
