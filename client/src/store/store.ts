@@ -1,9 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./authSlice";
 import { baseApi } from "../api/baseApi";
+import { localStorageMiddleware } from "./middleware";
+import userReducer from "./authSlice";
 import uiReducer from "./uiSlice";
 import cartReducer from "./cartSlice";
-import { localStorageMiddleware } from "./middleware";
+import favoritesReducer from "./favoriteSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     [baseApi.reducerPath]: baseApi.reducer,
     ui: uiReducer,
     cart: cartReducer,
+    favorites: favoritesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware, localStorageMiddleware),

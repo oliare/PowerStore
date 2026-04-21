@@ -11,6 +11,8 @@ import { baseApi } from "../../api/baseApi";
 import type { RootState } from "../../store/store";
 import { useSyncCartMutation } from "../../services/cartApi";
 import { setCartItems } from "../../store/cartSlice";
+import { useSyncFavoritesMutation } from "../../services/favoritesApi";
+import { setFavoriteItems } from "../../store/favoriteSlice";
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -19,14 +21,24 @@ export const LoginPage = () => {
   const [form] = Form.useForm();
   const { items } = useSelector((state: RootState) => state.cart);
   const [syncCart] = useSyncCartMutation();
+  const { items: favorites } = useSelector(
+    (state: RootState) => state.favorites,
+  );
+  const [syncFavorites] = useSyncFavoritesMutation();
 
   const onFinish = async (values: LoginRequest) => {
     try {
       const result = await login(values).unwrap();
       dispatch(setCredentials({ accessToken: result.accessToken }));
-      console.log("SYNC ITEMS:", items);
+
       const cart = await syncCart({ items }).unwrap();
       dispatch(setCartItems(cart));
+
+      const mergedFavorites = await syncFavorites({
+        productIds: favorites.map((item) => item.productId),
+      }).unwrap();
+      dispatch(setFavoriteItems(mergedFavorites));
+
       navigate("/");
       dispatch(baseApi.util.invalidateTags(["User"]));
     } catch (err) {

@@ -10,7 +10,7 @@ import {
   User,
 } from "lucide-react";
 import Select from "antd/es/select";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useGetMeQuery } from "../../services/userApi";
 import type { MenuProps } from "antd/es/menu/menu";
 import Dropdown from "antd/es/dropdown/dropdown";
@@ -18,12 +18,49 @@ import Avatar from "antd/es/avatar/Avatar";
 import type { RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { openCartSidebar } from "../../store/uiSlice";
+import { useGetFavoritesQuery } from "../../services/favoritesApi";
 
 export default function Header() {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const dispatch = useDispatch();
 
   const { data: user } = useGetMeQuery();
+
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
+  const accessToken = useSelector(
+    (state: RootState) => state.account.accessToken,
+  );
+  const localFavorites = useSelector(
+    (state: RootState) => state.favorites.items,
+  );
+  const { data: serverFavorites = [] } = useGetFavoritesQuery(undefined, {
+    skip: !accessToken,
+  });
+
+  const favoritesCount = accessToken
+    ? serverFavorites.length
+    : localFavorites.length;
+
+  const getInitials = () => {
+    if (!user) return "";
+    return `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 80);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleLogout = () => {
     // dispatch(logOut());
@@ -47,29 +84,6 @@ export default function Header() {
       onClick: handleLogout,
     },
   ];
-
-  const cartItems = useSelector((state: RootState) => state.cart.items);
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-
-  const getInitials = () => {
-    if (!user) return "";
-    return `${user.firstName?.charAt(0) || ""}${user.lastName?.charAt(0) || ""}`.toUpperCase();
-  };
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  console.log("Current user:", user);
 
   return (
     <header className="w-full text-sm">
@@ -183,7 +197,17 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-6">
-            <HeartIcon size={24} strokeWidth={1.5} />
+            <button
+              onClick={() => navigate("/wishlist")}
+              className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
+              <HeartIcon size={24} strokeWidth={1.5} />
+              {favoritesCount > 0 && (
+                <span className="absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
+                  {favoritesCount}
+                </span>
+              )}
+            </button>
             <div className="h-4 w-[1px] bg-gray-300"></div>
 
             <button

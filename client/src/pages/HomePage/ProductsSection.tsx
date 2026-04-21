@@ -1,19 +1,13 @@
-import {
-  ArrowRight,
-  Eye,
-  ShoppingCart,
-  AlertCircle,
-  Heart,
-} from "lucide-react";
+import { ArrowRight, Eye, ShoppingCart, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { ProductDto } from "../../types/user/product";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import type { SerializedError } from "@reduxjs/toolkit/react";
-import { openAuthModal } from "../../store/uiSlice";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../store/store";
+import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
 import type { CartItemDto } from "../../types/user/cart";
+import { FavoriteButton } from "../../common/FavoriteButton";
+import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -41,15 +35,6 @@ export const ProductsSection = ({
   );
 
   const dispatch = useDispatch();
-  const user = useSelector((state: RootState) => state.account.accessToken);
-
-  const handleHeartClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    if (!user) {
-      dispatch(openAuthModal("Збережіть улюблене"));
-      return;
-    }
-  };
 
   const handleCartClick = (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -137,18 +122,13 @@ export const ProductsSection = ({
                           src={
                             product.images && product.images.length > 0
                               ? product.images[0].image
-                              : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsrGS4gCi1t_OKtlUFXwoXq0Z1yJBkNagHOsgoPa1N-A&s"
+                              : PLACEHOLDER_IMAGE_URL
                           }
                           alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-                          <button
-                            className="bg-white shadow-lg p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors"
-                            onClick={handleHeartClick}
-                          >
-                            <Heart size={18} />
-                          </button>
+                          <FavoriteButton product={product} />
                           <button className="bg-white shadow-lg p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
                             <Eye size={18} />
                           </button>

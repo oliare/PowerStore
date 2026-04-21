@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { removeFromCart } from "../store/cartSlice";
 import { closeCartSidebar } from "../store/uiSlice";
 import type { RootState } from "../store/store";
+import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 
 export const CartSidebar = () => {
   const dispatch = useDispatch();
@@ -73,7 +74,7 @@ export const CartSidebar = () => {
                   src={
                     item.productImage
                       ? item.productImage
-                      : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsrGS4gCi1t_OKtlUFXwoXq0Z1yJBkNagHOsgoPa1N-A&s"
+                      : PLACEHOLDER_IMAGE_URL
                   }
                   alt={item.productName}
                   className="w-full h-full object-cover rounded-md group-hover:scale-105 transition-all"
