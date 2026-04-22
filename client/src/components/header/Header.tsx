@@ -33,10 +33,9 @@ export default function Header() {
     0,
   );
 
-  const localFavorites = useSelector(
-    (state: RootState) => state.favorites.items,
+  const totalFavorites = useSelector(
+    (state: RootState) => state.favorites.items.length,
   );
-  const totalFavorites = localFavorites.length || 0;
 
   const getInitials = () => {
     if (!user) return "";

@@ -2,17 +2,17 @@ import {
   LayoutDashboard,
   History,
   Heart,
-  ShoppingCart,
   LogOut,
+  ShoppingBasket,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { JSX } from "react";
 
 interface NavItemProps {
   icon: JSX.Element;
   label: string;
   active?: boolean;
-  href: string; // Робимо обов'язковим для Link
+  href: string;
 }
 
 const NavItem = ({ icon, label, active = false, href }: NavItemProps) => (
@@ -31,13 +31,15 @@ const NavItem = ({ icon, label, active = false, href }: NavItemProps) => (
   </Link>
 );
 
-export const ProfileSidebar = ({
-  activeKey = "dashboard",
-}: {
-  activeKey?: "dashboard" | "history" | "wishlist" | "cart";
-}) => {
+export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
   return (
-    <aside className="w-full lg:w-1/4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit">
+    <aside
+      className={`w-full lg:w-1/4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden h-fit ${className}`}
+    >
       <h2 className="p-6 text-lg font-semibold border-b border-gray-50 font-montserrat text-gray-900">
         Навігація
       </h2>
@@ -46,29 +48,32 @@ export const ProfileSidebar = ({
           icon={<LayoutDashboard size={20} />}
           label="Панель керування"
           href="/profile"
-          active={activeKey === "dashboard"}
+          active={isActive("/profile")}
         />
         <NavItem
           icon={<History size={20} />}
           label="Історія замовлень"
-          href="/history"
-          active={activeKey === "history"}
+          href="/profile/history"
+          active={isActive("/profile/history")}
         />
         <NavItem
           icon={<Heart size={20} />}
-          label="Улюблені"
-          href="/wishlist"
-          active={activeKey === "wishlist"}
+          label="Список бажань"
+          href="/profile/wishlist"
+          active={isActive("/profile/wishlist")}
         />
         <NavItem
-          icon={<ShoppingCart size={20} />}
+          icon={<ShoppingBasket size={20} />}
           label="Кошик"
-          href="/cart"
-          active={activeKey === "cart"}
+          href="/profile/cart"
+          active={isActive("/profile/cart")}
         />
-        
-        <button className="flex items-center gap-3 px-6 py-4 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all border-l-4 border-transparent mt-2">
-          <LogOut size={20} className="text-gray-400" />
+
+        <button className="flex items-center gap-3 px-6 py-4 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all border-l-4 border-transparent mt-2 group">
+          <LogOut
+            size={20}
+            className="text-gray-400 group-hover:text-red-600 transition-colors"
+          />
           <span>Вийти</span>
         </button>
       </nav>

@@ -6,26 +6,48 @@ import {
   useToggleFavoriteMutation,
 } from "../services/favoritesApi";
 import type { RootState } from "../store/store";
-import { toggleFavorites } from "../store/favoriteSlice";
+import { setFavoriteItems, toggleFavorites } from "../store/favoriteSlice";
 import { MailingSection } from "./HomePage/MailingSection";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
+import { addToCart } from "../store/cartSlice";
+import type { FavoriteItemDTO } from "../types/user/favorite";
 
 export const WishlistPage = () => {
   const dispatch = useDispatch();
   const accessToken = useSelector(
     (state: RootState) => state.account.accessToken,
   );
-  const localItems = useSelector((state: RootState) => state.favorites.items);
+  const items = useSelector((state: RootState) => state.favorites.items);
 
-  const { data: serverItems = [], isLoading } = useGetFavoritesQuery(
-    undefined,
-    {
-      skip: !accessToken,
-    },
-  );
   const [toggleServerFavorites] = useToggleFavoriteMutation();
+  const { data: serverItems, isLoading } = useGetFavoritesQuery(undefined, {
+    skip: !accessToken,
+  });
 
-  const items = accessToken ? serverItems : localItems;
+  if (serverItems && accessToken && items.length !== serverItems.length) {
+    dispatch(setFavoriteItems(serverItems));
+  }
+
+  const handleMoveToCart = (item: FavoriteItemDTO) => {
+    dispatch(
+      addToCart({
+        productId: item.productId,
+        productName: item.productName,
+        productImage: item.productImage,
+        price: item.productPrice,
+        quantity: 1,
+      }),
+    );
+    handleRemove(item);
+  };
+
+  const handleRemove = (item: FavoriteItemDTO) => {
+    dispatch(toggleFavorites(item));
+
+    if (accessToken) {
+      toggleServerFavorites({ productId: item.productId });
+    }
+  };
 
   if (isLoading)
     return (
@@ -64,7 +86,7 @@ export const WishlistPage = () => {
         </h1>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+          <div className="h-[400px] overflow-y-auto">
             <table className="w-full text-left">
               <thead className="border-b border-gray-100 text-gray-400 uppercase text-[11px] tracking-widest">
                 <tr>
@@ -83,11 +105,11 @@ export const WishlistPage = () => {
                       key={item.id}
                       className="group hover:bg-gray-50/50 transition-colors"
                     >
-                      <td className="px-6 py-6 font-semibold">
-                        <div className="flex items-center gap-4">
+                      <td className="px-6 py-4 font-semibold">
+                        <div className="flex items-center gap-5">
                           <img
                             src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                            className="w-16 h-16 object-contain rounded-lg border border-gray-100"
+                            className="w-16 h-16 object-cover rounded-lg border border-gray-100"
                             alt={item.productName}
                           />
                           <span className="text-gray-900">
@@ -105,7 +127,10 @@ export const WishlistPage = () => {
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center justify-end gap-4">
-                          <button className="bg-brand-primary hover:bg-brand-dark text-white px-8 py-2 rounded-full text-sm font-medium transition-colors">
+                          <button
+                            onClick={() => handleMoveToCart(item)}
+                            className="bg-brand-primary hover:bg-brand-dark text-white px-8 py-2 rounded-full text-sm font-medium transition-colors"
+                          >
                             В кошик
                           </button>
                           <button

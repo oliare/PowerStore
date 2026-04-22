@@ -1,10 +1,7 @@
 import { Heart } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorites } from "../store/favoriteSlice";
-import {
-  useGetFavoritesQuery,
-  useToggleFavoriteMutation,
-} from "../services/favoritesApi";
+import { useToggleFavoriteMutation } from "../services/favoritesApi";
 import type { RootState } from "../store/store";
 import type { ProductDto } from "../types/user/product";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
@@ -23,30 +20,30 @@ export const FavoriteButton = ({
   );
 
   const localItems = useSelector((state: RootState) => state.favorites.items);
-  const { data: serverItems = [] } = useGetFavoritesQuery(undefined, {
-    skip: !accessToken,
-  });
-  const [toggleServerFavorites] = useToggleFavoriteMutation();
 
-  const isFavorite = accessToken
-    ? serverItems.some((item) => item.productId === product.id)
-    : localItems.some((item) => item.productId === product.id);
+  const isFavorite = localItems.some((item) => item.productId === product.id);
+
+  const [toggleServerFavorites] = useToggleFavoriteMutation();
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
+    dispatch(
+      toggleFavorites({
+        productId: product.id,
+        productName: product.name,
+        productImage: product.image || PLACEHOLDER_IMAGE_URL,
+        productPrice: product.price,
+      } as FavoriteItemDTO),
+    );
+
     if (accessToken) {
-      await toggleServerFavorites({ productId: product.id }).unwrap();
-    } else {
-      dispatch(
-        toggleFavorites({
-          productId: product.id,
-          productName: product.name,
-          productImage: product.image || PLACEHOLDER_IMAGE_URL,
-          productPrice: product.price,
-        } as FavoriteItemDTO),
-      );
+      try {
+        await toggleServerFavorites({ productId: product.id }).unwrap();
+      } catch (error) {
+        console.error("Failed to sync favorite:", error);
+      }
     }
   };
 
