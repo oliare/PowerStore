@@ -18,6 +18,9 @@ import Avatar from "antd/es/avatar/Avatar";
 import type { RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { openCartSidebar } from "../../store/uiSlice";
+import { useLogoutMutation } from "../../services/authApi";
+import { logOut } from "../../store/authSlice";
+import { baseApi } from "../../api/baseApi";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -25,6 +28,7 @@ export default function Header() {
   const dispatch = useDispatch();
 
   const { data: user } = useGetMeQuery();
+  const [logout] = useLogoutMutation();
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -51,9 +55,16 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleLogout = () => {
-    // dispatch(logOut());
-    // navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      dispatch(logOut());
+      dispatch(baseApi.util.resetApiState());
+      navigate("/login");
+    }
   };
 
   const userMenuItems: MenuProps["items"] = [

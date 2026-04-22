@@ -2,10 +2,9 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phoneNumber: string;
   registrationDate: string;
   updatedAt: string;
   birthDate: string;
-  imageUrl: string | null;
-};
-
+  image: string | null;
+}

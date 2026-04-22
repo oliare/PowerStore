@@ -5,8 +5,12 @@ import {
   LogOut,
   ShoppingBasket,
 } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { JSX } from "react";
+import { logOut } from "../store/authSlice";
+import { useLogoutMutation } from "../services/authApi";
+import { useDispatch } from "react-redux";
+import { baseApi } from "../api/baseApi";
 
 interface NavItemProps {
   icon: JSX.Element;
@@ -33,8 +37,22 @@ const NavItem = ({ icon, label, active = false, href }: NavItemProps) => (
 
 export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
   const location = useLocation();
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [logout] = useLogoutMutation();
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = async () => {
+    try {
+      await logout().unwrap();
+    } catch (err) {
+      console.error("Logout failed:", err);
+    } finally {
+      dispatch(logOut());
+      dispatch(baseApi.util.resetApiState());
+      navigate("/login");
+    }
+  };
 
   return (
     <aside
@@ -69,7 +87,10 @@ export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
           active={isActive("/profile/cart")}
         />
 
-        <button className="flex items-center gap-3 px-6 py-4 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all border-l-4 border-transparent mt-2 group">
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-6 py-4 text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all border-l-4 border-transparent mt-2 group"
+        >
           <LogOut
             size={20}
             className="text-gray-400 group-hover:text-red-600 transition-colors"
