@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { FavoriteItemDTO } from "../types/user/favorite";
+import type { FavoriteItemDTO } from "../types/favorite";
 
 interface FavoritesState {
   items: FavoriteItemDTO[];

@@ -1,4 +1,4 @@
-import type { UserProfile } from "../types/user/user";
+import type { UserProfile } from "../types/user";
 import { baseApi } from "../api/baseApi";
 
 export const usersApi = baseApi.injectEndpoints({

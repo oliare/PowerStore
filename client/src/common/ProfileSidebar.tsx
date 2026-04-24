@@ -11,6 +11,8 @@ import { logOut } from "../store/authSlice";
 import { useLogoutMutation } from "../services/authApi";
 import { useDispatch } from "react-redux";
 import { baseApi } from "../api/baseApi";
+import { clearFavorites } from "../store/favoriteSlice";
+import { clearCart } from "../store/cartSlice";
 
 interface NavItemProps {
   icon: JSX.Element;
@@ -45,6 +47,8 @@ export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
   const handleLogout = async () => {
     try {
       await logout().unwrap();
+      dispatch(clearCart());
+      dispatch(clearFavorites());
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {

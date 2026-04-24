@@ -2,8 +2,58 @@ import { Input, Form, ConfigProvider } from "antd";
 import { Footer, Header } from "antd/es/layout/layout";
 import { MailingSection } from "../HomePage/MailingSection";
 import { Eye, EyeOffIcon } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useRegisterMutation } from "../../services/authApi";
+import type { RegisterRequest } from "../../types/auth";
+import { useDispatch } from "react-redux";
+import { setCredentials } from "../../store/authSlice";
+import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+import { baseApi } from "../../api/baseApi";
 
 export const RegistrationPage = () => {
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/profile";
+
+  const [register, { isLoading }] = useRegisterMutation();
+
+  const onFinish = async (values: RegisterRequest) => {
+    try {
+      const result = await register(values).unwrap();
+      dispatch(setCredentials({ accessToken: result.accessToken }));
+      dispatch(baseApi.util.invalidateTags(["User"]));
+
+      navigate(redirectPath);
+    } catch (err: unknown) {
+      const apiError = err as FetchBaseQueryError;
+
+      const data =
+        apiError?.data && typeof apiError.data === "object"
+          ? (apiError.data as { field?: string; message?: string })
+          : undefined;
+
+      const field = data?.field;
+      const message = data?.message;
+
+      if (field) {
+        const targetField = field.toLowerCase();
+
+        form.setFields([
+          {
+            name: targetField,
+            errors: [message || "Помилка валідації"],
+          },
+        ]);
+
+        setTimeout(() => {
+          form.scrollToField(targetField);
+        }, 0);
+      }
+    }
+  };
+
   const commonInputStyle: React.CSSProperties = {
     fontFamily: "Montserrat, sans-serif",
     width: "100%",
@@ -14,8 +64,6 @@ export const RegistrationPage = () => {
     transition: "all 0.2s ease-in-out",
     outline: "none",
   };
-
-  const [form] = Form.useForm();
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -30,6 +78,12 @@ export const RegistrationPage = () => {
           margin-top: 4px;
           margin-bottom: 10px;
           font-size: 12px;
+        }
+        .form-loading-overlay {
+          pointer-events: none;
+          opacity: 0.6;
+          filter: grayscale(20%);
+          transition: all 0.3s ease;
         }
         .custom-input:focus, .custom-input:hover,
         .custom-input-password:focus-within, .custom-input-password:hover {
@@ -66,7 +120,7 @@ export const RegistrationPage = () => {
               form={form}
               layout="vertical"
               requiredMark={false}
-              onFinish={(values) => console.log("Success:", values)}
+              onFinish={onFinish}
             >
               <div className="grid grid-cols-2 gap-4">
                 <Form.Item
@@ -181,7 +235,7 @@ export const RegistrationPage = () => {
                 />
               </Form.Item>
 
-              <Form.Item
+              {/* <Form.Item
                 name="agreement"
                 valuePropName="checked"
                 rules={[
@@ -213,13 +267,14 @@ export const RegistrationPage = () => {
                     та Політикою конфіденційності
                   </label>
                 </div>
-              </Form.Item>
+              </Form.Item> */}
 
               <button
                 type="submit"
-                className="w-full tracking-wider py-3.5 rounded-full bg-brand-primary text-white font-semibold hover:bg-brand-dark shadow-lg shadow-brand-primary/25 transition-all active:scale-[0.98]"
+                disabled={isLoading}
+                className="w-full tracking-wider py-3.5 rounded-full bg-brand-primary text-white font-semibold hover:bg-brand-dark shadow-lg shadow-brand-primary/25 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Зареєструватися
+                {isLoading ? "Зачекайте..." : "Зареєструватися"}
               </button>
             </Form>
           </ConfigProvider>

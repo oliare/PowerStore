@@ -3,10 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../services/productApi";
 import { ShoppingCart, Star, Plus, Minus } from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
-import type { ProductDto } from "../types/user/product";
+import type { ProductDto } from "../types/product";
 import { addToCart } from "../store/cartSlice";
 import { useDispatch } from "react-redux";
-import type { CartItemDto } from "../types/user/cart";
+import type { CartItemDto } from "../types/cart";
 import { FavoriteButton } from "../common/FavoriteButton";
 
 const ProductDetailsPage = () => {
@@ -54,7 +54,7 @@ const ProductDetailsPage = () => {
 
   return (
     <div className="bg-white font-manrope">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex md:flex-col gap-3 order-2 md:order-1">

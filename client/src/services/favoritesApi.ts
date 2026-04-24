@@ -1,7 +1,7 @@
 import type {
   FavoriteItemDTO,
   ToggleFavoriteRequestDTO,
-} from "../types/user/favorite";
+} from "../types/favorite";
 import { baseApi } from "../api/baseApi";
 
 export const favoritesApi = baseApi.injectEndpoints({

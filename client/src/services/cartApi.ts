@@ -1,5 +1,5 @@
 import { baseApi } from "../api/baseApi";
-import type { CartItemDto, SyncCartDto } from "../types/user/cart"; // імпортуйте SyncCartDto
+import type { CartItemDto, SyncCartDto } from "../types/cart"; // імпортуйте SyncCartDto
 
 export const cartApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -5,7 +5,7 @@ import { addToCart } from "../../store/cartSlice";
 import { useToggleFavoriteMutation } from "../../services/favoritesApi";
 import type { RootState } from "../../store/store";
 import { Heart, Trash2, ArrowLeft, ChevronDown } from "lucide-react";
-import type { FavoriteItemDTO } from "../../types/user/favorite";
+import type { FavoriteItemDTO } from "../../types/favorite";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { useState } from "react";
 

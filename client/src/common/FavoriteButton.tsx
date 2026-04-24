@@ -3,9 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { toggleFavorites } from "../store/favoriteSlice";
 import { useToggleFavoriteMutation } from "../services/favoritesApi";
 import type { RootState } from "../store/store";
-import type { ProductDto } from "../types/user/product";
+import type { ProductDto } from "../types/product";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
-import type { FavoriteItemDTO } from "../types/user/favorite";
+import type { FavoriteItemDTO } from "../types/favorite";
 
 export const FavoriteButton = ({
   product,

@@ -10,7 +10,7 @@ import { setFavoriteItems, toggleFavorites } from "../store/favoriteSlice";
 import { MailingSection } from "./HomePage/MailingSection";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import { addToCart } from "../store/cartSlice";
-import type { FavoriteItemDTO } from "../types/user/favorite";
+import type { FavoriteItemDTO } from "../types/favorite";
 
 export const WishlistPage = () => {
   const dispatch = useDispatch();

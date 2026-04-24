@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using PowerStore.Application.DTOs.Auth;
+using PowerStore.Application.Exceptions;
 using PowerStore.Application.Interfaces;
 using PowerStore.Domain;
 using PowerStore.Domain.Entities;
@@ -24,7 +25,7 @@ public class AuthService : IAuthService
     {
         var exists = await _userManager.FindByEmailAsync(dto.Email);
         if (exists != null)
-            throw new Exception("Email already registered");
+            throw new EmailExistsException(dto.Email, "email");
 
         var user = _mapper.Map<UserEntity>(dto);
         user.UserName = Guid.NewGuid().ToString("N");
@@ -64,5 +65,10 @@ public class AuthService : IAuthService
             AccessToken = token,
             Email = user.Email
         };
+    }
+
+    public Task LogoutAsync(Guid userId)
+    {
+        return Task.CompletedTask;
     }
 }

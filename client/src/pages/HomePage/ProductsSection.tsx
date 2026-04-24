@@ -1,11 +1,11 @@
 import { ArrowRight, Eye, ShoppingCart, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { ProductDto } from "../../types/user/product";
+import type { ProductDto } from "../../types/product";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import type { SerializedError } from "@reduxjs/toolkit/react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
-import type { CartItemDto } from "../../types/user/cart";
+import type { CartItemDto } from "../../types/cart";
 import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 

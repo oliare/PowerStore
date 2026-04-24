@@ -1,7 +1,7 @@
 import { Table } from "antd";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { OrderRecord } from "../../types/user/order";
+import type { OrderRecord } from "../../types/order";
 
 export const ProfileHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");

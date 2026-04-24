@@ -1,13 +1,13 @@
 import type {
+  AuthResponse,
   LoginRequest,
-  LoginResponse,
   RegisterRequest,
-} from "../types/user/auth";
+} from "../types/auth";
 import { baseApi } from "../api/baseApi";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    register: builder.mutation<void, RegisterRequest>({
+    register: builder.mutation<AuthResponse, RegisterRequest>({
       query: (userRegister) => ({
         url: "Auth/register",
         method: "POST",
@@ -16,7 +16,7 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["Auth"],
     }),
 
-    login: builder.mutation<LoginResponse, LoginRequest>({
+    login: builder.mutation<AuthResponse, LoginRequest>({
       query: (loginCredentials) => ({
         url: "Auth/login",
         method: "POST",

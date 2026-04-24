@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PowerStore.API.Middleware;
 using PowerStore.Application.Interfaces;
 using PowerStore.Application.Services;
 using PowerStore.Domain.Entities;
@@ -137,6 +138,7 @@ if (app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 
 app.UseCors("frontend-cors-policy");
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 

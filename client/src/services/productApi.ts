@@ -1,4 +1,4 @@
-import type { ProductDetailsDto, ProductDto } from "../types/user/product";
+import type { ProductDetailsDto, ProductDto } from "../types/product";
 import { baseApi } from "../api/baseApi";
 
 export const productApi = baseApi.injectEndpoints({

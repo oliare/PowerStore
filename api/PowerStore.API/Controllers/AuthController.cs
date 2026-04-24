@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PowerStore.Application.DTOs.Auth;
 using PowerStore.Application.Interfaces;
 
@@ -29,11 +30,12 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
-    //[HttpPost("logout")]
-    //public async Task<IActionResult> Logout()
-    //{
-    //    await _authService.LogoutAsync(Guid.Empty);
+    [Authorize]
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout(Guid userId)
+    {
+        await _authService.LogoutAsync(userId);
 
-    //    return NoContent();
-    //}
+        return Ok(new { message = "Logged out successfully" });
+    }
 }

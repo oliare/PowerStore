@@ -3,7 +3,7 @@ import { Footer, Header } from "antd/es/layout/layout";
 import { Eye, EyeOffIcon, Loader2 } from "lucide-react";
 import { useLoginMutation } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
-import type { LoginRequest } from "../../types/user/auth";
+import type { LoginRequest } from "../../types/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../store/authSlice";
 import { MailingSection } from "../HomePage/MailingSection";

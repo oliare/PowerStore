@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
-import type { AuthState } from "../types/user/auth";
+import type { AuthState } from "../types/auth";
 
 const ACCESS_TOKEN = "accessToken";
 const token = localStorage.getItem(ACCESS_TOKEN);
@@ -30,6 +30,8 @@ const userSlice = createSlice({
 
     logOut: (state) => {
       localStorage.removeItem(ACCESS_TOKEN);
+      localStorage.removeItem(ACCESS_TOKEN);
+      localStorage.removeItem(ACCESS_TOKEN);
 
       state.accessToken = null;
       state.auth = {
@@ -42,7 +44,8 @@ const userSlice = createSlice({
   },
 });
 
-export const getToken = (state: { account: AuthState }) => state.account.accessToken;
+export const getToken = (state: { account: AuthState }) =>
+  state.account.accessToken;
 
 export const { setCredentials, logOut } = userSlice.actions;
 export default userSlice.reducer;
