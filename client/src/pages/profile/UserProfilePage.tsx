@@ -181,7 +181,7 @@ export const UserProfilePage = () => {
               </h2>
               <a
                 href="/profile/history"
-                className="text-brand-primary font-bold hover:text-brand-dark transition-all text-sm flex items-center gap-2"
+                className="text-brand-primary font-semibold hover:text-brand-dark transition-all text-sm flex items-center gap-2"
               >
                 Дивитися всі замовлення
               </a>

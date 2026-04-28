@@ -30,7 +30,16 @@ namespace PowerStore.API.Controllers
         {
             var userId = User.GetUserId();
             await _cartService.SyncCartAsync(userId, dto);
-            var updatedCart = await _cartService.GetCartByUserIdAsync(userId); return Ok(updatedCart);
+            var updatedCart = await _cartService.GetCartByUserIdAsync(userId);
+            return Ok(updatedCart);
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> ClearCart()
+        {
+            var userId = User.GetUserId();
+            await _cartService.ClearCartAsync(userId);
+            return NoContent();
         }
     }
 }

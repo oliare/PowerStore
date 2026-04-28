@@ -1,11 +1,9 @@
-﻿namespace PowerStore.Domain.Enums
+﻿namespace PowerStore.Domain.Enums;
+public enum OrderStatus
 {
-    public enum OrderStatus
-    {
-        Pending,
-        Paid,
-        Shipped,
-        Completed,
-        Cancelled
-    }
+    Pending = 0,
+    Paid = 1,
+    Shipped = 2,
+    Completed = 3,
+    Cancelled = 4,
 }

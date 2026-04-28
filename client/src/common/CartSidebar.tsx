@@ -55,7 +55,7 @@ export const CartSidebar = () => {
       title={
         <div className="flex justify-between items-center py-2 font-montserrat">
           <span className="text-xl font-semibold text-gray-900">
-            Кошик ({items.length})
+            Кошик <span className="font-manrope">({items.length})</span>
           </span>
         </div>
       }
@@ -120,7 +120,11 @@ export const CartSidebar = () => {
 
           <button
             onClick={handleCheckout}
-            className="w-full py-2.5 bg-brand-primary text-white rounded-full font-semibold hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20 active:scale-[0.98]"
+            disabled={items.length === 0}
+            className="w-full py-2.5 bg-brand-primary text-white rounded-full font-semibold 
+             hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20 
+             active:scale-[0.98]
+             disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
           >
             Оформити замовлення
           </button>

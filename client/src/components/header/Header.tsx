@@ -215,7 +215,7 @@ export default function Header() {
             >
               <HeartIcon size={24} strokeWidth={1.5} />
               {totalFavorites > 0 && (
-                <span className="absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
+                <span className="font-manrope absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
                   {totalFavorites}
                 </span>
               )}
@@ -228,7 +228,7 @@ export default function Header() {
             >
               <Handbag size={24} strokeWidth={1.5} />
               {totalItems > 0 && (
-                <span className="absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
+                <span className="font-manrope absolute top-0 right-0 bg-brand-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white translate-x-1/4 -translate-y-1/4">
                   {totalItems}
                 </span>
               )}

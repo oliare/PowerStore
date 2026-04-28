@@ -2,10 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { ArrowLeft, Minus, Plus, ShoppingBag, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MailingSection } from "./HomePage/MailingSection";
 
 export const CartPage = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items } = useSelector((state: RootState) => state.cart);
 
@@ -13,6 +14,10 @@ export const CartPage = () => {
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
+  const handleCheckout = () => {
+    navigate("/checkout");
+  };
 
   if (items.length === 0) {
     return (
@@ -162,7 +167,10 @@ export const CartPage = () => {
               <span className="font-manrope">₴{subtotal.toFixed(2)}</span>
             </div>
 
-            <button className="mt-auto w-full py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]">
+            <button
+              onClick={handleCheckout}
+              className="mt-auto w-full py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]"
+            >
               Оформити замовлення
             </button>
           </div>

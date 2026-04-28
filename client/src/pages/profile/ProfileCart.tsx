@@ -2,10 +2,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { updateQuantity, removeFromCart } from "../../store/cartSlice";
 import { Minus, Plus, Trash2, ShoppingBasket, ArrowLeft } from "lucide-react";
 import type { RootState } from "../../store/store";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 
 export const ProfileCart = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
@@ -18,6 +19,10 @@ export const ProfileCart = () => {
     if (newQuantity >= 1) {
       dispatch(updateQuantity({ productId, quantity: newQuantity }));
     }
+  };
+
+  const handleCheckout = () => {
+    navigate("/checkout");
   };
 
   if (cartItems.length === 0)
@@ -119,7 +124,10 @@ export const ProfileCart = () => {
               ₴{totalPrice.toLocaleString()}
             </p>
           </div>
-          <button className="w-full sm:w-auto px-12 py-2 bg-brand-primary text-white rounded-full font-semibold shadow-xl shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]">
+          <button
+            onClick={handleCheckout}
+            className="w-full sm:w-auto px-12 py-2 bg-brand-primary text-white rounded-full font-semibold shadow-xl shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]"
+          >
             Оформити замовлення
           </button>
         </div>

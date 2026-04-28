@@ -19,6 +19,8 @@ import { CartPage } from "./pages/CartPage";
 import { ProfileLayout } from "./components/layout/ProfileLayout";
 import { ProfileWishlist } from "./pages/profile/ProfileWishlist";
 import { ProfileCart } from "./pages/profile/ProfileCart";
+import { CheckoutPage } from "./pages/CheckoutPage";
+import { OrderSuccessPage } from "./pages/OrderSuccessPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -38,6 +40,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="wishlist" element={<WishlistPage />} />
             <Route path="cart" element={<CartPage />} />
+            <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="order-success" element={<OrderSuccessPage />} />
 
             <Route path="profile" element={<ProfileLayout />}>
               <Route index element={<UserProfilePage />} />

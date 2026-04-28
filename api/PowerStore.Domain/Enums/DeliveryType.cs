@@ -2,6 +2,7 @@
 
 public enum DeliveryType
 {
-    NovaPoshta,
-    Courier,
+    NovaPoshta = 0,
+    UkrPoshta = 1,
+    Courier = 2,
 }

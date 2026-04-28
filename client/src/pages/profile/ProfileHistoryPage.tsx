@@ -1,7 +1,8 @@
 import { Table } from "antd";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { OrderRecord } from "../../types/order";
+import type { OrderDto } from "../../types/order";
+import { OrderStatus } from "../../enums/enum";
 
 export const ProfileHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -14,85 +15,78 @@ export const ProfileHistoryPage = () => {
     expensive: "Найдорожчі",
   };
 
-  const dataSource: OrderRecord[] = [
+  const dataSource: OrderDto[] = [
     {
-      key: "1",
-      id: "#738",
-      date: "2020-09-08",
-      total: 135,
-      items: 5,
-      status: "Обробка",
+      id: 1,
+      orderNumber: "#738",
+      createdAt: "2020-09-08",
+      totalPrice: 135,
+      items: [
+        { productId: "1", quantity: 5, price: 27, productName: "Product 1" },
+      ],
+      status: OrderStatus.Pending,
     },
     {
-      key: "2",
-      id: "#703",
-      date: "2020-05-24",
-      total: 25,
-      items: 1,
-      status: "В дорозі",
+      id: 2,
+      orderNumber: "#703",
+      createdAt: "2020-05-24",
+      totalPrice: 25,
+      items: [
+        { productId: "2", quantity: 1, price: 25, productName: "Product 2" },
+      ],
+      status: OrderStatus.Shipped,
     },
     {
-      key: "3",
-      id: "#130",
-      date: "2020-10-22",
-      total: 250,
-      items: 4,
-      status: "Завершено",
-    },
-    {
-      key: "4",
-      id: "#561",
-      date: "2020-02-01",
-      total: 35,
-      items: 1,
-      status: "Завершено",
-    },
-    {
-      key: "5",
-      id: "#440",
-      date: "2020-01-15",
-      total: 120,
-      items: 2,
-      status: "Скасовано",
+      id: 3,
+      orderNumber: "#130",
+      createdAt: "2020-10-22",
+      totalPrice: 250,
+      items: [],
+      status: OrderStatus.Completed,
     },
   ];
 
   const filteredData = dataSource
     .filter((item) => {
-      if (activeFilter === "active")
-        return item.status === "Обробка" || item.status === "В дорозі";
-      if (activeFilter === "completed") return item.status === "Завершено";
+      if (activeFilter === "active") return item.status === OrderStatus.Pending;
+      if (activeFilter === "completed")
+        return item.status === OrderStatus.Completed;
       return true;
     })
     .sort((a, b) => {
       if (sortBy === "newest")
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       if (sortBy === "oldest")
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      if (sortBy === "expensive") return b.total - a.total;
+        return (
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+      if (sortBy === "expensive") return b.totalPrice - a.totalPrice;
       return 0;
     });
 
   const columns = [
     {
       title: "ID Замовлення",
-      dataIndex: "id",
-      key: "id",
+      dataIndex: "orderNumber",
+      key: "orderNumber",
       className: "text-sm font-semibold text-gray-900",
     },
     {
       title: "Дата",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "createdAt",
+      key: "createdAt",
       render: (date: string) => new Date(date).toLocaleDateString("uk-UA"),
       className: "text-sm text-gray-500",
     },
     {
       title: "Сума",
       key: "total",
-      render: (_: OrderRecord, record: OrderRecord) => (
+      render: (_: number, record: OrderDto) => (
         <span className="font-semibold text-gray-900">
-          ₴{record.total} ({record.items})
+          ₴{record.totalPrice} (
+          {record.items.reduce((acc, item) => acc + item.quantity, 0)})
         </span>
       ),
     },
@@ -100,20 +94,30 @@ export const ProfileHistoryPage = () => {
       title: "Статус",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => {
-        const styles: Record<string, string> = {
-          Обробка: "bg-blue-50 text-blue-600",
-          "В дорозі": "bg-amber-50 text-amber-600",
-          Завершено: "bg-green-50 text-green-600",
-          Скасовано: "bg-red-50 text-red-600",
+      render: (status: OrderStatus) => {
+        const statusLabels: Record<OrderStatus, string> = {
+          [OrderStatus.Pending]: "Обробка",
+          [OrderStatus.Shipped]: "В дорозі",
+          [OrderStatus.Completed]: "Завершено",
+          [OrderStatus.Cancelled]: "Скасовано",
+          [OrderStatus.Paid]: "Оплачено",
         };
+
+        const styles: Record<OrderStatus, string> = {
+          [OrderStatus.Pending]: "bg-blue-50 text-blue-600",
+          [OrderStatus.Shipped]: "bg-amber-50 text-amber-600",
+          [OrderStatus.Completed]: "bg-green-50 text-green-600",
+          [OrderStatus.Cancelled]: "bg-red-50 text-red-600",
+          [OrderStatus.Paid]: "bg-purple-50 text-purple-600",
+        };
+
         return (
           <span
             className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
               styles[status] || "bg-gray-50 text-gray-500"
             }`}
           >
-            {status}
+            {statusLabels[status] || status}
           </span>
         );
       },
@@ -132,6 +136,7 @@ export const ProfileHistoryPage = () => {
 
   return (
     <div className="font-montserrat animate-in fade-in duration-500">
+      {/* Ваш JSX код залишається таким самим */}
       <h1 className="text-2xl font-semibold text-gray-900 mb-8 tracking-tight">
         Історія замовлень
       </h1>
@@ -200,6 +205,7 @@ export const ProfileHistoryPage = () => {
 
       <div className="bg-white rounded-[28px] border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
         <Table
+          rowKey="id"
           dataSource={filteredData}
           columns={columns}
           pagination={{
@@ -209,7 +215,6 @@ export const ProfileHistoryPage = () => {
           rowClassName="group hover:bg-gray-50/50 transition-colors cursor-pointer"
         />
       </div>
-
       <style>{`
         /* Основний шрифт для всієї таблиці та її елементів */
         .ant-table, 

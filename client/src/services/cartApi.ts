@@ -1,22 +1,34 @@
 import { baseApi } from "../api/baseApi";
-import type { CartItemDto, SyncCartDto } from "../types/cart"; // імпортуйте SyncCartDto
+import type { CartItemDto, SyncCartDto } from "../types/cart";
 
 export const cartApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getRemoteCart: builder.query<CartItemDto[], void>({
-      query: () => "/Cart",
+      query: () => "Cart",
       providesTags: ["Cart"],
     }),
 
     syncCart: builder.mutation<CartItemDto[], SyncCartDto>({
       query: (dto) => ({
-        url: "/Cart/sync",
+        url: "Cart/sync",
         method: "POST",
         body: dto,
+      }),
+      invalidatesTags: ["Cart"],
+    }),
+
+    clearCart: builder.mutation<void, void>({
+      query: () => ({
+        url: "Cart/clear",
+        method: "DELETE",
       }),
       invalidatesTags: ["Cart"],
     }),
   }),
 });
 
-export const { useGetRemoteCartQuery, useSyncCartMutation } = cartApi;
+export const {
+  useGetRemoteCartQuery,
+  useSyncCartMutation,
+  useClearCartMutation,
+} = cartApi;
