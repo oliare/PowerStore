@@ -1,4 +1,4 @@
-import { Eye, ShoppingCart } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/cartSlice";
@@ -67,9 +67,6 @@ export const ShopProductGrid = ({
 
                   <div className="absolute top-0 right-0 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
                     <FavoriteButton product={product} />
-                    <button className="bg-white shadow-lg w-10 h-10 p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
-                      <Eye size={20} />
-                    </button>
                   </div>
                 </div>
 

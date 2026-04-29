@@ -1,4 +1,4 @@
-import { ChevronDown, LayoutGrid, List, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2 } from "lucide-react";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { MailingSection } from "./HomePage/MailingSection";
 import { ShopSidebar } from "../common/ShopSidebar";
@@ -13,7 +13,6 @@ export const ShopPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  
   const productsPerPage = 28;
   const { data: products, isLoading } = useGetProductsQuery({
     page: currentPage,
@@ -140,14 +139,6 @@ export const ShopPage = () => {
                           {processedProducts.length}
                         </span>
                       </span>
-                      <div className="flex border rounded-md overflow-hidden bg-white">
-                        <button className="p-2 bg-gray-50 text-brand-primary border-r">
-                          <LayoutGrid size={18} />
-                        </button>
-                        <button className="p-2 text-gray-400 hover:text-brand-primary transition-colors">
-                          <List size={18} />
-                        </button>
-                      </div>
                     </div>
                   </div>
 
