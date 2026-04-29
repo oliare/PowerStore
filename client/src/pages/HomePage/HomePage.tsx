@@ -12,7 +12,10 @@ const HomePage = () => {
     data: products,
     isLoading,
     error,
-  } = useGetProductsQuery({ limit: 5 });
+  } = useGetProductsQuery({
+    page: 1,
+    pageSize: 5,
+  });
 
   const categories = [
     {
@@ -46,7 +49,7 @@ const HomePage = () => {
       <HeroSection />
       <FeaturesSection />
       <ProductsSection
-        products={products || []}
+        products={products?.items || []}
         isLoading={isLoading}
         error={error}
       />

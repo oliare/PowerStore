@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using PowerStore.Application.DTOs.Pagination;
 using PowerStore.Application.DTOs.Product;
 using PowerStore.Application.Interfaces;
 using PowerStore.Domain.Entities;
@@ -17,14 +18,25 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetAllAsync(int? limit = null)
+    public async Task<PagedResponse<ProductDto>> GetAllAsync(int page = 1, int pageSize = 12)
     {
-        var query = _repo.Query();
-        if (limit.HasValue)  query = query.Take(limit.Value);
+        var totalItems = await _repo.Query().CountAsync();
+        var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-        return await query
+        var items = await _repo.Query()
+            .OrderByDescending(p => p.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
+
+        return new PagedResponse<ProductDto>
+        {
+            Items = items,
+            TotalPages = totalPages,
+            CurrentPage = page,
+            TotalItems = totalItems
+        };
     }
 
     public async Task<ProductDto?> GetByIdAsync(Guid id)

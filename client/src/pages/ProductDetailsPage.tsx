@@ -1,7 +1,15 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../services/productApi";
-import { ShoppingCart, Star, Plus, Minus } from "lucide-react";
+import {
+  ShoppingCart,
+  Star,
+  Plus,
+  Minus,
+  ArrowLeft,
+  RefreshCcw,
+  AlertCircle,
+} from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
 import type { ProductDto } from "../types/product";
 import { addToCart } from "../store/cartSlice";
@@ -11,6 +19,7 @@ import { FavoriteButton } from "../common/FavoriteButton";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useGetProductDetailsQuery(id!);
 
@@ -24,12 +33,44 @@ const ProductDetailsPage = () => {
         Завантаження...
       </div>
     );
-  if (error || !data)
+  if (error || !data) {
     return (
-      <div className="p-20 text-center text-red-500 font-bold">
-        Помилка завантаження товару
+      <div className="max-w-7xl mx-auto py-12 min-h-screen">
+        <div className="relative flex flex-col items-center justify-center min-h-[70vh] px-4">
+          <button
+            onClick={() => navigate("/shop")}
+            className="absolute top-0 md:left-4 flex items-center gap-2 text-gray-500 hover:text-brand-primary transition-colors font-medium"
+          >
+            <ArrowLeft size={20} />
+            Назад до магазину
+          </button>
+
+          <div className="flex flex-col items-center text-center max-w-sm">
+            <div className="text-red-400 mb-4">
+              <AlertCircle size={48} strokeWidth={1.5} />
+            </div>
+
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
+              Товар не знайдено
+            </h2>
+
+            <p className="text-sm text-gray-500 mb-8">
+              Не вдалося завантажити дані. Перевірте з'єднання або спробуйте
+              пізніше.
+            </p>
+
+            <button
+              onClick={() => window.location.reload()}
+              className="flex items-center justify-center gap-2 px-8 py-3 bg-brand-primary text-white rounded-full text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
+            >
+              <RefreshCcw size={16} />
+              Оновити сторінку
+            </button>
+          </div>
+        </div>
       </div>
     );
+  }
 
   const { product, relatedProducts } = data;
 
@@ -55,6 +96,13 @@ const ProductDetailsPage = () => {
   return (
     <div className="bg-white font-manrope">
       <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen">
+        <Link
+          to="/shop"
+          className="flex items-center gap-2 text-gray-500 hover:text-brand-primary transition-colors font-medium mb-10"
+        >
+          <ArrowLeft size={20} />
+          Назад до магазину
+        </Link>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex md:flex-col gap-3 order-2 md:order-1">
@@ -74,7 +122,7 @@ const ProductDetailsPage = () => {
             </div>
             <div className="flex-1 bg-white rounded-3xl border border-gray-200 p-8 flex items-center justify-center order-1 md:order-2">
               <img
-                src={activeImage || ""}
+                src={activeImage || product.images?.[0]?.image || ""}
                 alt={product.name}
                 className="max-h-[450px] w-full object-contain"
               />
@@ -91,7 +139,7 @@ const ProductDetailsPage = () => {
               </span>
             </div>
 
-            <div className="flex items-center gap-3 mb-8 text-sm">
+            <div className="flex items-center gap-3 mb-6 text-sm">
               <div className="flex text-orange-400">
                 {[...Array(5)].map((_, i) => (
                   <Star
@@ -102,10 +150,6 @@ const ProductDetailsPage = () => {
                 ))}
               </div>
               <span className="text-gray-500">4 Відгуки</span>
-              <span className="text-gray-300">•</span>
-              <span className="text-gray-500 font-medium">
-                SKU: {product.id.slice(0, 6)}
-              </span>
             </div>
 
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
@@ -127,7 +171,7 @@ const ProductDetailsPage = () => {
               </span>
             </div>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">
               {product.description || "Опис відсутній"}
             </p>
 

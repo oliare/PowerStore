@@ -16,9 +16,12 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(int? limit)
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
     {
-        var products = await _productService.GetAllAsync(limit);
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 12;
+
+        var products = await _productService.GetAllAsync(page, pageSize);
         return Ok(products);
     }
 

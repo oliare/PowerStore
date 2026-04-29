@@ -22,6 +22,7 @@ import { ProfileCart } from "./pages/profile/ProfileCart";
 import { CheckoutPage } from "./pages/CheckoutPage";
 import { OrderSuccessPage } from "./pages/OrderSuccessPage";
 import { ShopPage } from "./pages/ShopPage";
+import { ScrollToTop } from "./common/ScrollToTop";
 
 function App() {
   const dispatch = useDispatch();
@@ -61,6 +62,7 @@ function App() {
         title={authModalTitle}
       />
       <CartSidebar />
+      <ScrollToTop />
     </>
   );
 }

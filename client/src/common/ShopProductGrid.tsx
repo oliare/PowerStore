@@ -62,7 +62,7 @@ export const ShopProductGrid = ({
                   <img
                     src={product.images?.[0]?.image || PLACEHOLDER_IMAGE_URL}
                     alt={product.name}
-                    className="max-h-full max-w-full object-contain group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                   />
 
                   <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">

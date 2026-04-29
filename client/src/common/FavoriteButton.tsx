@@ -50,9 +50,9 @@ export const FavoriteButton = ({
   return (
     <button
       onClick={handleToggle}
-      className={`p-2.5 rounded-full shadow-lg transition-all border border-transparent ${
+      className={`p-2.5 rounded-full transition-all ${
         isFavorite
-          ? "bg-brand-primary text-white border-brand-primary"
+          ? "bg-brand-primary text-white "
           : "bg-white text-gray-900 hover:bg-brand-primary hover:text-white"
       } ${className}`}
     >
