@@ -8,6 +8,7 @@ import { addToCart } from "../../store/cartSlice";
 import type { CartItemDto } from "../../types/cart";
 import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
+import { SkeletonCard } from "../../common/SkeletonCard";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -20,20 +21,6 @@ export const ProductsSection = ({
   isLoading,
   error,
 }: ProductsSectionProps) => {
-  const SkeletonCard = () => (
-    <div className="bg-white p-4 border border-gray-100 rounded-lg animate-pulse">
-      <div className="h-48 bg-gray-200 rounded-xl mb-10"></div>
-      <div className="flex justify-between">
-        <div className="flex flex-col gap-2 w-full">
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-        </div>
-        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-      </div>
-    </div>
-  );
-
   const dispatch = useDispatch();
 
   const handleCartClick = (
@@ -105,7 +92,7 @@ export const ProductsSection = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
             {isLoading
               ? Array.from({ length: 5 }).map((_, i) => (
                   <SkeletonCard key={i} />
@@ -116,7 +103,7 @@ export const ProductsSection = ({
                     key={product.id}
                     className="group"
                   >
-                    <div className="h-full bg-white p-4 border z-10 border-gray-100 rounded-lg shadow-sm transition-all hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 hover:border-brand-primary/70">
+                    <div className="h-full bg-white p-4 border z-10 border-gray-100 rounded-2xl shadow-sm transition-all hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 hover:border-brand-primary/70">
                       <div className="relative h-48 rounded-xl overflow-hidden mb-10 bg-gray-50">
                         <img
                           src={
@@ -140,7 +127,7 @@ export const ProductsSection = ({
                           <p className="text-sm text-gray-700 font-medium transition-colors duration-300 group-hover:text-blue-800/85 line-clamp-2">
                             {product.name}
                           </p>
-                          <p className="text-[18px] font-semibold font-manrope text-black">
+                          <p className="text-lg font-bold text-gray-900 font-manrope">
                             ₴ {product.price}
                           </p>
                           <p className="text-xs text-brand-accent font-medium">

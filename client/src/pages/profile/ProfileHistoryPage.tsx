@@ -136,7 +136,6 @@ export const ProfileHistoryPage = () => {
 
   return (
     <div className="font-montserrat animate-in fade-in duration-500">
-      {/* Ваш JSX код залишається таким самим */}
       <h1 className="text-2xl font-semibold text-gray-900 mb-8 tracking-tight">
         Історія замовлень
       </h1>
@@ -216,7 +215,6 @@ export const ProfileHistoryPage = () => {
         />
       </div>
       <style>{`
-        /* Основний шрифт для всієї таблиці та її елементів */
         .ant-table, 
         .ant-table-container, 
         .ant-table-thead > tr > th, 
@@ -251,7 +249,6 @@ export const ProfileHistoryPage = () => {
           padding: 20px 0;
         }
 
-        /* Стилізація кнопок пагінації, якщо потрібно */
         .ant-pagination-item a, .ant-pagination-item-ellipsis {
           font-family: 'Montserrat', sans-serif !important;
         }
