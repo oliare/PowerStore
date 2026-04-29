@@ -9,6 +9,7 @@ import type { CartItemDto } from "../../types/cart";
 import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { SkeletonCard } from "../../common/SkeletonCard";
+import { showNotify } from "../../utils/showNotify";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -49,6 +50,7 @@ export const ProductsSection = ({
     };
 
     dispatch(addToCart(item));
+    showNotify.success(`"${product.name}" додано до кошика`);
   };
 
   return (
@@ -116,8 +118,8 @@ export const ProductsSection = ({
                         />
                         <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
                           <FavoriteButton product={product} />
-                          <button className="bg-white shadow-lg p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
-                            <Eye size={18} />
+                          <button className="bg-white w-10 h-10 shadow-lg p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
+                            <Eye size={20} />
                           </button>
                         </div>
                       </div>

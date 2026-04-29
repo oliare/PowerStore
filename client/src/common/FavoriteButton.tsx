@@ -6,6 +6,7 @@ import type { RootState } from "../store/store";
 import type { ProductDto } from "../types/product";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import type { FavoriteItemDTO } from "../types/favorite";
+import { showNotify } from "../utils/showNotify";
 
 export const FavoriteButton = ({
   product,
@@ -29,6 +30,12 @@ export const FavoriteButton = ({
     e.preventDefault();
     e.stopPropagation();
 
+    if (isFavorite) {
+      showNotify.warn(`"${product.name}" видалено з обраного`);
+    } else {
+      showNotify.success(`"${product.name}" додано до обраного`);
+    }
+
     dispatch(
       toggleFavorites({
         productId: product.id,
@@ -50,14 +57,14 @@ export const FavoriteButton = ({
   return (
     <button
       onClick={handleToggle}
-      className={`p-2.5 rounded-full transition-all ${
+      className={`p-2.5 rounded-full border border-gray-200 transition-all ${
         isFavorite
           ? "bg-brand-primary text-white "
-          : "bg-white text-gray-900 hover:bg-brand-primary hover:text-white"
+          : "bg-white text-gray-800 hover:bg-brand-primary hover:text-white"
       } ${className}`}
     >
       <Heart
-        size={18}
+        size={22}
         fill={isFavorite ? "currentColor" : "none"}
         className="transition-colors"
       />

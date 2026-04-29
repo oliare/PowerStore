@@ -65,10 +65,10 @@ export const ShopProductGrid = ({
                     className="w-full h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
                   />
 
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                  <div className="absolute top-0 right-0 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
                     <FavoriteButton product={product} />
-                    <button className="bg-white shadow-lg p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
-                      <Eye size={18} />
+                    <button className="bg-white shadow-lg w-10 h-10 p-2.5 rounded-full hover:bg-brand-primary hover:text-white transition-colors">
+                      <Eye size={20} />
                     </button>
                   </div>
                 </div>

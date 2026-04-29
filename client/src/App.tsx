@@ -23,6 +23,8 @@ import { CheckoutPage } from "./pages/CheckoutPage";
 import { OrderSuccessPage } from "./pages/OrderSuccessPage";
 import { ShopPage } from "./pages/ShopPage";
 import { ScrollToTop } from "./common/ScrollToTop";
+import { Toastify } from "./common/CustomToast";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const dispatch = useDispatch();
@@ -63,6 +65,17 @@ function App() {
       />
       <CartSidebar />
       <ScrollToTop />
+      <Toaster position="top-right">
+        {(t) => {
+          const type = (t.className || t.type || "info") as
+            | "success"
+            | "error"
+            | "info"
+            | "warn";
+
+          return <Toastify t={t} message={t.message as string} type={type} />;
+        }}
+      </Toaster>
     </>
   );
 }

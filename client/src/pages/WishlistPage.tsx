@@ -11,6 +11,7 @@ import { MailingSection } from "./HomePage/MailingSection";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import { addToCart } from "../store/cartSlice";
 import type { FavoriteItemDTO } from "../types/favorite";
+import { showNotify } from "../utils/showNotify";
 
 export const WishlistPage = () => {
   const dispatch = useDispatch();
@@ -38,11 +39,16 @@ export const WishlistPage = () => {
         quantity: 1,
       }),
     );
-    handleRemove(item);
+    showNotify.success(`"${item.productName}" перенесено в кошик`);
+    handleRemove(item, false);
   };
 
-  const handleRemove = (item: FavoriteItemDTO) => {
+  const handleRemove = (item: FavoriteItemDTO, showToast = true) => {
     dispatch(toggleFavorites(item));
+
+    if (showToast) {
+      showNotify.warn(`"${item.productName}" видалено з обраного`);
+    }
 
     if (accessToken) {
       toggleServerFavorites({ productId: item.productId });
@@ -134,13 +140,7 @@ export const WishlistPage = () => {
                             В кошик
                           </button>
                           <button
-                            onClick={() =>
-                              accessToken
-                                ? toggleServerFavorites({
-                                    productId: item.productId,
-                                  })
-                                : dispatch(toggleFavorites(item))
-                            }
+                            onClick={() => handleRemove(item)}
                             className="text-gray-300 hover:text-red-500 transition-colors p-1"
                             title="Видалити"
                           >

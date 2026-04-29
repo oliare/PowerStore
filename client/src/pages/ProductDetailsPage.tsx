@@ -16,6 +16,7 @@ import { addToCart } from "../store/cartSlice";
 import { useDispatch } from "react-redux";
 import type { CartItemDto } from "../types/cart";
 import { FavoriteButton } from "../common/FavoriteButton";
+import { showNotify } from "../utils/showNotify";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
@@ -91,6 +92,7 @@ const ProductDetailsPage = () => {
     };
 
     dispatch(addToCart(item));
+    showNotify.success(`"${product.name}" додано до кошика!`);
   };
 
   return (
