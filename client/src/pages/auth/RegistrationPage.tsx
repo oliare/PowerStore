@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { setCredentials } from "../../store/authSlice";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { baseApi } from "../../api/baseApi";
+import { showNotify } from "../../utils/showNotify";
 
 export const RegistrationPage = () => {
   const [form] = Form.useForm();
@@ -22,6 +23,7 @@ export const RegistrationPage = () => {
   const onFinish = async (values: RegisterRequest) => {
     try {
       const result = await register(values).unwrap();
+      showNotify.success("Вітаємо! Ви успішно зареєструвалися.");
       dispatch(setCredentials({ accessToken: result.accessToken }));
       dispatch(baseApi.util.invalidateTags(["User"]));
 

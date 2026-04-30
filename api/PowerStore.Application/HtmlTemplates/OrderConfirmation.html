@@ -1,0 +1,55 @@
+﻿<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<div style='background-color: #E1EEFF; padding: 40px 20px; font-family: "Montserrat", "Segoe UI", sans-serif; color: #0F2854;'>
+    <div style='max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 40, 84, 0.1); border: 1px solid #BDE8F5;'>
+
+        <div style='background-color: #1C4D8D; padding: 50px 30px; text-align: center;'>
+            <div style='background: #4988C4; width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 20px; display: block; text-align: center; line-height: 64px; transform: rotate(-5deg);'>
+                <span style='font-size: 32px; display: inline-block; vertical-align: middle;'>📦</span>
+            </div>
+            <h1 style='color: #ffffff; margin: 0; font-size: 26px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;'>Замовлення прийнято</h1>
+            <p style='color: #BDE8F5; margin: 12px 0 0; font-size: 16px; font-weight: 500;'>Дякуємо, {{UserName}}, що обрали нас!</p>
+        </div>
+
+        <div style='padding: 40px;'>
+            <div style='background-color: #d9ecfa; padding: 16px 24px; border-radius: 12px; margin-bottom: 35px; display: flex; align-items: center;'>
+                <span style='margin-right: 12px;'>🚚</span>
+                <p style='margin: 0; color: #1C4D8D; font-size: 14px; font-weight: 600;'>
+                    Ваше замовлення вже передано на склад для комплектації.
+                </p>
+            </div>
+
+            <h3 style='color: #0F2854; font-size: 18px; font-weight: 700; margin-bottom: 20px; text-transform: uppercase; border-bottom: 2px solid #E1EEFF; padding-bottom: 10px;'>Ваші товари</h3>
+
+            <table style='width: 100%; border-collapse: collapse;'>
+                {{Items}}
+            </table>
+
+            {{CustomerNoteBlock}}
+
+            <div style='margin-top: 30px; padding: 25px; background-color: #ebf5fc; border-radius: 16px;'>
+                <table style='width: 100%;'>
+                    <tr>
+                        <td style='color: #4988C4; font-size: 14px; font-weight: 600; padding-bottom: 8px;'>Товари:</td>
+                        <td style='text-align: right; color: #0F2854; font-weight: 600; padding-bottom: 8px;'>₴{{TotalPrice}}</td>
+                    </tr>
+                    <tr>
+                        <td style='color: #4988C4; font-size: 14px; font-weight: 600; border-bottom: 1px solid #BDE8F5; padding-bottom: 12px;'></td>
+                        <td style='text-align: right; color: #0F2854; font-weight: 600; border-bottom: 1px solid #BDE8F5; padding-bottom: 12px;'></td>
+                    </tr>
+                    <tr>
+                        <td style='color: #0F2854; font-size: 18px; font-weight: 600; padding-top: 15px;'>ЗАГАЛОМ до сплати:</td>
+                        <td style='text-align: right; color: #1C4D8D; font-size: 22px; font-weight: 800; padding-top: 15px;'>₴{{TotalPrice}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div style='background-color: #0F2854; padding: 25px; text-align: center;'>
+            <p style='margin: 0; color: #BDE8F5; font-size: 12px; font-weight: 500; line-height: 1.6;'>
+                Маєте запитання? Ми на зв'язку: <br>
+                <span style='color: #ffffff; font-weight: 700;'>(219) 555-0114</span>
+            </p>
+        </div>
+    </div>
+</div>

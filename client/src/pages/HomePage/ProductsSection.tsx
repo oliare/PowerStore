@@ -68,7 +68,7 @@ export const ProductsSection = ({
           <h2 className="text-3xl font-semibold z-10">Рекомендовані товари</h2>
           {!isLoading && !error && (
             <Link
-              to="/products"
+              to="/shop"
               className="flex items-center gap-2 text-brand-primary font-semibold hover:underline group"
             >
               Переглянути всі

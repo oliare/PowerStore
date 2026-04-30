@@ -1,4 +1,3 @@
-// pages/CheckoutPage.tsx
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Radio, Divider, ConfigProvider } from "antd";
@@ -27,6 +26,7 @@ import {
 } from "../store/cartSlice";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import { MailingSection } from "./HomePage/MailingSection";
+import { showNotify } from "../utils/showNotify";
 
 export const CheckoutPage = () => {
   const [form] = Form.useForm();
@@ -45,7 +45,6 @@ export const CheckoutPage = () => {
   const [createOrder, { isLoading: isCreatingOrder }] =
     useCreateOrderMutation();
 
-  // Слідкуємо за типом доставки реактивно
   const deliveryMethod = Form.useWatch("deliveryMethod", form);
   const isPostalDelivery =
     deliveryMethod === DeliveryType.NovaPoshta ||
@@ -59,12 +58,11 @@ export const CheckoutPage = () => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        phone: user.phoneNumber,
+        phone: user.phoneNumber?.replace("+380", "").replace(/\s/g, "") || "",
       });
     }
   }, [user, form]);
 
-  // Скидаємо поля при зміні типу доставки
   useEffect(() => {
     form
       .validateFields(["city", "street", "house", "warehouseNumber"])
@@ -103,11 +101,15 @@ export const CheckoutPage = () => {
 
     try {
       const response = await createOrder(newOrder).unwrap();
+      showNotify.success("Замовлення успішно оформлено!");
       if (isAuth) await clearCartApi().unwrap();
       dispatch(clearCartLocal());
       navigate("/order-success", { state: { orderId: response.id } });
     } catch (err) {
       console.error("Помилка замовлення:", err);
+      showNotify.error(
+        "Сталася помилка при оформленні замовлення. Спробуйте ще раз пізніше.",
+      );
     }
   };
 

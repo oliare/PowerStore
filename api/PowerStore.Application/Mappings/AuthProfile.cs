@@ -8,6 +8,7 @@ public class AuthProfile : Profile
 {
     public AuthProfile()
     {
-        CreateMap<RegisterRequestDto, UserEntity>();
+        CreateMap<RegisterRequestDto, UserEntity>()
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.Phone));
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PowerStore.Application.DTOs.Cart;
 using PowerStore.Application.DTOs.Order;
 using PowerStore.Application.Interfaces;
+using PowerStore.Application.Services;
 using System.Security.Claims;
 
 namespace PowerStore.API.Controllers;
@@ -12,10 +14,11 @@ namespace PowerStore.API.Controllers;
 public class OrdersController : ControllerBase
 {
     private readonly IOrderService _orderService;
-
-    public OrdersController(IOrderService orderService)
+    private readonly IEmailService _emailService;
+    public OrdersController(IOrderService orderService, IEmailService emailService)
     {
         _orderService = orderService;
+        _emailService = emailService;
     }
 
     private Guid? GetCurrentUserId()
@@ -45,6 +48,28 @@ public class OrdersController : ControllerBase
     {
         var userId = GetCurrentUserId();
         var order = await _orderService.CreateOrderAsync(dto, userId);
+
+        try
+        {
+            var emailItems = order.Items.Select(i => new CartItemDto
+            {
+                ProductName = i.ProductName,
+                Quantity = i.Quantity,
+                Price = i.Price
+            }).ToList();
+
+            await _emailService.SendOrderConfirmationAsync(
+                dto.Email ?? "no-reply@email.com",
+                $"{dto.FirstName} {dto.LastName}",
+                order.TotalPrice,
+                emailItems
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Помилка відправки пошти: {ex.Message}");
+        }
+
         return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
     }
 }

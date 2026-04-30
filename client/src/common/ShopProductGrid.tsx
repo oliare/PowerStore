@@ -6,6 +6,7 @@ import type { ProductDto } from "../types/product";
 import type { CartItemDto } from "../types/cart";
 import { FavoriteButton } from "./FavoriteButton";
 import { SkeletonCard } from "./SkeletonCard";
+import { showNotify } from "../utils/showNotify";
 
 const PLACEHOLDER_IMAGE_URL = "/images/placeholder.png";
 
@@ -44,6 +45,7 @@ export const ShopProductGrid = ({
       quantity: selectedQuantity,
     };
 
+    showNotify.success(`"${product.name}" додано до кошика`);
     dispatch(addToCart(item));
   };
 
