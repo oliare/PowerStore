@@ -5,13 +5,14 @@ import type { PagedResponse } from "../types/common";
 interface GetProductsArgs {
   page: number;
   pageSize: number;
+  categoryId?: string;
 }
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<PagedResponse<ProductDto>, GetProductsArgs>({
-      query: ({ page, pageSize }) =>
-        `/Products?page=${page}&pageSize=${pageSize}`,
+      query: ({ page, pageSize, categoryId }) =>
+        `/Products?page=${page}&pageSize=${pageSize}${categoryId ? `&categoryId=${categoryId}` : ""}`,
       providesTags: ["Products"],
     }),
 

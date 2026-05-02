@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PowerStore.Application.DTOs.Category;
 using PowerStore.Application.Interfaces;
+using PowerStore.Application.Services;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -18,6 +19,13 @@ public class CategoriesController : ControllerBase
     {
         var categories = await _service.GetAllAsync();
         return Ok(categories);
+    }
+
+    [HttpGet("tree")]
+    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetTree()
+    {
+        var tree = await _service.GetCategoryTreeAsync();
+        return Ok(tree);
     }
 
     [HttpGet("{id}")]

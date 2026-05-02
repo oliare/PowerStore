@@ -84,19 +84,30 @@ public class DbSeeder
     {
         if (_context.Categories.Any()) return;
 
-        var categories = new List<CategoryEntity>
+        var cabling = new CategoryEntity { Name = "Кабельна продукція", Description = "Все для монтажу мереж" };
+        var lighting = new CategoryEntity { Name = "Освітлення", Description = "Лампи та світильники" };
+        var tools = new CategoryEntity { Name = "Інструменти", Description = "Електроінструмент" };
+
+        await _context.Categories.AddRangeAsync(cabling, lighting, tools);
+
+        await _context.SaveChangesAsync();
+
+        var subCategories = new List<CategoryEntity>
         {
-            new() { Name = "Cables", Description = "All types of cables" },
-            new() { Name = "Lighting", Description = "Lamps and lighting" },
-            new() { Name = "Switches", Description = "Electrical switches" },
-            new() { Name = "Sockets", Description = "Wall sockets" },
-            new() { Name = "Tools", Description = "Electrical tools" }
+            new() { Name = "Силовий кабель", ParentId = cabling.Id },
+            new() { Name = "Кручена пара (LAN)", ParentId = cabling.Id },
+            new() { Name = "Кабель-канали", ParentId = cabling.Id },
+
+            new() { Name = "LED Стрічки", ParentId = lighting.Id },
+            new() { Name = "Вуличні ліхтарі", ParentId = lighting.Id },
+
+            new() { Name = "Вимірювальні прилади", ParentId = tools.Id },
+            new() { Name = "Викрутки та плоскогубці", ParentId = tools.Id }
         };
 
-        await _context.Categories.AddRangeAsync(categories);
+        await _context.Categories.AddRangeAsync(subCategories);
         await _context.SaveChangesAsync();
     }
-
     private async Task SeedProductsAsync()
     {
         if (_context.Products.Any()) return;
@@ -105,18 +116,18 @@ public class DbSeeder
 
         var products = new List<ProductEntity>
         {
-            new() { Name = "USB Cable Type-C", Price = 10, StockQuantity = 100, CategoryId = categories[0].Id },
-            new() { Name = "HDMI Cable 2m", Price = 15, StockQuantity = 80, CategoryId = categories[0].Id },
-            new() { Name = "Ethernet Cable Cat6", Price = 12, StockQuantity = 120, CategoryId = categories[0].Id },
+            new() { Name = "USB Кабель Type-C", Price = 10, StockQuantity = 100, CategoryId = categories[0].Id },
+            new() { Name = "HDMI Кабель 2m", Price = 15, StockQuantity = 80, CategoryId = categories[0].Id },
+            new() { Name = "Ethernet Кабель Cat6", Price = 12, StockQuantity = 120, CategoryId = categories[0].Id },
 
-            new() { Name = "LED Bulb 10W", Price = 5, StockQuantity = 200, CategoryId = categories[1].Id },
-            new() { Name = "Desk Lamp", Price = 25, StockQuantity = 50, CategoryId = categories[1].Id },
+            new() { Name = "LED Лампа 10W", Price = 5, StockQuantity = 200, CategoryId = categories[1].Id },
+            new() { Name = "Настільна лампа", Price = 25, StockQuantity = 50, CategoryId = categories[1].Id },
 
-            new() { Name = "Single Switch", Price = 3, StockQuantity = 150, CategoryId = categories[2].Id },
+            new() { Name = "Одинарний вимикач", Price = 3, StockQuantity = 150, CategoryId = categories[2].Id },
 
-            new() { Name = "Wall Socket EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id },
+            new() { Name = "Настінна мережева розетка EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id },
 
-            new() { Name = "Voltage Tester", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id }
+            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id }
         };
 
         await _context.Products.AddRangeAsync(products);

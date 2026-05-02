@@ -1,5 +1,7 @@
 import { Filter, Star, X } from "lucide-react";
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { useGetCategoriesQuery } from "../services/categoryApi";
 
 interface ShopSidebarProps {
   priceRange: number;
@@ -14,13 +16,20 @@ export const ShopSidebar = ({
 }: ShopSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const categoriesList = [
-    { name: "Освітлення", count: 120 },
-    { name: "Кабельна продукція", count: 85 },
-    { name: "Розетки та вимикачі", count: 210 },
-    { name: "Інструменти", count: 45 },
-    { name: "Системи захисту", count: 30 },
-  ];
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { data: categories } = useGetCategoriesQuery();
+
+  const activeCategoryId = searchParams.get("categoryId");
+  const rootCategories = categories?.filter((cat) => !cat.parentId) || [];
+
+  const handleCategoryChange = (id: string) => {
+    if (activeCategoryId === id) {
+      searchParams.delete("categoryId");
+    } else {
+      searchParams.set("categoryId", id);
+    }
+    setSearchParams(searchParams);
+  };
 
   return (
     <aside className={`w-full lg:w-1/4 ${className}`}>
@@ -45,28 +54,69 @@ export const ShopSidebar = ({
           </button>
         </div>
 
-        <div className="mb-8 lg:mb-0">
+        <div className="mb-8">
           <h3 className="text-lg font-semibold mb-4 border-b pb-2 font-montserrat text-black">
             Категорії
           </h3>
-          <ul className="space-y-3">
-            {categoriesList.map((cat) => (
-              <li
-                key={cat.name}
-                className="flex items-center justify-between group cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 accent-brand-primary rounded cursor-pointer"
-                  />
-                  <span className="text-sm group-hover:text-brand-primary transition-colors font-montserrat">
-                    {cat.name}
-                  </span>
-                </div>
-                <span className="text-xs text-gray-400">({cat.count})</span>
-              </li>
-            ))}
+
+          <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {rootCategories.map((cat) => {
+              const isParentOfActive = cat.childrens?.some(
+                (child) => child.id == activeCategoryId,
+              );
+              const isActive = activeCategoryId == cat.id || isParentOfActive;
+
+              return (
+                <li key={cat.id} className="flex flex-col">
+                  <div
+                    className="flex items-center justify-between group cursor-pointer py-1"
+                    onClick={() => handleCategoryChange(cat.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={
+                          activeCategoryId === cat.id || isParentOfActive
+                        }
+                        onChange={() => {}}
+                        className="w-4 h-4 accent-brand-primary rounded cursor-pointer"
+                      />
+                      <span
+                        className={`text-sm transition-colors font-montserrat ${
+                          isActive
+                            ? "text-brand-primary font-bold"
+                            : "group-hover:text-brand-primary text-gray-700"
+                        }`}
+                      >
+                        {cat.name}
+                      </span>
+                    </div>
+                  </div>
+
+                  {isActive && cat.childrens && cat.childrens.length > 0 && (
+                    <ul className="ml-8 mt-2 space-y-2 border-l-2 border-gray-100 pl-4 animate-in slide-in-from-top-2 duration-300">
+                      {cat.childrens.map((sub) => (
+                        <li
+                          key={sub.id}
+                          className={`text-sm cursor-pointer transition-colors ${
+                            activeCategoryId === sub.id
+                              ? "text-brand-primary font-semibold"
+                              : "text-gray-500 hover:text-brand-primary"
+                          }`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            searchParams.set("categoryId", sub.id);
+                            setSearchParams(searchParams);
+                          }}
+                        >
+                          {sub.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </div>
 

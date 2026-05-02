@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PowerStore.Domain.Entities;
+using System.Reflection.Emit;
 
 namespace PowerStore.Infrastructure.Data;
 
@@ -52,5 +53,13 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
             .HasOne(oi => oi.Product)
             .WithMany()
             .HasForeignKey(oi => oi.ProductId);
+
+        builder.Entity<CategoryEntity>(entity =>
+        {
+            entity.HasOne(c => c.Parent)
+                .WithMany(c => c.Childrens)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

@@ -18,12 +18,20 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
 
-    public async Task<PagedResponse<ProductDto>> GetAllAsync(int page = 1, int pageSize = 12)
+    public async Task<PagedResponse<ProductDto>> GetAllAsync(int page = 1, int pageSize = 12, Guid? categoryId = null)
     {
-        var totalItems = await _repo.Query().CountAsync();
+        var query = _repo.Query();
+
+        if (categoryId.HasValue)
+        {
+            query = query.Where(p => p.CategoryId == categoryId.Value
+                                  || p.Category.ParentId == categoryId.Value);
+        }
+
+        var totalItems = await query.CountAsync();
         var totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
 
-        var items = await _repo.Query()
+        var items = await query
             .OrderByDescending(p => p.CreatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)

@@ -4,6 +4,7 @@ public class CategoryEntity : AuditableEntityBase
 {
     public required string Name { get; set; }
     public string? Image { get; set; }
+    public Guid? ParentId { get; set; }
     public string? Description { get; set; }
     public int DisplayOrder { get; private set; }
     public bool IsActive { get; private set; } = true;

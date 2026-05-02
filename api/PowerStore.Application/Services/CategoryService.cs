@@ -25,6 +25,17 @@ public class CategoryService : ICategoryService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<CategoryDto>> GetCategoryTreeAsync()
+    {
+        var categories = await _repo.Query()
+            .Include(c => c.Childrens) 
+            .Where(c => c.ParentId == null)
+            .OrderBy(c => c.DisplayOrder)
+            .ToListAsync();
+
+        return _mapper.Map<List<CategoryDto>>(categories);
+    }
+
     public async Task<CategoryDto?> GetByIdAsync(Guid id)
     {
         return await _repo.Query()

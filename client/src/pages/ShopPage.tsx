@@ -5,18 +5,23 @@ import { ShopSidebar } from "../common/ShopSidebar";
 import { ShopProductGrid } from "../common/ShopProductGrid";
 import { useGetProductsQuery } from "../services/productApi";
 import { Pagination } from "../common/Pagination";
+import { useSearchParams } from "react-router-dom";
 
 export const ShopPage = () => {
   const [priceRange, setPriceRange] = useState(5000);
   const [activeSort, setActiveSort] = useState("latest");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams] = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const productsPerPage = 28;
+  const categoryId = searchParams.get("categoryId");
+
   const { data: products, isLoading } = useGetProductsQuery({
     page: currentPage,
     pageSize: productsPerPage,
+    categoryId: categoryId || undefined,
   });
 
   const sortOptions = [

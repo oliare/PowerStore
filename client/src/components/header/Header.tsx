@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  ChevronDown,
+  Dot,
   Handbag,
   HeartIcon,
   LogOut,
@@ -23,6 +25,7 @@ import { logOut } from "../../store/authSlice";
 import { baseApi } from "../../api/baseApi";
 import { clearFavorites } from "../../store/favoriteSlice";
 import { clearCart } from "../../store/cartSlice";
+import { useGetCategoryTreeQuery } from "../../services/categoryApi";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -31,6 +34,8 @@ export default function Header() {
 
   const { data: user } = useGetMeQuery();
   const [logout] = useLogoutMutation();
+  const { data: categories, isLoading } = useGetCategoryTreeQuery();
+  const [activeParentId, setActiveParentId] = useState<string | null>(null);
 
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -253,27 +258,150 @@ export default function Header() {
         <div className="max-w-7xl mx-auto flex justify-between items-center px-4">
           <ul className="flex gap-9">
             <li>
-              <Link to={"/"}>Головна</Link>
+              <Link
+                to={"/"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Головна
+              </Link>
             </li>
             <li>
-              <Link to={"/shop"}>Магазин</Link>
+              <Link
+                to={"/shop"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Магазин
+              </Link>
+            </li>
+
+            <li>
+              <Dropdown
+                placement="bottomLeft"
+                trigger={["hover"]}
+                onOpenChange={(open) => {
+                  if (open && categories && categories.length > 0) {
+                    setActiveParentId(categories[0].id);
+                  }
+                }}
+                dropdownRender={() => (
+                  <div className="bg-white shadow-2xl border rounded-lg flex min-w-[900px] h-[500px] mt-2 overflow-hidden font-montserrat">
+                    {isLoading ? (
+                      <div className="p-10 text-gray-500 w-full text-center">
+                        Завантаження каталогу...
+                      </div>
+                    ) : (
+                      <>
+                        <div className="w-1/3 border-r bg-gray-50/50 py-2 overflow-y-auto">
+                          {categories?.map((parent) => (
+                            <div
+                              key={parent.id}
+                              onMouseEnter={() => setActiveParentId(parent.id)}
+                              className={`px-6 py-3 cursor-pointer flex justify-between items-center transition-colors ${
+                                activeParentId === parent.id
+                                  ? "bg-white text-brand-primary font-bold shadow-sm"
+                                  : "text-gray-700 hover:bg-gray-100"
+                              }`}
+                            >
+                              <span className="text-sm">{parent.name}</span>
+                              <ChevronDown
+                                size={14}
+                                className="-rotate-90 opacity-50"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="w-2/3 p-8 bg-white overflow-y-auto">
+                          {activeParentId && (
+                            <div>
+                              <h3 className="text-xl font-semibold text-black mb-6 border-b pb-2">
+                                <Dot size={45} className="text-brand-primary inline-block -ml-5" />
+                                {
+                                  categories?.find(
+                                    (c) => c.id === activeParentId,
+                                  )?.name
+                                }
+                              </h3>
+
+                              <div className="grid grid-cols-2 gap-x-8 gap-y-6">
+                                {categories
+                                  ?.find((c) => c.id === activeParentId)
+                                  ?.childrens?.map((child) => (
+                                    <div
+                                      key={child.id}
+                                      className="flex flex-col gap-2"
+                                    >
+                                      <Link
+                                        to={`/shop?category=${child.id}`}
+                                        className="font-semibold text-gray-900 hover:text-brand-primary transition-colors"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    </div>
+                                  ))}
+
+                                {(!categories?.find(
+                                  (c) => c.id === activeParentId,
+                                )?.childrens ||
+                                  categories?.find(
+                                    (c) => c.id === activeParentId,
+                                  )?.childrens?.length === 0) && (
+                                  <div className="text-gray-400 italic">
+                                    У цій категорії поки немає підкатегорій
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              >
+                <div className="flex items-center gap-1 cursor-pointer hover:text-gray-200 transition-colors">
+                  <span className="font-semibold">Каталог товарів</span>
+                  <ChevronDown size={14} />
+                </div>
+              </Dropdown>
+            </li>
+
+            <li>
+              <Link
+                to={"/pages"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Сторінки
+              </Link>
             </li>
             <li>
-              <Link to={"/pages"}>Сторінки</Link>
+              <Link
+                to={"/blog"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Блог
+              </Link>
             </li>
             <li>
-              <Link to={"/blog"}>Блог</Link>
+              <Link
+                to={"/about"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Про нас
+              </Link>
             </li>
             <li>
-              <Link to={"/about"}>Про нас</Link>
-            </li>
-            <li>
-              <Link to={"/contact"}>Контакти</Link>
+              <Link
+                to={"/contact"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Контакти
+              </Link>
             </li>
           </ul>
           <div className="flex items-center gap-3">
             <Phone size={20} />
-            <span>(219) 555-0114</span>
+            <span className="font-manrope">(219) 555-0114</span>
           </div>
         </div>
       </nav>
