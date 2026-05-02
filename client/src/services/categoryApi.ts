@@ -8,6 +8,10 @@ export const categoryApi = baseApi.injectEndpoints({
       providesTags: ["Category"],
     }),
 
+    getTopCategories: builder.query<CategoryDto[], number>({
+      query: (count) => `categories/top?count=${count}`,
+    }),
+
     getCategoryTree: builder.query<CategoryDto[], void>({
       query: () => "categories/tree",
       providesTags: ["Category"],
@@ -31,6 +35,7 @@ export const categoryApi = baseApi.injectEndpoints({
 
 export const {
   useGetCategoriesQuery,
+  useGetTopCategoriesQuery,
   useGetCategoryTreeQuery,
   useGetCategoryByIdQuery,
   useCreateCategoryMutation,

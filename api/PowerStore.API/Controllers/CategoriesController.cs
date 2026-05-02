@@ -44,4 +44,10 @@ public class CategoriesController : ControllerBase
 
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity);
     }
+
+    [HttpGet("top")]
+    public async Task<ActionResult<IEnumerable<CategoryDto>>> GetTopCategoriesAsync(int count)
+    {
+        return Ok(await _service.GetTopCategoriesAsync(count));
+    }
 }

@@ -25,6 +25,14 @@ public class CategoryService : ICategoryService
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<CategoryDto>> GetTopCategoriesAsync(int count)
+    {
+        return await _repo.Query()
+            .Take(count) 
+            .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<CategoryDto>> GetCategoryTreeAsync()
     {
         var categories = await _repo.Query()

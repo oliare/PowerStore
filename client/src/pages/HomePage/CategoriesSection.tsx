@@ -1,15 +1,36 @@
-import { ArrowRight, Check, Wrench, Zap, Settings, Nut } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Wrench,
+  Zap,
+  Settings,
+  Nut,
+  AlertCircle,
+} from "lucide-react";
+import type { CategoryDto } from "../../types/category";
+import type { SerializedError } from "@reduxjs/toolkit/react";
+import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
+import { Link } from "react-router-dom";
 
-interface Category {
-  name: string;
-  img: string;
+const CategorySkeleton = () => (
+  <div className="bg-white p-4 py-6 rounded-2xl border border-gray-100 animate-pulse">
+    <div className="aspect-square w-full bg-gray-200 rounded-xl mb-4" />
+    <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2" />
+    <div className="h-3 bg-gray-100 rounded w-1/2 mx-auto" />
+  </div>
+);
+
+interface CategoriesSectionProps {
+  categories: CategoryDto[];
+  isLoading?: boolean;
+  error?: FetchBaseQueryError | SerializedError | undefined;
 }
 
 export const CategoriesSection = ({
   categories,
-}: {
-  categories: Category[];
-}) => {
+  isLoading,
+  error,
+}: CategoriesSectionProps) => {
   return (
     <section className="bg-brand-bg relative overflow-hidden font-montserrat">
       <div className="absolute top-36 left-10 text-[#c5d4f0] blur-[0.7px] -rotate-12 pointer-events-none">
@@ -24,39 +45,69 @@ export const CategoriesSection = ({
       <div className="absolute -top-4 -right-14 text-[#c5d4f0] blur-[0.7px] -rotate-12 pointer-events-none">
         <Settings size={145} strokeWidth={0.5} />
       </div>
+
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-semibold">Популярні категорії</h2>
-          <button className="flex gap-2 text-brand-primary font-semibold hover:underline z-10">
-            Переглянути всі
-            <ArrowRight />
-          </button>
+          <h2 className="text-3xl font-semibold z-10">Популярні категорії</h2>
+          {!isLoading && !error && (
+            <Link
+              to="/shop"
+              className="flex items-center gap-2 text-brand-primary font-semibold hover:underline group z-10"
+            >
+              Переглянути всі
+              <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+          )}
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
-          {categories.map((cat, index) => (
-            <div key={index} className="group cursor-pointer flex">
-              <div
-                className="bg-white p-4 py-6 rounded-2xl shadow-sm border border-gray-100 transition-all 
-                      hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 
-                      hover:border-brand-primary/70 text-center flex flex-col w-full h-full z-10"
-              >
-                <div className="aspect-square w-full flex items-center justify-center text-white mx-auto mb-4 overflow-hidden">
-                  <img
-                    src={cat.img}
-                    alt={cat.name}
-                    className="w-full h-full object-cover rounded-xl transition-transform group-hover:scale-105"
-                  />
-                </div>
-                <p className="font-semibold mt-2 text-gray-800 leading-tight flex-grow flex items-center justify-center">
-                  {cat.name}
-                </p>
-                <p className="font-normal text-xs text-gray-600 tracking-wide mt-auto pt-2">
-                  10 Товарів
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+
+        {error ? (
+          <div className="flex flex-col items-center justify-center py-12 bg-red-50 rounded-2xl border border-red-100 z-10 relative">
+            <AlertCircle className="text-red-500 mb-2" size={40} />
+            <p className="text-red-800 font-medium text-center">
+              Не вдалося завантажити категорії
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 text-sm text-red-600 underline hover:text-red-800"
+            >
+              Спробувати ще раз
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                  <CategorySkeleton key={i} />
+                ))
+              : categories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    to={`/shop?categoryId=${cat.id}`}
+                    className="group cursor-pointer flex z-10"
+                  >
+                    <div
+                      className="bg-white p-4 py-6 rounded-2xl shadow-sm border border-gray-100 transition-all 
+                                    hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 
+                                    hover:border-brand-primary/70 text-center flex flex-col w-full h-full"
+                    >
+                      <div className="aspect-square w-full flex items-center justify-center text-white mx-auto mb-4 overflow-hidden bg-gray-50 rounded-xl">
+                        <img
+                          src={cat.image || "/placeholder-category.png"}
+                          alt={cat.name}
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                      </div>
+                      <p className="font-semibold mt-2 text-gray-800 leading-tight flex-grow flex items-center justify-center group-hover:text-brand-primary transition-colors">
+                        {cat.name}
+                      </p>
+                      {/* <p className="font-normal text-xs text-gray-500 tracking-wide mt-auto pt-2">
+                        Товарів: {cat.productsCount || 0}
+                      </p> */}
+                    </div>
+                  </Link>
+                ))}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_3fr] gap-4 mt-24 py-12">
           <img
