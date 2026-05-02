@@ -1,19 +1,22 @@
 ﻿using MailKit.Net.Smtp;
-using MimeKit;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
-using PowerStore.Application.Interfaces;
+using MimeKit;
 using PowerStore.Application.DTOs.Cart;
 using PowerStore.Application.DTOs.Email;
-using MailKit.Security;
+using PowerStore.Application.Interfaces;
+using PowerStore.Domain.Entities;
 
 namespace PowerStore.Application.Services;
 
 public class EmailService : IEmailService
 {
     private readonly EmailSettings _settings;
+    private readonly IRepository<ContactMessageEntity> _repo;
 
-    public EmailService(IConfiguration config)
+    public EmailService(IConfiguration config, IRepository<ContactMessageEntity> repo)
     {
+        _repo = repo;
         _settings = new EmailSettings();
 
         config.GetSection("EmailSettings").Bind(_settings);
@@ -22,6 +25,21 @@ public class EmailService : IEmailService
         {
             throw new Exception("Не вдалося завантажити налаштування пошти. Перевірте appsettings.json");
         }
+    }
+
+    public async Task SaveContactMessageAsync(ContactMessageDto messageDto)
+    {
+        var entity = new ContactMessageEntity
+        {
+            Name = messageDto.Name,
+            Email = messageDto.Email,
+            Subject = messageDto.Subject,
+            Message = messageDto.Message,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await _repo.AddAsync(entity);
+        await _repo.SaveAsync();
     }
 
     public async Task SendOrderConfirmationAsync(

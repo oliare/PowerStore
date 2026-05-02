@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PowerStore.Application.Interfaces;
 using PowerStore.API.Extensions;
+using PowerStore.Application.DTOs.Email;
 
 namespace PowerStore.API.Controllers;
 
@@ -10,9 +11,12 @@ namespace PowerStore.API.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
-    public UsersController(IUserService userService)
+    private readonly IEmailService _emailService;
+
+    public UsersController(IUserService userService, IEmailService emailService)
     {
         _userService = userService;
+        _emailService = emailService;
     }
 
     [Authorize]
@@ -23,5 +27,14 @@ public class UsersController : ControllerBase
         var user = await _userService.GetMeAsync(userId);
 
         return user == null ? NotFound() : Ok(user);
+    }
+
+    [HttpPost("contact-message")]
+    public async Task<IActionResult> SendContactMessage([FromBody] ContactMessageDto messageDto)
+    {
+        Console.WriteLine($"Recieved: {messageDto.Email}");
+
+        await _emailService.SaveContactMessageAsync(messageDto);
+        return Ok();
     }
 }

@@ -12,3 +12,10 @@ export interface ToastifyProps {
   message: string;
   type: "success" | "error" | "info" | "warn";
 }
+
+export interface ContactMessage {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}

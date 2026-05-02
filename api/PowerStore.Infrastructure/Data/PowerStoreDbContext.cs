@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PowerStore.Domain.Entities;
-using System.Reflection.Emit;
 
 namespace PowerStore.Infrastructure.Data;
 
@@ -19,6 +18,7 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
     public DbSet<CartEntity> Carts { get; set; }
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderItemEntity> OrderItems { get; set; }
+    public DbSet<ContactMessageEntity> ContactMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

@@ -1,4 +1,5 @@
 ﻿using PowerStore.Application.DTOs.Cart;
+using PowerStore.Application.DTOs.Email;
 
 namespace PowerStore.Application.Interfaces;
 
@@ -10,4 +11,6 @@ public interface IEmailService
         decimal totalPrice,
         List<CartItemDto> items,
         string? customerNote = null);
+
+    Task SaveContactMessageAsync(ContactMessageDto messageDto);
 }
