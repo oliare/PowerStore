@@ -25,6 +25,7 @@ import { ShopPage } from "./pages/ShopPage";
 import { ScrollToTop } from "./common/ScrollToTop";
 import { Toastify } from "./common/CustomToast";
 import { Toaster } from "react-hot-toast";
+import { AboutUsPage } from "./pages/AboutUsPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -43,6 +44,7 @@ function App() {
           <Route path="shop" element={<ShopPage />} />
           <Route path="wishlist" element={<WishlistPage />} />
           <Route path="cart" element={<CartPage />} />
+          <Route path="about" element={<AboutUsPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<CheckoutPage />} />
