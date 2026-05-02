@@ -22,7 +22,7 @@ export const ContactSection = () => {
                 Наша адреса
               </h4>
               <p className="text-gray-900 font-semibold mt-1">
-                вул. Енергетиків, 12, Рівне
+                вул. Енергетиків, 12, Київ
               </p>
             </div>
           </div>
