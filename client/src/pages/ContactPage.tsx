@@ -41,7 +41,7 @@ export const ContactPage = () => {
     <div className="bg-white min-h-screen font-montserrat">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-8 items-stretch">
-          <div className="lg:w-1/3 bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 flex flex-col justify-between">
+          <div className="lg:w-1/3 bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-200 flex flex-col justify-between">
             <div className="p-8 flex flex-col items-center text-center text-sm">
               <MapPin
                 strokeWidth={1}
@@ -79,7 +79,7 @@ export const ContactPage = () => {
             </div>
           </div>
 
-          <div className="lg:w-2/3 bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-100 p-8 md:p-10">
+          <div className="lg:w-2/3 bg-white rounded-2xl shadow-xl shadow-gray-100 border border-gray-200 p-8 md:p-10">
             <h2 className="text-3xl font-semibold text-gray-900 mb-5">
               Просто скажіть "Привіт!"
             </h2>

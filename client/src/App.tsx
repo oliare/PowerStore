@@ -27,6 +27,8 @@ import { Toastify } from "./common/CustomToast";
 import { Toaster } from "react-hot-toast";
 import { AboutUsPage } from "./pages/AboutUsPage";
 import { ContactPage } from "./pages/ContactPage";
+import { DeliveryPaymentPage } from "./pages/DeliveryPaymentPage";
+import { FaqPage } from "./pages/FaqPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -47,6 +49,8 @@ function App() {
           <Route path="cart" element={<CartPage />} />
           <Route path="about" element={<AboutUsPage />} />
           <Route path="contact" element={<ContactPage />} />
+          <Route path="for-buyers" element={<DeliveryPaymentPage />} />
+          <Route path="faq" element={<FaqPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<CheckoutPage />} />

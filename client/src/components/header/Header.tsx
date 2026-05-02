@@ -315,7 +315,10 @@ export default function Header() {
                           {activeParentId && (
                             <div>
                               <h3 className="text-xl font-semibold text-black mb-6 border-b pb-2">
-                                <Dot size={45} className="text-brand-primary inline-block -ml-5" />
+                                <Dot
+                                  size={45}
+                                  className="text-brand-primary inline-block -ml-5"
+                                />
                                 {
                                   categories?.find(
                                     (c) => c.id === activeParentId,
@@ -365,29 +368,28 @@ export default function Header() {
                 </div>
               </Dropdown>
             </li>
-
-            <li>
-              <Link
-                to={"/pages"}
-                className="hover:text-gray-200 transition-colors font-semibold"
-              >
-                Сторінки
-              </Link>
-            </li>
-            <li>
-              <Link
-                to={"/blog"}
-                className="hover:text-gray-200 transition-colors font-semibold"
-              >
-                Блог
-              </Link>
-            </li>
             <li>
               <Link
                 to={"/about"}
                 className="hover:text-gray-200 transition-colors font-semibold"
               >
                 Про нас
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={"/for-buyers"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                Для покупця
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={"/faq"}
+                className="hover:text-gray-200 transition-colors font-semibold"
+              >
+                FAQ
               </Link>
             </li>
             <li>
