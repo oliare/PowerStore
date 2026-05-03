@@ -424,7 +424,7 @@ export default function Header() {
           <div className="flex-1 overflow-y-auto">
             <Menu
               mode="inline"
-              className="border-none font-semibold text-gray-700"
+              className="border-none font-semibold text-gray-700 font-montserrat"
               items={[
                 {
                   key: "1",
@@ -514,14 +514,14 @@ export default function Header() {
                 <Link
                   to="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-center py-2 bg-gray-200 rounded-lg"
+                  className="w-full text-center py-2 bg-gray-200 rounded-full font-semibold text-gray-700 hover:text-brand-accent"
                 >
                   Увійти
                 </Link>
                 <Link
                   to="/register"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full text-center py-2 bg-brand-primary text-white rounded-lg"
+                  className="w-full text-center py-2 bg-brand-primary text-white rounded-full font-semibold hover:text-white hover:bg-brand-accent transition-colors"
                 >
                   Реєстрація
                 </Link>
