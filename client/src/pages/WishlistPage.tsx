@@ -75,7 +75,7 @@ export const WishlistPage = () => {
           Додайте товари, які вам сподобались, щоб не загубити їх пізніше.
         </p>
         <Link
-          to="/"
+          to="/shop"
           className="flex items-center gap-2 px-10 py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all"
         >
           <ArrowLeft size={20} /> До каталогу

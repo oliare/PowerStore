@@ -62,48 +62,34 @@ const CustomFooter = () => {
           <div>
             <h3 className="text-white text-lg font-medium mb-6">Мій акаунт</h3>
             <ul className="space-y-4 text-sm">
-              <FooterLink href="#">Особистий кабінет</FooterLink>
-              <FooterLink href="#">Історія замовлень</FooterLink>
-              <FooterLink href="#">Кошик</FooterLink>
-              <FooterLink href="#">Список бажаного</FooterLink>
+              <FooterLink href="/profile">Особистий кабінет</FooterLink>
+              <FooterLink href="/orders">Історія замовлень</FooterLink>
+              <FooterLink href="/cart">Кошик</FooterLink>
+              <FooterLink href="/wishlist">Список бажаного</FooterLink>
             </ul>
           </div>
 
           <div>
             <h3 className="text-white text-lg font-medium mb-6">Компанія</h3>
             <ul className="space-y-4 text-sm">
-              <FooterLink href="#">Про нас</FooterLink>
-              <FooterLink href="#">Наші послуги</FooterLink>
-              <FooterLink href="#">Контакти</FooterLink>
-              <FooterLink href="#">Блог</FooterLink>
+              <FooterLink href="/">Головна</FooterLink>
+              <FooterLink href="/about">Про нас</FooterLink>
+              <FooterLink href="/contact">Контакти</FooterLink>
             </ul>
           </div>
 
           <div>
             <h3 className="text-white text-lg font-medium mb-6">Підтримка</h3>
             <ul className="space-y-4 text-sm">
-              <FooterLink href="#">Допомога</FooterLink>
-              <FooterLink href="#">Умови використання</FooterLink>
-              <FooterLink href="#">Політика конфіденційності</FooterLink>
-              <FooterLink href="#">Повернення</FooterLink>
+              <FooterLink href="/for-buyers">Для покупця</FooterLink>
+              <FooterLink href="/faq">FAQ</FooterLink>
             </ul>
           </div>
         </div>
 
         <Divider className="border-gray-800 my-8" />
-        <div className="flex flex-col md:flex-row justify-between items-center text-xs gap-4">
+        <div className="flex flex-col md:flex-row justify-center items-center text-xs">
           <p>© {new Date().getFullYear()} PowerStore. Всі права захищені.</p>
-          <div className="flex gap-6">
-            <span className="cursor-pointer hover:text-white">
-              Privacy Policy
-            </span>
-            <span className="cursor-pointer hover:text-white">
-              Terms of Service
-            </span>
-            <span className="cursor-pointer hover:text-white">
-              Cookies Settings
-            </span>
-          </div>
         </div>
       </div>
     </Footer>

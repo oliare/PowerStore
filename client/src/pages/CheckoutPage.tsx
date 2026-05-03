@@ -195,17 +195,18 @@ export const CheckoutPage = () => {
                       label="Телефон"
                       rules={[
                         { required: true, message: "Введіть номер" },
-                        { pattern: /^[0-9]{9}$/, message: "9 цифр без +380" },
+                        {
+                          pattern: /^[0-9]{9,10}$/,
+                          message: "Введіть коректну кількість цифр",
+                        },
                       ]}
                     >
                       <Input
-                        placeholder="00 000 00 00"
-                        prefix={
-                          <span className="mr-1 text-gray-400">+380</span>
-                        }
+                        placeholder="67 000 00 00"
+                        prefix={<span className="mr-1 text-gray-400">+38</span>}
                         style={inputStyle}
                         className="h-11"
-                        maxLength={9}
+                        maxLength={10}
                       />
                     </Form.Item>
                   </div>

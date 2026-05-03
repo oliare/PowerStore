@@ -132,7 +132,7 @@ export const CartPage = () => {
 
             <div className="p-6 bg-gray-50/50 flex justify-between items-center mt-auto">
               <Link
-                to="/"
+                to="/shop"
                 className="flex items-center gap-2 px-8 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-all active:scale-[0.98]"
               >
                 <ArrowLeft size={18} />
