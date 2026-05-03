@@ -268,7 +268,7 @@ export default function Header() {
                           <img
                             src={
                               product.images?.[0]?.image ||
-                              "https://via.placeholder.com/40"
+                              PLACEHOLDER_IMAGE_URL
                             }
                             className="w-full h-full object-cover"
                             alt=""
@@ -413,7 +413,7 @@ export default function Header() {
                                   ?.childrens?.map((child) => (
                                     <Link
                                       key={child.id}
-                                      to={`/shop?category=${child.id}`}
+                                      to={`/shop?categoryId=${child.id}`}
                                       className="font-semibold text-gray-600 hover:text-brand-primary transition-colors"
                                     >
                                       {child.name}
