@@ -11,6 +11,7 @@ import type { CategoryDto } from "../../types/category";
 import type { SerializedError } from "@reduxjs/toolkit/react";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { Link } from "react-router-dom";
+import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 
 const CategorySkeleton = () => (
   <div className="bg-white p-4 py-6 rounded-2xl border border-gray-100 animate-pulse">
@@ -74,7 +75,7 @@ export const CategoriesSection = ({
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
             {isLoading
               ? Array.from({ length: 6 }).map((_, i) => (
                   <CategorySkeleton key={i} />
@@ -92,17 +93,19 @@ export const CategoriesSection = ({
                     >
                       <div className="aspect-square w-full flex items-center justify-center text-white mx-auto mb-4 overflow-hidden bg-gray-50 rounded-xl">
                         <img
-                          src={cat.image || "/placeholder-category.png"}
+                          src={cat.image || PLACEHOLDER_IMAGE_URL}
                           alt={cat.name}
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                       </div>
                       <p className="font-semibold mt-2 text-gray-800 leading-tight flex-grow flex items-center justify-center group-hover:text-brand-primary transition-colors">
-                        {cat.name}
+                        {cat.name.length > 14
+                          ? cat.name.slice(0, 14) + "..."
+                          : cat.name}
                       </p>
-                      {/* <p className="font-normal text-xs text-gray-500 tracking-wide mt-auto pt-2">
-                        Товарів: {cat.productsCount || 0}
-                      </p> */}
+                      <p className="font-normal text-xs text-gray-500 tracking-wide mt-2 line-clamp-2 h-[2rem] overflow-hidden">
+                        {cat.description}
+                      </p>
                     </div>
                   </Link>
                 ))}

@@ -28,7 +28,9 @@ public class CategoryService : ICategoryService
     public async Task<IEnumerable<CategoryDto>> GetTopCategoriesAsync(int count)
     {
         return await _repo.Query()
-            .Take(count) 
+            .Where(x => x.ParentId == null)
+            .OrderBy(x => x.Name)
+            .Take(count)
             .ProjectTo<CategoryDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
@@ -36,7 +38,7 @@ public class CategoryService : ICategoryService
     public async Task<IEnumerable<CategoryDto>> GetCategoryTreeAsync()
     {
         var categories = await _repo.Query()
-            .Include(c => c.Childrens) 
+            .Include(c => c.Childrens)
             .Where(c => c.ParentId == null)
             .OrderBy(c => c.DisplayOrder)
             .ToListAsync();

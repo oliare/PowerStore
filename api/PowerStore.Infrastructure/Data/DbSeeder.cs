@@ -84,11 +84,45 @@ public class DbSeeder
     {
         if (_context.Categories.Any()) return;
 
-        var cabling = new CategoryEntity { Name = "Кабельна продукція", Description = "Все для монтажу мереж" };
-        var lighting = new CategoryEntity { Name = "Освітлення", Description = "Лампи та світильники" };
-        var tools = new CategoryEntity { Name = "Інструменти", Description = "Електроінструмент" };
+        var cabling = new CategoryEntity
+        {
+            Name = "Кабельна продукція",
+            Description = "Все для монтажу мереж",
+            Image = "https://media.istockphoto.com/id/1150199550/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%96%D0%BD%D0%B6%D0%B5%D0%BD%D0%B5%D1%80-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D0%BA-%D0%BF%D1%80%D0%B0%D1%86%D1%8E%D1%94-%D1%82%D0%B5%D1%81%D1%82%D0%B5%D1%80%D0%BE%D0%BC-%D1%89%D0%BE-%D0%B2%D0%B8%D0%BC%D1%96%D1%80%D1%8E%D1%94-%D0%BD%D0%B0%D0%BF%D1%80%D1%83%D0%B3%D1%83-%D1%96-%D1%81%D1%82%D1%80%D1%83%D0%BC-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%BD%D0%BE%D1%97-%D0%BB%D1%96%D0%BD%D1%96%D1%97-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87-%D0%B2.jpg?s=612x612&w=0&k=20&c=LToBdaP1afPEsp_XNqs0g_pWvs0Jmvp2E-RBqfvqFMw="
+        };
+        var lighting = new CategoryEntity
+        {
+            Name = "Освітлення",
+            Description = "Лампи та світильники",
+            Image = "https://media.istockphoto.com/id/1934009955/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BC%D0%BE%D0%BB%D0%BE%D0%B4%D0%B0-%D0%B6%D1%96%D0%BD%D0%BA%D0%B0-%D0%B7%D0%BC%D1%96%D0%BD%D1%8E%D1%94-%D0%BB%D0%B0%D0%BC%D0%BF%D0%BE%D1%87%D0%BA%D1%83-%D0%B7-%D0%BB%D0%B0%D0%BC%D0%BF%D0%B8-%D1%80%D0%BE%D0%B7%D0%B6%D0%B0%D1%80%D1%8E%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F-%D0%BD%D0%B0-%D1%81%D0%B2%D1%96%D1%82%D0%BB%D0%BE%D0%B4%D1%96%D0%BE%D0%B4%D0%BD%D1%83.jpg?s=612x612&w=0&k=20&c=mvRLvQXTgmY4PzCvLs5SP_J8L1KLBhgWXzHnYsaIKA0="
+        };
+        var tools = new CategoryEntity
+        {
+            Name = "Інструменти",
+            Description = "Електроінструмент",
+            Image = "https://media.istockphoto.com/id/1186871403/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%81%D0%B2%D0%B5%D1%80%D0%B4%D0%BB%D0%B0-%D1%82%D0%B0-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D1%96%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B8-%D0%B2-%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%D1%96.jpg?s=612x612&w=0&k=20&c=6mVBdJyyki_S5iemNaXv5cne_QiV1no9FMI0jWHZLpg="
+        };
+        var smartHome = new CategoryEntity
+        {
+            Name = "Розумний дім",
+            Description = "Датчики та контролери",
+            Image = "https://media.istockphoto.com/id/870664542/uk/%D1%84%D0%BE%D1%82%D0%BE/stem-%D0%B0%D0%B1%D0%BE-diy-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B8%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%82-%D0%BB%D1%96%D0%BD%D1%96%D1%8F-%D0%B2%D1%96%D0%B4%D1%81%D1%82%D0%B5%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F-%D1%85%D0%BE%D0%B4%D1%8C%D0%B1%D0%B8-%D1%80%D0%BE%D0%B1%D0%BE%D1%82-%D0%BA%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%86%D1%96%D1%97-%D1%96%D0%B4%D0%B5%D1%97.jpg?s=612x612&w=0&k=20&c=p5KnhZyUw2HM0gIbkolQBePESIMm1_VVxD909ze2pBI="
+        };
+        var sockets = new CategoryEntity
+        {
+            Name = "Розетки та вимикачі",
+            Description = "Електрофурнітура",
+            Image = "https://media.istockphoto.com/id/1288881663/uk/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D1%96-%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F/%D1%80%D0%BE%D0%B7%D0%B5%D1%82%D0%BA%D0%B8-%D0%B2%D0%B8%D0%BC%D0%B8%D0%BA%D0%B0%D1%87%D1%96-%D1%81%D0%B2%D1%96%D1%82%D0%BB%D0%B0-%D0%BD%D0%B0%D1%80%D1%8F%D0%B4%D0%B8-%D1%80%D1%96%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D1%83-%D1%80%D0%B5%D0%B0%D0%BB%D1%96%D1%81%D1%82%D0%B8%D1%87%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BD%D0%B0%D0%B1%D0%BE%D1%80%D1%83.jpg?s=612x612&w=0&k=20&c=FzoI7E3S9wvtVScDlO0lZ8QcpSK85FDe3g0hGhwNEaQ="
+        };
+        var protection = new CategoryEntity
+        {
+            Name = "Автоматика",
+            Description = "Захист та щитове обладнання",
+            Image = "https://media.istockphoto.com/id/950865552/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BF%D0%BB%D0%B0%D1%81%D1%82%D0%B8%D0%BA%D0%BE%D0%B2%D1%96-%D0%BA%D0%BE%D1%80%D0%BE%D0%B1%D0%BA%D0%B8-%D0%B4%D0%BB%D1%8F-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BC%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%D1%83-%D0%B2-%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%D1%96.jpg?s=612x612&w=0&k=20&c=R2Ya4lnn13ZrcSxz2jhZA8XbbdIMnupE2wGrbPAsxg0="
+        };
 
-        await _context.Categories.AddRangeAsync(cabling, lighting, tools);
+
+        await _context.Categories.AddRangeAsync(cabling, lighting, tools, smartHome, sockets, protection);
 
         await _context.SaveChangesAsync();
 
@@ -102,7 +136,19 @@ public class DbSeeder
             new() { Name = "Вуличні ліхтарі", ParentId = lighting.Id },
 
             new() { Name = "Вимірювальні прилади", ParentId = tools.Id },
-            new() { Name = "Викрутки та плоскогубці", ParentId = tools.Id }
+            new() { Name = "Викрутки та плоскогубці", ParentId = tools.Id },
+
+            new() { Name = "Датчики руху та витоку", ParentId = smartHome.Id },
+            new() { Name = "Розумні реле та хаби", ParentId = smartHome.Id },
+            new() { Name = "Системи відеоспостереження", ParentId = smartHome.Id },
+
+            new() { Name = "Внутрішні розетки", ParentId = sockets.Id },
+            new() { Name = "Сенсорні вимикачі", ParentId = sockets.Id },
+            new() { Name = "Рамки та аксесуари", ParentId = sockets.Id },
+
+            new() { Name = "Автоматичні вимикачі", ParentId = protection.Id },
+            new() { Name = "Пристрої захисного вимкнення (ПЗВ)", ParentId = protection.Id },
+            new() { Name = "Електричні щити та бокси", ParentId = protection.Id }
         };
 
         await _context.Categories.AddRangeAsync(subCategories);
@@ -127,7 +173,15 @@ public class DbSeeder
 
             new() { Name = "Настінна мережева розетка EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id },
 
-            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id }
+            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id },
+
+            new() { Name = "Датчик затоплення ZigBee", Price = 480, StockQuantity = 60, CategoryId = categories[5].Id },
+            new() { Name = "Датчик відкриття дверей/вікна", Price = 320, StockQuantity = 100, CategoryId = categories[5].Id },
+
+            new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id },
+            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id },
+
+            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id },
         };
 
         await _context.Products.AddRangeAsync(products);
