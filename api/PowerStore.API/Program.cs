@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PowerStore.API.Middleware;
+using PowerStore.Application.DTOs;
 using PowerStore.Application.Interfaces;
 using PowerStore.Application.Services;
 using PowerStore.Domain.Entities;
@@ -18,6 +19,8 @@ builder.Services.AddDbContext<PowerStoreDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+builder.Services.Configure<FileStorageSettings>(builder.Configuration.GetSection("FileStorageSettings"));
+
 // Add services to the container.
 builder.Services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
 builder.Services.AddScoped<IProductService, ProductService>();
@@ -29,6 +32,7 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 
 builder.Services.AddScoped<DbSeeder>();
@@ -136,6 +140,12 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.UseStaticFiles();
+string uploadPath = Path.Combine(app.Environment.WebRootPath, "uploads", "avatars");
+if (!Directory.Exists(uploadPath))
+{
+    Directory.CreateDirectory(uploadPath);
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

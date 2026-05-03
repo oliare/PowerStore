@@ -5,6 +5,7 @@ export interface UserProfile {
   phoneNumber: string;
   registrationDate: string;
   updatedAt: string;
+  createdAt: string;
   birthDate: string;
   image: string | null;
 }

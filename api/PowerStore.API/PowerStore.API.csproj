@@ -21,4 +21,8 @@
     <ProjectReference Include="..\PowerStore.Infrastructure\PowerStore.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\uploads\avatars\" />
+  </ItemGroup>
+
 </Project>

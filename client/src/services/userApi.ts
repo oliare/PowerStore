@@ -16,7 +16,20 @@ export const usersApi = baseApi.injectEndpoints({
         body: message,
       }),
     }),
+
+    updateProfile: builder.mutation<void, FormData>({
+      query: (formData) => ({
+        url: "Users/update",
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
-export const { useGetMeQuery, useSendMessageMutation } = usersApi;
+export const {
+  useGetMeQuery,
+  useSendMessageMutation,
+  useUpdateProfileMutation,
+} = usersApi;

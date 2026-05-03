@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PowerStore.Application.Interfaces;
 using PowerStore.API.Extensions;
 using PowerStore.Application.DTOs.Email;
+using PowerStore.Application.DTOs.User;
 
 namespace PowerStore.API.Controllers;
 
@@ -28,6 +29,16 @@ public class UsersController : ControllerBase
 
         return user == null ? NotFound() : Ok(user);
     }
+
+    [Authorize]
+    [HttpPut("update")]
+    public async Task<IActionResult> UpdateProfile([FromForm] UpdateUserDto updateDto)
+    {
+        var userId = User.GetUserId();
+        await _userService.UpdateProfileAsync(userId, updateDto);
+        return Ok();
+    }
+
 
     [HttpPost("contact-message")]
     public async Task<IActionResult> SendContactMessage([FromBody] ContactMessageDto messageDto)

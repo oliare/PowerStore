@@ -29,6 +29,7 @@ import { clearCart } from "../../store/cartSlice";
 import { useGetCategoryTreeQuery } from "../../services/categoryApi";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useSearchProductsQuery } from "../../services/productApi";
+import { IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL } from "../../api/api";
 
 export default function Header() {
   const navigate = useNavigate();
@@ -147,16 +148,26 @@ export default function Header() {
                 arrow
               >
                 <div className="flex items-center gap-2 cursor-pointer group">
-                  <Avatar
-                    style={{
-                      backgroundColor: "#00B207",
-                      verticalAlign: "middle",
-                    }}
-                    size="medium"
-                    className="group-hover:opacity-80 transition-opacity"
-                  >
-                    {getInitials() || <User size={16} />}
-                  </Avatar>
+                  {user.image ? (
+                    <Avatar
+                      src={
+                        user.image
+                          ? `${IMAGE_BASE_URL}/${user.image}`
+                          : PLACEHOLDER_IMAGE_URL
+                      }
+                    />
+                  ) : (
+                    <Avatar
+                      style={{
+                        backgroundColor: "#00B207",
+                        verticalAlign: "middle",
+                      }}
+                      size="medium"
+                      className="group-hover:opacity-80 transition-opacity"
+                    >
+                      {getInitials() || <User size={16} />}
+                    </Avatar>
+                  )}
                   <span className="text-gray-700 font-medium group-hover:text-brand-primary">
                     {user.firstName}
                   </span>

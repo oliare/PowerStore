@@ -52,7 +52,7 @@ public class DbSeeder
             Email = "admin@gmail.com",
             FirstName = "Doris",
             LastName = "Lewicki",
-            Image = "https://www.mamp.one/wp-content/uploads/2024/09/image-resources2.jpg",
+            Image = "/image-resources2.jpg",
             EmailConfirmed = true
         };
 
@@ -62,7 +62,7 @@ public class DbSeeder
             Email = "user@gmail.com",
             FirstName = "Test",
             LastName = "User",
-            Image = "https://webupon.com/wp-content/uploads/2024/02/SampleImage1-Dog-small.png",
+            Image = "/SampleImage1-Dog-small.png",
             EmailConfirmed = true
         };
 
