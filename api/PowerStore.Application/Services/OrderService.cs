@@ -41,6 +41,7 @@ public class OrderService : IOrderService
             TotalPrice = dto.TotalPrice,
             DeliveryMethod = dto.DeliveryMethod,
             PaymentType = dto.PaymentType,
+            TrackingNumber = GenerateShortTrackingNumber(),
             Status = OrderStatus.Pending,
             DeliveryAddress = deliveryAddress,
             CustomerNote = dto.CustomerNote,
@@ -106,5 +107,16 @@ public class OrderService : IOrderService
         order.Status = status;
         _orderRepo.Update(order);
         await _orderRepo.SaveAsync();
+    }
+
+    private string GenerateShortTrackingNumber()
+    {
+        const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        var random = new Random();
+
+        var result = new string(Enumerable.Repeat(chars, 6)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
+
+        return result;
     }
 }

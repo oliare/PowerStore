@@ -9,6 +9,8 @@ import { IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { showNotify } from "../../utils/showNotify";
 import { ImageCropperModal } from "../../common/ImageCropperModal";
 import type { UserProfile } from "../../types/user";
+import { useGetMyOrdersQuery } from "../../services/orderApi";
+import { orderHistoryColumns } from "../../utils/orderHistoryColumns";
 
 export const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,6 +24,7 @@ export const UserProfilePage = () => {
 
   const { data: user, isLoading } = useGetMeQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
+  const { data: orders } = useGetMyOrdersQuery();
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return "—";
@@ -143,50 +146,6 @@ export const UserProfilePage = () => {
   const avatarSrc =
     previewImage ??
     (user?.image ? `${IMAGE_BASE_URL}/${user.image}` : PLACEHOLDER_IMAGE_URL);
-
-  const dataSource = [
-    {
-      key: "1",
-      id: "#738",
-      date: "8 Sep, 2020",
-      total: "$135.00",
-      status: "Processing",
-    },
-    {
-      key: "2",
-      id: "#703",
-      date: "24 May, 2020",
-      total: "$25.00",
-      status: "Completed",
-    },
-  ];
-
-  const columns = [
-    { title: "№ Замовлення", dataIndex: "id", key: "id" },
-    { title: "Дата", dataIndex: "date", key: "date" },
-    { title: "Загалом", dataIndex: "total", key: "total" },
-    {
-      title: "Статус",
-      dataIndex: "status",
-      key: "status",
-      render: (status: string) => (
-        <span
-          className={`capitalize ${status === "Completed" ? "text-gray-400" : "text-brand-dark"}`}
-        >
-          {status}
-        </span>
-      ),
-    },
-    {
-      title: "",
-      key: "action",
-      render: () => (
-        <a className="text-brand-primary font-medium hover:underline cursor-pointer">
-          Детальніше
-        </a>
-      ),
-    },
-  ];
 
   return (
     <>
@@ -388,9 +347,12 @@ export const UserProfilePage = () => {
             <div className="px-4 pb-4">
               <div className="rounded-2xl border border-gray-50 overflow-hidden">
                 <Table
-                  dataSource={dataSource}
-                  columns={columns}
+                  dataSource={orders?.slice(0, 2)}
+                  columns={orderHistoryColumns}
                   pagination={false}
+                  rowKey="id"
+                  loading={isLoading}
+                  locale={{ emptyText: "У вас поки немає замовлень" }}
                   rowClassName="group hover:bg-gray-50/50 transition-colors cursor-pointer"
                 />
               </div>

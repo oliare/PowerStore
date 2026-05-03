@@ -1,13 +1,15 @@
 import { Table } from "antd";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { OrderDto } from "../../types/order";
 import { OrderStatus } from "../../enums/enum";
+import { useGetMyOrdersQuery } from "../../services/orderApi";
+import { orderHistoryColumns } from "../../utils/orderHistoryColumns";
 
 export const ProfileHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
+  const { data: orders } = useGetMyOrdersQuery();
 
   const sortLabels: Record<string, string> = {
     newest: "Спочатку нові",
@@ -15,39 +17,8 @@ export const ProfileHistoryPage = () => {
     expensive: "Найдорожчі",
   };
 
-  const dataSource: OrderDto[] = [
-    {
-      id: 1,
-      orderNumber: "#738",
-      createdAt: "2020-09-08",
-      totalPrice: 135,
-      items: [
-        { productId: "1", quantity: 5, price: 27, productName: "Product 1" },
-      ],
-      status: OrderStatus.Pending,
-    },
-    {
-      id: 2,
-      orderNumber: "#703",
-      createdAt: "2020-05-24",
-      totalPrice: 25,
-      items: [
-        { productId: "2", quantity: 1, price: 25, productName: "Product 2" },
-      ],
-      status: OrderStatus.Shipped,
-    },
-    {
-      id: 3,
-      orderNumber: "#130",
-      createdAt: "2020-10-22",
-      totalPrice: 250,
-      items: [],
-      status: OrderStatus.Completed,
-    },
-  ];
-
-  const filteredData = dataSource
-    .filter((item) => {
+  const filteredData = orders
+    ?.filter((item) => {
       if (activeFilter === "active") return item.status === OrderStatus.Pending;
       if (activeFilter === "completed")
         return item.status === OrderStatus.Completed;
@@ -66,74 +37,6 @@ export const ProfileHistoryPage = () => {
       return 0;
     });
 
-  const columns = [
-    {
-      title: "ID Замовлення",
-      dataIndex: "orderNumber",
-      key: "orderNumber",
-      className: "text-sm font-semibold text-gray-900",
-    },
-    {
-      title: "Дата",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (date: string) => new Date(date).toLocaleDateString("uk-UA"),
-      className: "text-sm text-gray-500",
-    },
-    {
-      title: "Сума",
-      key: "total",
-      render: (_: number, record: OrderDto) => (
-        <span className="font-semibold text-gray-900">
-          ₴{record.totalPrice} (
-          {record.items.reduce((acc, item) => acc + item.quantity, 0)})
-        </span>
-      ),
-    },
-    {
-      title: "Статус",
-      dataIndex: "status",
-      key: "status",
-      render: (status: OrderStatus) => {
-        const statusLabels: Record<OrderStatus, string> = {
-          [OrderStatus.Pending]: "Обробка",
-          [OrderStatus.Shipped]: "В дорозі",
-          [OrderStatus.Completed]: "Завершено",
-          [OrderStatus.Cancelled]: "Скасовано",
-          [OrderStatus.Paid]: "Оплачено",
-        };
-
-        const styles: Record<OrderStatus, string> = {
-          [OrderStatus.Pending]: "bg-blue-50 text-blue-600",
-          [OrderStatus.Shipped]: "bg-amber-50 text-amber-600",
-          [OrderStatus.Completed]: "bg-green-50 text-green-600",
-          [OrderStatus.Cancelled]: "bg-red-50 text-red-600",
-          [OrderStatus.Paid]: "bg-purple-50 text-purple-600",
-        };
-
-        return (
-          <span
-            className={`px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
-              styles[status] || "bg-gray-50 text-gray-500"
-            }`}
-          >
-            {statusLabels[status] || status}
-          </span>
-        );
-      },
-    },
-    {
-      title: "",
-      key: "action",
-      align: "right" as const,
-      render: () => (
-        <button className="text-brand-primary text-sm font-semibold hover:underline">
-          Детальніше
-        </button>
-      ),
-    },
-  ];
-
   return (
     <div className="font-montserrat animate-in fade-in duration-500">
       <h1 className="text-2xl font-semibold text-gray-900 mb-8 tracking-tight">
@@ -143,7 +46,7 @@ export const ProfileHistoryPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
         <div className="flex flex-wrap items-center gap-2">
           {[
-            { id: "all", label: `Всі (${dataSource.length})` },
+            { id: "all", label: `Всі (${orders?.length || 0})` },
             { id: "active", label: "Активні" },
             { id: "completed", label: "Завершені" },
           ].map((filter) => (
@@ -206,7 +109,7 @@ export const ProfileHistoryPage = () => {
         <Table
           rowKey="id"
           dataSource={filteredData}
-          columns={columns}
+          columns={orderHistoryColumns}
           pagination={{
             pageSize: 5,
             position: ["bottomCenter"],
