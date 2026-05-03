@@ -9,4 +9,5 @@ public interface IProductService
     Task<ProductDto?> GetByIdAsync(Guid id);
     Task<ProductDto> CreateAsync(ProductCreateDto dto);
     Task<ProductDetailsDto> GetProductDetailsAsync(Guid id);
+    Task<IEnumerable<ProductDto>> SearchProductsAsync(string query, int count);
 }

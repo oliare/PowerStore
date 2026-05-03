@@ -258,7 +258,7 @@ const ProductDetailsPage = () => {
               </h2>
               <div className="h-0.5 flex-1 bg-gray-100 mx-8 hidden md:block"></div>
               <Link
-                to="/products"
+                to="/shop"
                 className="text-brand-primary font-bold hover:underline"
               >
                 Всі товари

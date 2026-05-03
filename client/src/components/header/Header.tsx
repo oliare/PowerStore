@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ChevronDown,
   Dot,
@@ -12,6 +12,7 @@ import {
   User,
   Menu as MenuIcon,
   X,
+  Loader,
 } from "lucide-react";
 import { Drawer, Menu, Avatar, Dropdown } from "antd";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,12 +27,17 @@ import { baseApi } from "../../api/baseApi";
 import { clearFavorites } from "../../store/favoriteSlice";
 import { clearCart } from "../../store/cartSlice";
 import { useGetCategoryTreeQuery } from "../../services/categoryApi";
+import { useDebounce } from "../../hooks/useDebounce";
+import { useSearchProductsQuery } from "../../services/productApi";
 
 export default function Header() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const dispatch = useDispatch();
+  const [isFocused, setIsFocused] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { data: user } = useGetMeQuery();
   const [logout] = useLogoutMutation();
@@ -61,6 +67,26 @@ export default function Header() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
+
+  const { data: suggestions, isFetching } = useSearchProductsQuery(
+    { query: debouncedSearch, count: 5 },
+    { skip: debouncedSearch.length < 2 },
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = async () => {
@@ -182,18 +208,80 @@ export default function Header() {
             />
           </Link>
 
-          <div className="hidden md:flex flex-1 mx-12">
-            <div className="relative w-full">
+          <div
+            className="hidden md:flex flex-1 mx-12 relative"
+            ref={dropdownRef}
+          >
+            <div className="relative w-full group">
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsFocused(true)}
                 placeholder="Пошук електротоварів..."
-                className="w-full bg-gray-100 rounded-full py-2.5 pl-12 pr-4 focus:ring-2 focus:ring-blue-500 outline-none"
+                className="w-full bg-gray-100 rounded-full py-2.5 pl-12 pr-10 
+                   focus:bg-white focus:ring-1 focus:ring-brand-accent/50 
+                   border border-transparent focus:border-brand-primary/30
+                   outline-none transition-all shadow-sm"
               />
+
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
+                  isFocused ? "text-brand-primary" : "text-gray-400"
+                }`}
                 size={18}
               />
+
+              {isFetching && (
+                <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                  <Loader className="text-brand-primary" />
+                </div>
+              )}
             </div>
+
+            {isFocused && searchTerm.length >= 2 && suggestions && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 overflow-hidden">
+                {suggestions.length > 0 ? (
+                  <div className="py-2">
+                    {suggestions.map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => {
+                          navigate(`/product/${product.id}`);
+                          setIsFocused(false);
+                          setSearchTerm("");
+                        }}
+                        className="px-5 py-3 hover:bg-gray-50 cursor-pointer flex items-center gap-4 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-gray-50 overflow-hidden flex-shrink-0 border border-gray-100">
+                          <img
+                            src={
+                              product.images?.[0]?.image ||
+                              "https://via.placeholder.com/40"
+                            }
+                            className="w-full h-full object-cover"
+                            alt=""
+                          />
+                        </div>
+                        <div className="flex-grow">
+                          <div className="text-sm font-semibold text-gray-800 line-clamp-1">
+                            {product.name}
+                          </div>
+                          <div className="text-xs text-brand-primary font-medium">
+                            {product.price} грн
+                          </div>
+                        </div>
+                        <Search size={14} className="text-gray-300" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 text-center text-gray-400 text-sm italic">
+                    Нічого не знайдено за запитом "{searchTerm}"
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 md:gap-6">

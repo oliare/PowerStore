@@ -86,4 +86,20 @@ public class ProductService : IProductService
 
         return _mapper.Map<ProductDto>(entity);
     }
+
+    public async Task<IEnumerable<ProductDto>> SearchProductsAsync(string query, int count)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return Enumerable.Empty<ProductDto>();
+
+        var lowerQuery = query.ToLower();
+
+        return await _repo.Query()
+            .Where(p => p.Name.ToLower().Contains(lowerQuery) ||
+                        p.Description.ToLower().Contains(lowerQuery))
+            .OrderByDescending(p => p.Name.ToLower().StartsWith(lowerQuery))
+            .Take(count)
+            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+            .ToListAsync();
+    }
 }

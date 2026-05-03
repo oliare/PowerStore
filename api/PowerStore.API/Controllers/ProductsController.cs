@@ -49,4 +49,12 @@ public class ProductsController : ControllerBase
         var entity = await _productService.CreateAsync(dto);
         return CreatedAtAction(nameof(GetProduct), new { id = entity.Id }, entity);
     }
+
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<ProductDto>>> Search([FromQuery] string query, [FromQuery] int count)
+    {
+        var results = await _productService.SearchProductsAsync(query, count);
+
+        return Ok(results);
+    }
 }
