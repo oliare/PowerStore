@@ -17,6 +17,7 @@ import { useDispatch } from "react-redux";
 import type { CartItemDto } from "../types/cart";
 import { FavoriteButton } from "../common/FavoriteButton";
 import { showNotify } from "../utils/showNotify";
+import { StockStatus } from "../common/StockStatus";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
@@ -136,22 +137,23 @@ const ProductDetailsPage = () => {
               <h1 className="text-4xl font-semibold text-gray-900">
                 {product.name}
               </h1>
-              <span className="bg-green-100 text-green-700 px-3 py-0.5 rounded-full text-xs font-medium">
-                В наявності
-              </span>
             </div>
 
-            <div className="flex items-center gap-3 mb-6 text-sm">
+            <div className="flex items-center gap-3 mb-6 mt-3 text-sm">
               <div className="flex text-orange-400">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
                     size={14}
-                    fill={i < 4 ? "currentColor" : "none"}
+                    fill={i < (product.rate || 0) ? "currentColor" : "none"}
                   />
                 ))}
               </div>
-              <span className="text-gray-500">4 Відгуки</span>
+              <span className="text-gray-500">
+                {product.rate || "Немає відгуків"}
+              </span>
+
+              <StockStatus quantity={product.stockQuantity} />
             </div>
 
             <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
@@ -169,7 +171,7 @@ const ProductDetailsPage = () => {
             <div className="text-sm flex items-center gap-4 mb-6">
               <span className="text-gray-900 font-semibold">Бренд:</span>
               <span className="font-medium text-gray-900 italic">
-                PowerStore
+                {product.brand || "Невідомий бренд"}
               </span>
             </div>
 
@@ -212,13 +214,13 @@ const ProductDetailsPage = () => {
               <p>
                 <span className="font-medium text-gray-900">Категорія:</span>{" "}
                 <span className="text-gray-500">
-                  {product.categoryName || "Vegetables"}
+                  {product.categoryName || "Категорія відсутня"}
                 </span>
               </p>
               <p>
                 <span className="font-medium text-gray-900">Теги:</span>{" "}
                 <span className="text-gray-500">
-                  Healthy, {product.categoryName}, PowerStore
+                  {product.tags?.join(", ") || "Немає тегів"}
                 </span>
               </p>
             </div>

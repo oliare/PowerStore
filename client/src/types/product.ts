@@ -17,6 +17,8 @@ export interface ProductDto {
   categoryId: string;
   isFavorite: boolean;
   images?: ProductImageDto[];
+  brand?: string;
+  tags?: string[];
 }
 
 export interface ProductDetailsDto {

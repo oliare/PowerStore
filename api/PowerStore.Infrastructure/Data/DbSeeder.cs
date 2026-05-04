@@ -162,26 +162,47 @@ public class DbSeeder
 
         var products = new List<ProductEntity>
         {
-            new() { Name = "USB Кабель Type-C", Price = 10, StockQuantity = 100, CategoryId = categories[0].Id },
-            new() { Name = "HDMI Кабель 2m", Price = 15, StockQuantity = 80, CategoryId = categories[0].Id },
-            new() { Name = "Ethernet Кабель Cat6", Price = 12, StockQuantity = 120, CategoryId = categories[0].Id },
+            new() { Name = "USB Кабель Type-C", Price = 10, StockQuantity = 100, CategoryId = categories[0].Id ,Brand = "Baseus",
+            Tags = "4K,Video,HDMI 2.1"
+        },
+            new() { Name = "HDMI Кабель 2m", Price = 15, StockQuantity = 80, CategoryId = categories[0].Id
+            ,Brand = "Ugreen",
+            Tags = "LAN,Мережа,Інтернет"
+        },
+            new() { Name = "Ethernet Кабель Cat6", Price = 12, StockQuantity = 120, CategoryId = categories[0].Id,Brand = "Philips",
+            Tags = "E27,Економна,Тепле світло"
+        },
 
             new() { Name = "LED Лампа 10W", Price = 5, StockQuantity = 200, CategoryId = categories[1].Id },
-            new() { Name = "Настільна лампа", Price = 25, StockQuantity = 50, CategoryId = categories[1].Id },
+            new() { Name = "Настільна лампа", Price = 25, StockQuantity = 50, CategoryId = categories[1].Id,Brand = "Xiaomi",
+            Tags = "Smart,Освітлення,Робота"
+        },
 
-            new() { Name = "Одинарний вимикач", Price = 3, StockQuantity = 150, CategoryId = categories[2].Id },
+            new() { Name = "Одинарний вимикач", Price = 3, StockQuantity = 150, CategoryId = categories[2].Id,Brand = "Schneider Electric",
+            Tags = "Фурнітура,Білий,Classic"
+        },
 
-            new() { Name = "Настінна мережева розетка EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id },
+            new() { Name = "Настінна мережева розетка EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id,Brand = "Legrand",
+            Tags = "Розетка,Заземлення,Монтаж"
+        },
 
-            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id },
+            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id,Brand = "UNI-T",
+            Tags = "Вимірювання,Електрика,Інструмент"
+        },
 
-            new() { Name = "Датчик затоплення ZigBee", Price = 480, StockQuantity = 60, CategoryId = categories[5].Id },
-            new() { Name = "Датчик відкриття дверей/вікна", Price = 320, StockQuantity = 100, CategoryId = categories[5].Id },
+            new() { Name = "Датчик затоплення ZigBee", Price = 480, StockQuantity = 60, CategoryId = categories[5].Id,Brand = "Aqara",
+            Tags = "Smart Home,ZigBee,Безпека"
+        },
+            new() { Name = "Датчик відкриття дверей/вікна", Price = 320, StockQuantity = 100, CategoryId = categories[5].Id, Brand = "Sonoff",
+            Tags = "WiFi,Безпека,Розумний дім"
+        },
 
-            new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id },
-            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id },
+            new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id, Brand = "Eaton",
+            Tags = "Захист,Автоматика,Щит" },
+            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id, Brand = "ABB",
+            Tags = "Захист,Надійність,Professional" },
 
-            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id },
+            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id, Brand = "Livolo", Tags = "Сенсор,WiFi,Modern" },
         };
 
         await _context.Products.AddRangeAsync(products);

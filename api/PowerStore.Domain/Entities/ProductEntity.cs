@@ -12,7 +12,8 @@ public class ProductEntity : AuditableEntityBase
     public double? Rate { get; set; }
     public int StockQuantity { get; set; }
     public decimal? Discount { get; set; }
-
+    public string? Brand { get; set; }
+    public string? Tags { get; set; }
     public Guid CategoryId { get; set; }
     public CategoryEntity Category { get; set; }
     public virtual ICollection<ProductImageEntity> Images { get; set; } = [];

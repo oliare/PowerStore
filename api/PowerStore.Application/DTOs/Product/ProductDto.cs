@@ -15,5 +15,7 @@ public class ProductDto
     public string? CategoryName { get; set; }
     public Guid CategoryId { get; set; }
     public bool IsFavorite { get; set; }
+    public string? Brand { get; set; }
+    public List<string> Tags { get; set; } = [];
     public List<ProductImageDto>? Images { get; set; }
 }
