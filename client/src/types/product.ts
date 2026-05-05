@@ -9,6 +9,7 @@ export interface ProductDto {
   name: string;
   price: number;
   description?: string;
+  specifications?: string;
   image?: string;
   rate?: number;
   stockQuantity: number;

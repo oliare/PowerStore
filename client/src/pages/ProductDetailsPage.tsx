@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useGetProductDetailsQuery } from "../services/productApi";
 import {
@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   RefreshCcw,
   AlertCircle,
+  ArrowRight,
 } from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
 import type { ProductDto } from "../types/product";
@@ -18,12 +19,14 @@ import type { CartItemDto } from "../types/cart";
 import { FavoriteButton } from "../common/FavoriteButton";
 import { showNotify } from "../utils/showNotify";
 import { StockStatus } from "../common/StockStatus";
+import { ProductSpecifications } from "../common/ProductSpecifications";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { data, isLoading, error } = useGetProductDetailsQuery(id!);
+  const detailsSectionRef = useRef<HTMLDivElement>(null);
 
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -35,6 +38,7 @@ const ProductDetailsPage = () => {
         Завантаження...
       </div>
     );
+
   if (error || !data) {
     return (
       <div className="max-w-7xl mx-auto py-12 min-h-screen">
@@ -51,16 +55,13 @@ const ProductDetailsPage = () => {
             <div className="text-red-400 mb-4">
               <AlertCircle size={48} strokeWidth={1.5} />
             </div>
-
             <h2 className="text-xl font-bold text-gray-900 mb-2">
               Товар не знайдено
             </h2>
-
             <p className="text-sm text-gray-500 mb-8">
               Не вдалося завантажити дані. Перевірте з'єднання або спробуйте
               пізніше.
             </p>
-
             <button
               onClick={() => window.location.reload()}
               className="flex items-center justify-center gap-2 px-8 py-3 bg-brand-primary text-white rounded-full text-sm font-semibold hover:shadow-lg transition-all active:scale-95"
@@ -75,6 +76,7 @@ const ProductDetailsPage = () => {
   }
 
   const { product, relatedProducts } = data;
+  const isOutOfStock = product.stockQuantity <= 0;
 
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
     const image =
@@ -96,6 +98,28 @@ const ProductDetailsPage = () => {
     showNotify.success(`"${product.name}" додано до кошика!`);
   };
 
+  const scrollToDescription = () => {
+    setActiveTab("description");
+    detailsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const parseSpecs = (specsString: string | null | undefined) => {
+    if (!specsString || specsString === "[]") return [];
+    try {
+      const parsed = JSON.parse(specsString);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.error("Помилка парсингу характеристик", e);
+      return [];
+    }
+  };
+
+  const productSpecs = parseSpecs(product.specifications);
+  const isLongDescription = (product.description?.length || 0) > 241;
+  const displayDescription = isLongDescription
+    ? `${product.description?.substring(0, 241)}...`
+    : product.description;
+
   return (
     <div className="bg-white font-manrope">
       <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen">
@@ -106,6 +130,7 @@ const ProductDetailsPage = () => {
           <ArrowLeft size={20} />
           Назад до магазину
         </Link>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex md:flex-col gap-3 order-2 md:order-1">
@@ -113,7 +138,11 @@ const ProductDetailsPage = () => {
                 <button
                   key={img.id}
                   onClick={() => setActiveImage(img.image)}
-                  className={`w-20 h-20 border-2 rounded-xl p-1 transition-all ${activeImage === img.image ? "border-brand-primary" : "border-gray-100"}`}
+                  className={`w-20 h-20 border-2 rounded-xl p-1 transition-all ${
+                    activeImage === img.image
+                      ? "border-brand-primary"
+                      : "border-gray-100"
+                  }`}
                 >
                   <img
                     src={img.image}
@@ -133,11 +162,9 @@ const ProductDetailsPage = () => {
           </div>
 
           <div className="flex flex-col">
-            <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-4xl font-semibold text-gray-900">
-                {product.name}
-              </h1>
-            </div>
+            <h1 className="text-4xl font-semibold text-gray-900 mb-2">
+              {product.name}
+            </h1>
 
             <div className="flex items-center gap-3 mb-6 mt-3 text-sm">
               <div className="flex text-orange-400">
@@ -152,7 +179,6 @@ const ProductDetailsPage = () => {
               <span className="text-gray-500">
                 {product.rate || "Немає відгуків"}
               </span>
-
               <StockStatus quantity={product.stockQuantity} />
             </div>
 
@@ -175,10 +201,20 @@ const ProductDetailsPage = () => {
               </span>
             </div>
 
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">
-              {product.description || "Опис відсутній"}
-            </p>
-
+            <div className="mb-6 flex ">
+              <p className="text-gray-400 text-sm leading-relaxed inline">
+                {displayDescription || "Опис відсутній"}
+                {isLongDescription && (
+                  <button
+                    onClick={scrollToDescription}
+                    className="ml-2 text-brand-primary font-bold text-sm hover:underline"
+                  >
+                    Читати далі
+                    <ArrowRight size={16} className="ml-1 inline" />
+                  </button>
+                )}
+              </p>
+            </div>
             <div className="flex items-center gap-3 py-6 border-t border-b border-gray-200 mb-8">
               <div className="flex items-center border border-gray-200 rounded-full h-11 bg-white">
                 <button
@@ -197,17 +233,22 @@ const ProductDetailsPage = () => {
                   <Plus size={16} />
                 </button>
               </div>
-
-              <button
-                onClick={() => handleAddToCart(product, quantity)}
-                className="flex-1 h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
-              >
-                Покласти в кошик <ShoppingCart size={18} />
-              </button>
-
-              <div className="flex gap-2">
-                <FavoriteButton product={product} className="" />
-              </div>
+              {isOutOfStock ? (
+                <button
+                  className="flex-1 h-11 bg-gray-400 text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors cursor-not-allowed"
+                  disabled
+                >
+                  Немає в наявності <ShoppingCart size={18} />
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleAddToCart(product, quantity)}
+                  className="flex-1 h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
+                >
+                  Покласти в кошик <ShoppingCart size={18} />
+                </button>
+              )}{" "}
+              <FavoriteButton product={product} />
             </div>
 
             <div className="text-sm space-y-2">
@@ -227,31 +268,53 @@ const ProductDetailsPage = () => {
           </div>
         </div>
 
-        <div className="mt-20 border-t border-gray-100 pt-10">
-          <div className="flex justify-center gap-20 mb-10 border-b border-gray-100">
-            {["description", "additional", "feedback"].map((tab) => (
+        <div
+          ref={detailsSectionRef}
+          className="mt-20 border-t border-gray-100 pt-10"
+        >
+          <div className="flex justify-center gap-10 md:gap-20 mb-10 border-b border-gray-100 overflow-x-auto">
+            {[
+              { id: "description", label: "Опис" },
+              { id: "specs", label: "Характеристики" },
+              { id: "feedback", label: "Відгуки" },
+            ].map((tab) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`pb-4 text-sm font-bold tracking-widest transition-all relative ${activeTab === tab ? "text-gray-900 border-b-2 border-brand-primary" : "text-gray-400 hover:text-gray-600"}`}
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`pb-4 text-sm font-bold tracking-widest transition-all whitespace-nowrap relative ${
+                  activeTab === tab.id
+                    ? "text-gray-900 border-b-2 border-brand-primary"
+                    : "text-gray-400 hover:text-gray-600"
+                }`}
               >
-                {tab === "description"
-                  ? "Опис"
-                  : tab === "additional"
-                    ? "Додаткова інформація"
-                    : "Відгуки"}
+                {tab.label}
               </button>
             ))}
           </div>
-          <div className="text-gray-500 text-sm leading-loose max-w-4xl mx-auto text-center">
-            {activeTab === "description" &&
-              (product.description || "Опис відсутній.")}
-            {activeTab === "additional" &&
-              "Вага: 1кг, Якість: Преміум, Гарантія: 12 місяців"}
-            {activeTab === "feedback" &&
-              "Відгуків ще немає. Будьте першим, хто залишить відгук!"}
+
+          <div className="max-w-4xl mx-auto min-h-[200px]">
+            {activeTab === "description" && (
+              <div className="text-gray-500 text-sm leading-loose">
+                <p className="whitespace-pre-line">
+                  {product.description || "Опис відсутній."}
+                </p>
+              </div>
+            )}
+
+            {activeTab === "specs" && (
+              <div className="flex justify-center">
+                <ProductSpecifications spec={productSpecs} />
+              </div>
+            )}
+
+            {activeTab === "feedback" && (
+              <p className="text-gray-500 text-sm leading-loose text-center">
+                Відгуків ще немає. Будьте першим, хто залишить відгук!
+              </p>
+            )}
           </div>
         </div>
+
         {relatedProducts.length > 0 && (
           <div className="mt-32">
             <div className="flex items-center justify-between mb-12">
@@ -266,7 +329,6 @@ const ProductDetailsPage = () => {
                 Всі товари
               </Link>
             </div>
-
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
               {relatedProducts.map((item) => (
                 <Link

@@ -7,6 +7,7 @@ public class ProductCreateDto
     public required string Name { get; set; }
     public decimal Price { get; set; }
     public string? Description { get; set; }
+    public string? Specifications { get; set; }
     public string? Image { get; set; }
     public double? Rate { get; set; }
     public int StockQuantity { get; set; }

@@ -1,4 +1,9 @@
-import { ArrowRight, ShoppingCart, AlertCircle } from "lucide-react";
+import {
+  ArrowRight,
+  ShoppingCart,
+  AlertCircle,
+  PackageCheck,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import type { ProductDto } from "../../types/product";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
@@ -10,6 +15,7 @@ import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { SkeletonCard } from "../../common/SkeletonCard";
 import { showNotify } from "../../utils/showNotify";
+import { StockStatus } from "../../common/StockStatus";
 
 interface ProductsSectionProps {
   products: ProductDto[];
@@ -24,16 +30,9 @@ export const ProductsSection = ({
 }: ProductsSectionProps) => {
   const dispatch = useDispatch();
 
-  const handleCartClick = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    product: ProductDto,
-  ) => {
-    e.preventDefault();
-    e.stopPropagation();
-    handleAddToCart(product, 1);
-  };
-
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
+    if (product.stockQuantity <= 0) return;
+
     const image =
       product.images && product.images.length > 0
         ? product.images[0].image
@@ -51,6 +50,15 @@ export const ProductsSection = ({
 
     dispatch(addToCart(item));
     showNotify.success(`"${product.name}" додано до кошика`);
+  };
+
+  const handleCartClick = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    product: ProductDto,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleAddToCart(product, 1);
   };
 
   return (
@@ -99,50 +107,96 @@ export const ProductsSection = ({
               ? Array.from({ length: 5 }).map((_, i) => (
                   <SkeletonCard key={i} />
                 ))
-              : products.map((product) => (
-                  <Link
-                    to={`/product/${product.id}`}
-                    key={product.id}
-                    className="group"
-                  >
-                    <div className="h-full bg-white p-4 border z-10 border-gray-100 rounded-2xl shadow-sm transition-all hover:shadow-[0_0_20px_0_rgba(76,175,80,0.3)] hover:shadow-brand-dark/20 hover:border-brand-primary/70">
-                      <div className="relative h-48 rounded-xl overflow-hidden mb-10 bg-gray-50">
-                        <img
-                          src={
-                            product.images && product.images.length > 0
-                              ? product.images[0].image
-                              : PLACEHOLDER_IMAGE_URL
-                          }
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                        <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
-                          <FavoriteButton product={product} />
-                        </div>
-                      </div>
+              : products.map((product) => {
+                  const isOutOfStock = product.stockQuantity <= 0;
 
-                      <div className="flex justify-between items-end">
-                        <div className="flex flex-col gap-1">
-                          <p className="text-sm text-gray-700 font-medium transition-colors duration-300 group-hover:text-blue-800/85 line-clamp-2">
-                            {product.name}
-                          </p>
-                          <p className="text-lg font-bold text-gray-900 font-manrope">
-                            ₴ {product.price}
-                          </p>
-                          <p className="text-xs text-brand-accent font-medium">
-                            В наявності
-                          </p>
+                  return (
+                    <Link
+                      to={`/product/${product.id}`}
+                      key={product.id}
+                      className="group"
+                    >
+                      <div
+                        className={`h-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm transition-all relative
+                          ${
+                            isOutOfStock
+                              ? "opacity-70 grayscale-[0.4]"
+                              : "hover:shadow-xl hover:border-brand-primary/40"
+                          }`}
+                      >
+                        <div className="relative h-44 rounded-xl overflow-hidden mb-6 bg-gray-50 flex items-center justify-center p-2">
+                          <img
+                            src={
+                              product.images?.[0]?.image ||
+                              PLACEHOLDER_IMAGE_URL
+                            }
+                            alt={product.name}
+                            className={`w-full h-full object-contain mix-blend-multiply transition-transform duration-500 
+                              ${!isOutOfStock && "group-hover:scale-110"}`}
+                          />
+
+                          <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                            <FavoriteButton product={product} />
+                          </div>
+
+                          {isOutOfStock && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/5 z-10">
+                              <span className="bg-white/90 text-gray-600 text-[10px] font-bold px-2 py-1 rounded shadow-sm uppercase">
+                                Немає
+                              </span>
+                            </div>
+                          )}
                         </div>
-                        <button
-                          className="p-3 rounded-full bg-gray-100 hover:text-white hover:bg-brand-primary transition-colors flex-shrink-0"
-                          onClick={(e) => handleCartClick(e, product)}
-                        >
-                          <ShoppingCart size={20} />
-                        </button>
+
+                        <div className="space-y-2">
+                          <h3
+                            className={`text-sm font-medium line-clamp-2 min-h-[40px] transition-colors
+                            ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
+                          >
+                            {product.name}
+                          </h3>
+
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex flex-col">
+                              <span
+                                className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
+                              >
+                                ₴ {product.price}
+                              </span>
+
+                              {!isOutOfStock ? (
+                                <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
+                                  <PackageCheck size={12} />
+                                  <span className="text-[10px] font-medium">
+                                    В наявності
+                                  </span>
+                                </div>
+                              ) : (
+                                <StockStatus
+                                  className="mt-1"
+                                  quantity={product.stockQuantity}
+                                />
+                              )}
+                            </div>
+
+                            <button
+                              disabled={isOutOfStock}
+                              className={`p-3 rounded-full transition-colors flex-shrink-0 
+                                ${
+                                  isOutOfStock
+                                    ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                                    : "bg-gray-100 hover:text-white hover:bg-brand-primary"
+                                }`}
+                              onClick={(e) => handleCartClick(e, product)}
+                            >
+                              <ShoppingCart size={18} />
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
           </div>
         )}
       </div>
