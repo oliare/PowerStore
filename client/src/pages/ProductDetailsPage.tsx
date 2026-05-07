@@ -20,6 +20,11 @@ import { FavoriteButton } from "../common/FavoriteButton";
 import { showNotify } from "../utils/showNotify";
 import { StockStatus } from "../common/StockStatus";
 import { ProductSpecifications } from "../common/ProductSpecifications";
+import { ReviewForm } from "./ReviewForm";
+import { ProductReviewsPage } from "./ReviewsSection";
+import { ProductReviewStats } from "../common/ProductReviewStats";
+import { useGetMeQuery } from "../services/userApi";
+import { useGetProductReviewsQuery } from "../services/reviewsApi";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
@@ -31,6 +36,8 @@ const ProductDetailsPage = () => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
+  const { data: user } = useGetMeQuery();
+  const { data: reviews } = useGetProductReviewsQuery(id!);
 
   if (isLoading)
     return (
@@ -76,6 +83,7 @@ const ProductDetailsPage = () => {
   }
 
   const { product, relatedProducts } = data;
+
   const isOutOfStock = product.stockQuantity <= 0;
 
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
@@ -100,7 +108,14 @@ const ProductDetailsPage = () => {
 
   const scrollToDescription = () => {
     setActiveTab("description");
-    detailsSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (detailsSectionRef.current) {
+      const offset = 100;
+      const top =
+        detailsSectionRef.current.getBoundingClientRect().top +
+        window.scrollY -
+        offset;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   };
 
   const parseSpecs = (specsString: string | null | undefined) => {
@@ -120,9 +135,12 @@ const ProductDetailsPage = () => {
     ? `${product.description?.substring(0, 241)}...`
     : product.description;
 
+  const hasAlreadyReviewed =
+    reviews?.some((review) => review.userId === user?.id) ?? false;
+
   return (
     <div className="bg-white font-manrope">
-      <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen">
+      <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen mb-10">
         <Link
           to="/shop"
           className="flex items-center gap-2 text-gray-500 hover:text-brand-primary transition-colors font-medium mb-10"
@@ -308,10 +326,52 @@ const ProductDetailsPage = () => {
             )}
 
             {activeTab === "feedback" && (
-              <p className="text-gray-500 text-sm leading-loose text-center">
-                Відгуків ще немає. Будьте першим, хто залишить відгук!
-              </p>
+              <div className="flex justify-center">
+                <ProductReviewStats
+                  rate={reviews || []}
+                  hasAlreadyReviewed={hasAlreadyReviewed}
+                  onWriteReviewClick={() => {
+                    const formElement = document.getElementById("review-form");
+                    if (formElement) {
+                      const offset = 100;
+                      const top =
+                        formElement.getBoundingClientRect().top +
+                        window.scrollY -
+                        offset;
+                      window.scrollTo({ top, behavior: "smooth" });
+                    }
+                  }}
+                />
+              </div>
             )}
+          </div>
+        </div>
+        <div className="mt-16 border-t pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div>
+              {hasAlreadyReviewed ? (
+                <div className="bg-brand-primary/5 border border-brand-primary/20 rounded-3xl p-8 flex flex-col items-center text-center font-montserrat">
+                  <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center text-brand-primary mb-4">
+                    <Star size={32} fill="currentColor" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Дякуємо за ваш відгук!
+                  </h3>
+                  <p className="text-gray-500 text-sm ">
+                    Ви вже поділилися своїми враженнями про цей товар. Ваша
+                    думка допомагає іншим покупцям зробити правильний вибір.
+                  </p>
+                </div>
+              ) : (
+                <ReviewForm
+                  productId={id!}
+                  hasAlreadyReviewed={hasAlreadyReviewed}
+                />
+              )}
+            </div>
+            <div>
+              <ProductReviewsPage productId={id!} />
+            </div>
           </div>
         </div>
 

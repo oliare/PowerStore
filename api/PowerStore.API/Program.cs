@@ -33,7 +33,7 @@ builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFileService, FileService>();
-
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddScoped<DbSeeder>();
 

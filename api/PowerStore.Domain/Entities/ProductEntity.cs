@@ -19,4 +19,5 @@ public class ProductEntity : AuditableEntityBase
     public CategoryEntity Category { get; set; }
     public virtual ICollection<ProductImageEntity> Images { get; set; } = [];
     public ICollection<FavoriteEntity> Favorites { get; set; } = [];
+    public ICollection<ProductReviewEntity> Reviews { get; set; } = [];
 }

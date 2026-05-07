@@ -145,7 +145,9 @@ export const UserProfilePage = () => {
 
   const avatarSrc =
     previewImage ??
-    (user?.image ? `${IMAGE_BASE_URL}/${user.image}` : PLACEHOLDER_IMAGE_URL);
+    (user?.image
+      ? `${IMAGE_BASE_URL}/avatars/${user.image}`
+      : PLACEHOLDER_IMAGE_URL);
 
   return (
     <>

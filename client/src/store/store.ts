@@ -14,6 +14,7 @@ export const store = configureStore({
     cart: cartReducer,
     favorites: favoritesReducer,
     categories: baseApi.reducer,
+    reviews: baseApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(baseApi.middleware, localStorageMiddleware),

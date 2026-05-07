@@ -19,4 +19,5 @@ public class ProductDto
     public string? Brand { get; set; }
     public List<string> Tags { get; set; } = [];
     public List<ProductImageDto>? Images { get; set; }
+
 }

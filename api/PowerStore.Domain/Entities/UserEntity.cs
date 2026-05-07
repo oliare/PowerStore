@@ -20,4 +20,5 @@ public class UserEntity : IdentityUser<Guid>
     public virtual ICollection<OrderEntity> Orders { get; set; } = [];
     public ICollection<CartEntity> Carts { get; set; } = [];
     public ICollection<FavoriteEntity> Favorites { get; set; } = [];
+    public ICollection<ProductReviewEntity> Reviews { get; set; } = [];
 }

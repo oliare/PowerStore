@@ -152,7 +152,7 @@ export default function Header() {
                     <Avatar
                       src={
                         user.image
-                          ? `${IMAGE_BASE_URL}/${user.image}`
+                          ? `${IMAGE_BASE_URL}/avatars/${user.image}`
                           : PLACEHOLDER_IMAGE_URL
                       }
                     />

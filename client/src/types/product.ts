@@ -1,3 +1,5 @@
+import type { ReviewDto } from "./review";
+
 export interface ProductImageDto {
   id: string;
   image: string;
@@ -20,9 +22,11 @@ export interface ProductDto {
   images?: ProductImageDto[];
   brand?: string;
   tags?: string[];
+  reviews?: ReviewDto[];
 }
 
 export interface ProductDetailsDto {
   product: ProductDto;
   relatedProducts: ProductDto[];
+  reviews?: ReviewDto[];
 }

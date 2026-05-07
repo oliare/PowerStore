@@ -33,24 +33,24 @@ export const AuthModal = ({
         <div className="w-16 h-16 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
           <ShoppingBag className="text-brand-primary" size={32} />
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-2 uppercase tracking-tighter">
+        <h2 className="text-xl font-black text-gray-900 my-5 uppercase">
           {title}
         </h2>
         <p className="text-gray-500 mb-8 px-4">
-          Увійдіть у свій аккаунт, щоб зберігати товари, переглядати історію
-          замовлень та отримувати персональні знижки.
+          Увійдіть у свій аккаунт, щоб залишати відгуки про товари, переглядати
+          історію замовлень та отримувати персональні пропозиції.
         </p>
 
         <div className="space-y-3 px-4">
           <button
             onClick={() => handleAction("/login")}
-            className="w-full flex items-center justify-center gap-3 py-3.5 bg-brand-primary text-white rounded-full font-bold hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20"
+            className="w-full flex items-center justify-center gap-3 py-2 bg-brand-primary text-white rounded-full font-semibold hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20 tracking-wider"
           >
             <LogIn size={20} /> УВІЙТИ
           </button>
           <button
             onClick={() => handleAction("/register")}
-            className="w-full flex items-center justify-center gap-3 py-3.5 border-2 border-gray-100 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-all"
+            className="w-full flex items-center justify-center gap-3 py-2 border-2 border-gray-100 text-gray-700 rounded-full font-semibold hover:bg-gray-50 transition-all tracking-wide"
           >
             <UserPlus size={20} /> ЗАРЕЄСТРУВАТИСЯ
           </button>

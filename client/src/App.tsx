@@ -29,6 +29,8 @@ import { AboutUsPage } from "./pages/AboutUsPage";
 import { ContactPage } from "./pages/ContactPage";
 import { DeliveryPaymentPage } from "./pages/DeliveryPaymentPage";
 import { FaqPage } from "./pages/FaqPage";
+import { ProductReviewsPage } from "./pages/ProductReviewPage";
+
 
 function App() {
   const dispatch = useDispatch();
@@ -51,6 +53,10 @@ function App() {
           <Route path="contact" element={<ContactPage />} />
           <Route path="for-buyers" element={<DeliveryPaymentPage />} />
           <Route path="faq" element={<FaqPage />} />
+          <Route
+            path="/product/:productId/reviews"
+            element={<ProductReviewsPage />}
+          />
 
           <Route element={<ProtectedRoute />}>
             <Route path="checkout" element={<CheckoutPage />} />

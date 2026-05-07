@@ -19,6 +19,7 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderItemEntity> OrderItems { get; set; }
     public DbSet<ContactMessageEntity> ContactMessages { get; set; }
+    public DbSet<ProductReviewEntity> ProductReviews { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -60,6 +61,22 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
                 .WithMany(c => c.Childrens)
                 .HasForeignKey(c => c.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<ProductReviewEntity>(entity =>
+        {
+            entity.HasOne(r => r.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(r => r.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(r => r.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(r => new { r.UserId, r.ProductId })
+                .IsUnique();
         });
     }
 }
