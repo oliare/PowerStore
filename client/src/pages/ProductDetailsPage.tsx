@@ -138,6 +138,10 @@ const ProductDetailsPage = () => {
   const hasAlreadyReviewed =
     reviews?.some((review) => review.userId === user?.id) ?? false;
 
+  const averageRating = reviews?.length
+    ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
+    : 0;
+
   return (
     <div className="bg-white font-manrope">
       <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen mb-10">
@@ -190,12 +194,16 @@ const ProductDetailsPage = () => {
                   <Star
                     key={i}
                     size={14}
-                    fill={i < (product.rate || 0) ? "currentColor" : "none"}
+                    fill={
+                      i < Math.round(averageRating) ? "currentColor" : "none"
+                    }
                   />
                 ))}
               </div>
               <span className="text-gray-500">
-                {product.rate || "Немає відгуків"}
+                {reviews?.length
+                  ? `${averageRating.toFixed(1)} (${reviews.length} відгуків)`
+                  : "Немає відгуків"}
               </span>
               <StockStatus quantity={product.stockQuantity} />
             </div>
