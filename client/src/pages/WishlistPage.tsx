@@ -12,6 +12,7 @@ import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import { addToCart } from "../store/cartSlice";
 import type { FavoriteItemDTO } from "../types/favorite";
 import { showNotify } from "../utils/showNotify";
+import { useEffect } from "react";
 
 export const WishlistPage = () => {
   const dispatch = useDispatch();
@@ -21,13 +22,21 @@ export const WishlistPage = () => {
   const items = useSelector((state: RootState) => state.favorites.items);
 
   const [toggleServerFavorites] = useToggleFavoriteMutation();
-  const { data: serverItems, isLoading } = useGetFavoritesQuery(undefined, {
+
+  const {
+    data: serverItems,
+    isLoading,
+    isFetching,
+  } = useGetFavoritesQuery(undefined, {
     skip: !accessToken,
+    refetchOnMountOrArgChange: true,
   });
 
-  if (serverItems && accessToken && items.length !== serverItems.length) {
-    dispatch(setFavoriteItems(serverItems));
-  }
+  useEffect(() => {
+    if (serverItems && accessToken) {
+      dispatch(setFavoriteItems(serverItems));
+    }
+  }, [serverItems, accessToken, dispatch]);
 
   const handleMoveToCart = (item: FavoriteItemDTO) => {
     dispatch(
@@ -86,13 +95,15 @@ export const WishlistPage = () => {
 
   return (
     <>
-      <div className="max-w-7xl mx-auto px-4 py-12 font-montserrat min-h-screen">
-        <h1 className="text-3xl font-semibold text-center mb-10 font-montserrat">
+      <div
+        className={`max-w-7xl mx-auto px-4 py-12 font-montserrat min-h-screen transition-opacity duration-300 ${isFetching ? "opacity-60" : "opacity-100"}`}
+      >
+        <h1 className="text-3xl font-semibold text-center mb-10">
           Мій список бажань
         </h1>
 
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="h-[400px] overflow-y-auto">
+          <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead className="border-b border-gray-100 text-gray-400 uppercase text-[11px] tracking-widest">
                 <tr>
@@ -106,38 +117,70 @@ export const WishlistPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {items.map((item) => {
+                  const isOutOfStock = Number(item.stockQuantity) <= 0;
+
                   return (
                     <tr
-                      key={item.id}
-                      className="group hover:bg-gray-50/50 transition-colors"
+                      key={item.productId}
+                      className={`group transition-colors ${
+                        isOutOfStock ? "bg-gray-50/50" : "hover:bg-gray-50/50"
+                      }`}
                     >
-                      <td className="px-6 py-4 font-semibold">
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-5">
-                          <img
-                            src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                            className="w-16 h-16 object-cover rounded-lg border border-gray-100"
-                            alt={item.productName}
-                          />
-                          <span className="text-gray-900">
+                          <div className="relative">
+                            <img
+                              src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                              className={`w-16 h-16 object-cover rounded-lg border border-gray-100 transition-all ${
+                                isOutOfStock
+                                  ? "grayscale contrast-75 opacity-60"
+                                  : ""
+                              }`}
+                              alt={item.productName}
+                            />
+                            {isOutOfStock && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-full rotate-45 absolute" />
+                              </div>
+                            )}
+                          </div>
+                          <span
+                            className={`font-semibold ${isOutOfStock ? "text-gray-400 decoration-gray-300" : "text-gray-900"}`}
+                          >
                             {item.productName}
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-6 font-semibold text-gray-900 font-manrope">
+                      <td
+                        className={`px-6 py-6 font-semibold font-manrope ${isOutOfStock ? "text-gray-400" : "text-gray-900"}`}
+                      >
                         ₴{Number(item.productPrice).toFixed(2)}
                       </td>
                       <td className="px-6 py-6 text-center">
-                        <span className="px-3 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700">
-                          В наявності
-                        </span>
+                        {isOutOfStock ? (
+                          <span className="px-3 py-1 rounded-md text-xs font-medium bg-red-50 text-red-600 border border-red-100">
+                            Немає
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-md text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                            В наявності
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex items-center justify-end gap-4">
                           <button
-                            onClick={() => handleMoveToCart(item)}
-                            className="bg-brand-primary hover:bg-brand-dark text-white px-8 py-2 rounded-full text-sm font-medium transition-colors"
+                            onClick={() =>
+                              !isOutOfStock && handleMoveToCart(item)
+                            }
+                            disabled={isOutOfStock}
+                            className={`px-8 py-2 rounded-full text-sm font-medium transition-all ${
+                              isOutOfStock
+                                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                : "bg-brand-primary hover:bg-brand-dark text-white shadow-md shadow-brand-primary/10 active:scale-95"
+                            }`}
                           >
-                            В кошик
+                            {isOutOfStock ? "Недоступно" : "В кошик"}
                           </button>
                           <button
                             onClick={() => handleRemove(item)}

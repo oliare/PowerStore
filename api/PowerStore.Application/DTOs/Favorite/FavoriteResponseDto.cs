@@ -8,6 +8,7 @@ public record FavoriteResponseDto
     public decimal ProductPrice { get; init; }
     public string? ProductImage { get; init; }
     public DateTime AddedAt { get; init; }
+    public int StockQuantity { get; init; }
 }
 
 public record ToggleFavoriteRequestDto(Guid ProductId);

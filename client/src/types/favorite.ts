@@ -5,6 +5,7 @@ export interface FavoriteItemDTO {
   productPrice: number;
   productImage: string;
   addedAt: string;
+  stockQuantity: number;
 }
 
 export interface ToggleFavoriteRequestDTO {

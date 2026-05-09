@@ -21,7 +21,7 @@ import { showNotify } from "../utils/showNotify";
 import { StockStatus } from "../common/StockStatus";
 import { ProductSpecifications } from "../common/ProductSpecifications";
 import { ReviewForm } from "./ReviewForm";
-import { ProductReviewsPage } from "./ReviewsSection";
+import { ReviewsSection } from "./ReviewsSection";
 import { ProductReviewStats } from "../common/ProductReviewStats";
 import { useGetMeQuery } from "../services/userApi";
 import { useGetProductReviewsQuery } from "../services/reviewsApi";
@@ -378,7 +378,7 @@ const ProductDetailsPage = () => {
               )}
             </div>
             <div>
-              <ProductReviewsPage productId={id!} />
+              <ReviewsSection productId={id!} />
             </div>
           </div>
         </div>

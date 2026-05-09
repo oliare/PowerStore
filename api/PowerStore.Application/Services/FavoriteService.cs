@@ -31,7 +31,8 @@ public class FavoriteService : IFavoriteService
             ProductName = f.Product?.Name ?? "Unknown",
             ProductPrice = f.Product?.Price ?? 0,
             ProductImage = f.Product?.Images?.FirstOrDefault()?.Image,
-            AddedAt = f.AddedAt
+            AddedAt = f.AddedAt,
+            StockQuantity = f.Product?.StockQuantity ?? 0
         });
     }
 

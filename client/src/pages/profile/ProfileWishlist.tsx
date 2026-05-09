@@ -1,13 +1,16 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { toggleFavorites } from "../../store/favoriteSlice";
+import { setFavoriteItems, toggleFavorites } from "../../store/favoriteSlice";
 import { addToCart } from "../../store/cartSlice";
-import { useToggleFavoriteMutation } from "../../services/favoritesApi";
+import {
+  useGetFavoritesQuery,
+  useToggleFavoriteMutation,
+} from "../../services/favoritesApi";
 import type { RootState } from "../../store/store";
 import { Heart, Trash2, ArrowLeft, ChevronDown } from "lucide-react";
 import type { FavoriteItemDTO } from "../../types/favorite";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const ProfileWishlist = () => {
   const dispatch = useDispatch();
@@ -16,6 +19,16 @@ export const ProfileWishlist = () => {
     (state: RootState) => state.account.accessToken,
   );
   const [toggleServerFavorite] = useToggleFavoriteMutation();
+
+  const { data: serverItems } = useGetFavoritesQuery(undefined, {
+    skip: !accessToken,
+    refetchOnMountOrArgChange: true,
+  });
+  useEffect(() => {
+    if (serverItems && accessToken) {
+      dispatch(setFavoriteItems(serverItems));
+    }
+  }, [serverItems, accessToken, dispatch]);
 
   const [activeFilter, setActiveFilter] = useState("all");
   const [sortBy, setSortBy] = useState("default");
@@ -145,52 +158,83 @@ export const ProfileWishlist = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
-        {filteredItems.map((item) => (
-          <div
-            key={item.productId}
-            className="group relative bg-white border border-gray-100 rounded-[28px] overflow-hidden hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] transition-all duration-500"
-          >
-            <div className="relative aspect-square overflow-hidden bg-gray-50">
-              <img
-                src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                alt={item.productName}
-                className="w-full h-full object-cover transition-transform duration-[1s] group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <button
-                onClick={() => handleRemove(item)}
-                className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all translate-y-[-10px] group-hover:translate-y-0"
-              >
-                <Trash2 size={18} />
-              </button>
-            </div>
+        {filteredItems.map((item) => {
+          console.log(`${item.productName}: ${item.stockQuantity}`);
+          const isOutOfStock = item.stockQuantity === 0;
 
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-5">
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-base truncate mb-1">
-                    {item.productName}
-                  </h3>
-                  <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider bg-green-50 text-green-600">
-                    В наявності
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-lg font-semibold text-brand-primary">
-                    ₴{item.productPrice.toLocaleString()}
-                  </span>
-                </div>
+          return (
+            <div
+              key={item.productId}
+              className={`group relative bg-white border border-gray-100 rounded-[28px] overflow-hidden transition-all duration-500 ${
+                isOutOfStock
+                  ? "grayscale opacity-70 shadow-none"
+                  : "hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
+              }`}
+            >
+              <div className="relative aspect-square overflow-hidden bg-gray-50">
+                <img
+                  src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                  alt={item.productName}
+                  className={`w-full h-full object-cover transition-transform duration-[1s] ${
+                    !isOutOfStock && "group-hover:scale-110"
+                  }`}
+                />
+
+                {isOutOfStock && (
+                  <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] flex items-center justify-center z-10">
+                    <span className="bg-gray-700/70 text-white px-4 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest shadow-xl">
+                      Товар закінчився
+                    </span>
+                  </div>
+                )}
+
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <button
+                  onClick={() => handleRemove(item)}
+                  className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all translate-y-[-10px] group-hover:translate-y-0 z-20"
+                >
+                  <Trash2 size={18} />
+                </button>
               </div>
 
-              <button
-                onClick={() => handleAddToCart(item)}
-                className="w-full bg-brand-primary text-white py-2 rounded-full text-sm font-semibold hover:bg-brand-primary-dark shadow-lg shadow-gray-200 transition-all active:scale-[0.97]"
-              >
-                Купити
-              </button>
+              <div className="p-6">
+                <div className="flex flex-col justify-between items-start mb-5">
+                  <div className="flex-1 max-w-40">
+                    <h3 className="font-semibold text-gray-900 text-sm truncate mb-1">
+                      {item.productName}
+                    </h3>
+                  </div>
+                  <div className="flex justify-between items-center w-full">
+                    {!isOutOfStock && (
+                      <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider bg-green-50 text-green-600">
+                        В наявності
+                      </span>
+                    )}
+                    <span
+                      className={`text-lg font-semibold ${
+                        isOutOfStock ? "text-gray-400" : "text-brand-primary"
+                      }`}
+                    >
+                      ₴{item.productPrice.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => !isOutOfStock && handleAddToCart(item)}
+                  disabled={isOutOfStock}
+                  className={`w-full py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${
+                    isOutOfStock
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                      : "bg-brand-primary text-white hover:bg-brand-primary-dark shadow-gray-200 active:scale-[0.97]"
+                  }`}
+                >
+                  {isOutOfStock ? "Недоступно" : "Купити"}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

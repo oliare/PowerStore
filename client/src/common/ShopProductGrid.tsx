@@ -1,4 +1,4 @@
-import { PackageCheck, ShoppingCart } from "lucide-react";
+import { PackageCheck, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../store/cartSlice";
@@ -106,6 +106,25 @@ export const ShopProductGrid = ({
                         ? product.name.slice(0, 20) + "..."
                         : product.name}
                     </h3>
+
+                    {!!product.rate && (
+                      <div className="flex items-center gap-1 mt-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            size={11}
+                            className={
+                              i < Math.round(product.rate || 0)
+                                ? "fill-[#fbd53c] text-[#fbd53c]"
+                                : "text-gray-200 fill-gray-200"
+                            }
+                          />
+                        ))}
+                        <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
+                          {(product.rate || 0).toFixed(1)}
+                        </span>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex flex-col">
