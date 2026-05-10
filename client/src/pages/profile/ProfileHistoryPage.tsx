@@ -1,16 +1,27 @@
-import { Table } from "antd";
+import { Table, Modal } from "antd";
 import { useState, useMemo } from "react";
-import { ChevronDown } from "lucide-react";
+import {
+  ChevronDown,
+  Package,
+  Calendar,
+  CreditCard,
+  Minus,
+} from "lucide-react";
 import { OrderStatus } from "../../enums/enum";
 import { useGetMyOrdersQuery } from "../../services/orderApi";
 import { orderHistoryColumns } from "../../utils/orderHistoryColumns";
 import { Pagination } from "../../common/Pagination";
+import type { OrderDto, OrderItemDto } from "../../types/order";
+import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 
 export const ProfileHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
+
+  const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: orders, isLoading } = useGetMyOrdersQuery();
   const ordersPerPage = 5;
@@ -23,7 +34,6 @@ export const ProfileHistoryPage = () => {
 
   const processedOrders = useMemo(() => {
     if (!orders) return [];
-
     const result = orders.filter((item) => {
       if (activeFilter === "active") return item.status === OrderStatus.Pending;
       if (activeFilter === "completed")
@@ -46,7 +56,6 @@ export const ProfileHistoryPage = () => {
   }, [orders, activeFilter, sortBy]);
 
   const totalPages = Math.ceil(processedOrders.length / ordersPerPage);
-
   const activePage = currentPage > totalPages ? 1 : currentPage;
 
   const currentOrders = useMemo(() => {
@@ -54,6 +63,11 @@ export const ProfileHistoryPage = () => {
     const firstIndex = lastIndex - ordersPerPage;
     return processedOrders.slice(firstIndex, lastIndex);
   }, [processedOrders, activePage]);
+
+  const handleRowClick = (order: OrderDto) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
 
   return (
     <div className="font-montserrat animate-in fade-in duration-500">
@@ -96,7 +110,6 @@ export const ProfileHistoryPage = () => {
               className={`transition-transform ${isSortOpen ? "rotate-180" : ""}`}
             />
           </button>
-
           {isSortOpen && (
             <>
               <div
@@ -112,11 +125,7 @@ export const ProfileHistoryPage = () => {
                       setCurrentPage(1);
                       setIsSortOpen(false);
                     }}
-                    className={`w-full text-left px-5 py-3 text-[13px] font-semibold ${
-                      sortBy === key
-                        ? "bg-brand-dark text-white"
-                        : "text-gray-600 hover:bg-gray-50"
-                    }`}
+                    className={`w-full text-left px-5 py-3 text-[13px] font-semibold ${sortBy === key ? "bg-brand-dark text-white" : "text-gray-600 hover:bg-gray-50"}`}
                   >
                     {label}
                   </button>
@@ -134,6 +143,9 @@ export const ProfileHistoryPage = () => {
           columns={orderHistoryColumns}
           pagination={false}
           loading={isLoading}
+          onRow={(record) => ({
+            onClick: () => handleRowClick(record),
+          })}
           rowClassName="group hover:bg-gray-50/50 transition-colors cursor-pointer"
         />
 
@@ -143,6 +155,110 @@ export const ProfileHistoryPage = () => {
           </div>
         )}
       </div>
+
+      <Modal
+        title={null}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        footer={null}
+        centered
+        width={600}
+        className="order-details-modal"
+      >
+        {selectedOrder && (
+          <div className="font-montserrat p-2">
+            <div className="flex justify-between items-center mb-6 border-b pb-4">
+              <div>
+                <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">
+                  Деталі замовлення
+                </p>
+                <h2 className="text-xl font-semibold text-gray-900 mt-2">
+                  <Minus
+                    size={24}
+                    className="inline-block rotate-90 text-brand-primary -mr-1 -ml-3 mb-1"
+                  />
+                  {selectedOrder.id.slice(-8).toUpperCase()}
+                </h2>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <Calendar size={18} className="text-gray-400" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-gray-400 font-semibold uppercase">
+                    Дата
+                  </p>
+                  <p className="text-sm font-bold font-manrope">
+                    {new Date(selectedOrder?.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-gray-100 rounded-lg">
+                  <CreditCard size={18} className="text-gray-400" />
+                </div>
+                <div>
+                  <p className="text-[11px] text-gray-400 font-semibold uppercase">
+                    Сума до сплати
+                  </p>
+                  <p className="text-sm font-bold text-brand-dark font-manrope">
+                    {selectedOrder.totalPrice} ₴
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-50 rounded-2xl p-5 mb-6">
+              <p className="text-[11px] text-gray-400 font-bold uppercase mb-4 flex items-center gap-2">
+                <Package size={14} /> Склад замовлення
+              </p>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+                {selectedOrder.items?.map((item: OrderItemDto, idx: number) => (
+                  <div
+                    key={idx}
+                    className="flex justify-between items-center bg-white p-3 rounded-xl border border-gray-100"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-[10px] font-bold text-gray-400 overflow-hidden">
+                        {item.image ? (
+                          <img
+                            src={item.image || PLACEHOLDER_IMAGE_URL}
+                            alt=""
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <Package size={16} />
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-800 line-clamp-1">
+                          {item.productName}
+                        </p>
+                        <p className="text-[10px] text-gray-400 font-manrope">
+                          {item.quantity} шт. × {item.price} ₴
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-xs font-bold font-manrope">
+                      {item.price * item.quantity} ₴
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="w-full py-4 bg-brand-primary text-white rounded-full font-semibold text-sm hover:opacity-90 transition-opacity"
+            >
+              Закрити
+            </button>
+          </div>
+        )}
+      </Modal>
 
       {!isLoading && totalPages > 1 && (
         <div className="flex justify-center">
@@ -155,6 +271,10 @@ export const ProfileHistoryPage = () => {
       )}
 
       <style>{`
+        .order-details-modal .ant-modal-content {
+          border-radius: 24px;
+          padding: 24px;
+        }
         .ant-table-thead > tr > th {
           background: #F9FAFB !important;
           color: #9CA3AF !important;
