@@ -7,6 +7,7 @@ public class CartItemDto
     public string? ProductImage { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+    public int StockQuantity { get; set; }
 }
 
 public class SyncCartDto

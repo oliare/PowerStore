@@ -11,11 +11,13 @@ public class OrderService : IOrderService
 {
     private readonly IRepository<OrderEntity> _orderRepo;
     private readonly IMapper _mapper;
+    private readonly IRepository<ProductEntity> _productRepo;
 
-    public OrderService(IRepository<OrderEntity> orderRepo, IMapper mapper)
+    public OrderService(IRepository<OrderEntity> orderRepo, IMapper mapper, IRepository<ProductEntity> productRepo)
     {
         _orderRepo = orderRepo;
         _mapper = mapper;
+        _productRepo = productRepo;
     }
 
     public async Task<OrderDto> CreateOrderAsync(OrderCreateDto dto, Guid? userId)
@@ -50,6 +52,18 @@ public class OrderService : IOrderService
 
         foreach (var itemDto in dto.Items)
         {
+            var product = await _productRepo.GetByIdAsync(itemDto.ProductId);
+
+            if (product == null)
+                throw new Exception($"Product ID {itemDto.ProductId} didn`t found");
+
+            if (product.StockQuantity < itemDto.Quantity)
+                throw new Exception($"There is not enough {product.Name} in stock. It`s left: {product.StockQuantity}");
+
+            product.StockQuantity -= itemDto.Quantity;
+
+            _productRepo.Update(product);
+
             order.Items.Add(new OrderItemEntity
             {
                 ProductId = itemDto.ProductId,

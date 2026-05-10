@@ -20,6 +20,7 @@ export const WishlistPage = () => {
     (state: RootState) => state.account.accessToken,
   );
   const items = useSelector((state: RootState) => state.favorites.items);
+  const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const [toggleServerFavorites] = useToggleFavoriteMutation();
 
@@ -38,7 +39,38 @@ export const WishlistPage = () => {
     }
   }, [serverItems, accessToken, dispatch]);
 
+  const handleRemove = (item: FavoriteItemDTO) => {
+    dispatch(toggleFavorites(item));
+    showNotify.warn(`"${item.productName}" видалено з обраного`);
+
+    if (accessToken) {
+      toggleServerFavorites({ productId: item.productId });
+    }
+  };
+
   const handleMoveToCart = (item: FavoriteItemDTO) => {
+    const existingInCart = cartItems.find(
+      (c) => c.productId === item.productId,
+    );
+    const currentQtyInCart = existingInCart ? existingInCart.quantity : 0;
+    const stockLimit = Number(item.stockQuantity);
+
+    if (stockLimit <= 0) {
+      showNotify.error(`На жаль, "${item.productName}" закінчився`);
+      return;
+    }
+
+    if (currentQtyInCart + 1 > stockLimit) {
+      if (currentQtyInCart > 0) {
+        showNotify.error(
+          `Досягнуто ліміт залишку на складі (${stockLimit} шт.). У кошику вже є ${currentQtyInCart} шт.`,
+        );
+      } else {
+        showNotify.error(`Доступно лише ${stockLimit} шт.`);
+      }
+      return;
+    }
+
     dispatch(
       addToCart({
         productId: item.productId,
@@ -46,22 +78,11 @@ export const WishlistPage = () => {
         productImage: item.productImage,
         price: item.productPrice,
         quantity: 1,
+        stockQuantity: stockLimit,
       }),
     );
-    showNotify.success(`"${item.productName}" перенесено в кошик`);
-    handleRemove(item, false);
-  };
 
-  const handleRemove = (item: FavoriteItemDTO, showToast = true) => {
-    dispatch(toggleFavorites(item));
-
-    if (showToast) {
-      showNotify.warn(`"${item.productName}" видалено з обраного`);
-    }
-
-    if (accessToken) {
-      toggleServerFavorites({ productId: item.productId });
-    }
+    showNotify.success(`"${item.productName}" додано до кошика`);
   };
 
   if (isLoading)
@@ -128,24 +149,15 @@ export const WishlistPage = () => {
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-5">
-                          <div className="relative">
-                            <img
-                              src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                              className={`w-16 h-16 object-cover rounded-lg border border-gray-100 transition-all ${
-                                isOutOfStock
-                                  ? "grayscale contrast-75 opacity-60"
-                                  : ""
-                              }`}
-                              alt={item.productName}
-                            />
-                            {isOutOfStock && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-full rotate-45 absolute" />
-                              </div>
-                            )}
-                          </div>
+                          <img
+                            src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                            className={`w-16 h-16 object-cover rounded-lg border border-gray-100 transition-all ${
+                              isOutOfStock ? "grayscale opacity-60" : ""
+                            }`}
+                            alt={item.productName}
+                          />
                           <span
-                            className={`font-semibold ${isOutOfStock ? "text-gray-400 decoration-gray-300" : "text-gray-900"}`}
+                            className={`font-semibold ${isOutOfStock ? "text-gray-400" : "text-gray-900"}`}
                           >
                             {item.productName}
                           </span>
@@ -185,7 +197,7 @@ export const WishlistPage = () => {
                           <button
                             onClick={() => handleRemove(item)}
                             className="text-gray-300 hover:text-red-500 transition-colors p-1"
-                            title="Видалити"
+                            title="Видалити з обраного"
                           >
                             <X size={20} />
                           </button>

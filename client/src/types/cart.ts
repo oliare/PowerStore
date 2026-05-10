@@ -4,6 +4,7 @@ export interface CartItemDto {
   productImage: string;
   price: number;
   quantity: number;
+  stockQuantity: number;
 }
 
 export interface SyncCartDto {

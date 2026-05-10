@@ -1,9 +1,10 @@
 import { PackageCheck, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
 import type { ProductDto } from "../types/product";
 import type { CartItemDto } from "../types/cart";
+import type { RootState } from "../store/store";
 import { FavoriteButton } from "./FavoriteButton";
 import { SkeletonCard } from "./SkeletonCard";
 import { showNotify } from "../utils/showNotify";
@@ -22,14 +23,35 @@ export const ShopProductGrid = ({
 }: ShopProductGridProps) => {
   const dispatch = useDispatch();
 
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
-    if (product.stockQuantity <= 0) return;
+    const existingItem = cartItems.find(
+      (item) => item.productId === product.id,
+    );
+    const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+    const totalPotentialQty = currentQtyInCart + selectedQuantity;
+
+    if (product.stockQuantity <= 0) {
+      showNotify.error(`На жаль, "${product.name}" уже закінчився`);
+      return;
+    }
+
+    if (totalPotentialQty > product.stockQuantity) {
+      if (currentQtyInCart > 0) {
+        showNotify.error(
+          `У кошику вже ${currentQtyInCart} шт. Досягнуто ліміт залишку на складі (${product.stockQuantity} шт.)`,
+        );
+      } else {
+        showNotify.error(`Доступно лише ${product.stockQuantity} шт.`);
+      }
+      return;
+    }
 
     const image =
       product.images && product.images.length > 0
         ? product.images[0].image
-        : "";
-
+        : PLACEHOLDER_IMAGE_URL;
     const finalImage = product.image || image;
 
     const item: CartItemDto = {
@@ -38,10 +60,11 @@ export const ShopProductGrid = ({
       productImage: finalImage,
       price: product.price,
       quantity: selectedQuantity,
+      stockQuantity: product.stockQuantity,
     };
 
-    showNotify.success(`"${product.name}" додано до кошика`);
     dispatch(addToCart(item));
+    showNotify.success(`"${product.name}" додано до кошика`);
   };
 
   const handleCartClick = (
@@ -50,6 +73,12 @@ export const ShopProductGrid = ({
   ) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (product.stockQuantity <= 0) {
+      showNotify.error("Товару немає в наявності");
+      return;
+    }
+
     handleAddToCart(product, 1);
   };
 

@@ -11,6 +11,7 @@ public class CartProfile : Profile
         CreateMap<CartEntity, CartItemDto>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
             .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Product.Price))
+            .ForMember(dest => dest.StockQuantity, opt => opt.MapFrom(src => src.Product.StockQuantity))
             .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src =>
         src.Product.Images
             .OrderBy(i => i.DisplayOrder)

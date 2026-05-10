@@ -14,8 +14,9 @@ import {
 import { MailingSection } from "./HomePage/MailingSection";
 import type { ProductDto } from "../types/product";
 import { addToCart } from "../store/cartSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // Додано useSelector
 import type { CartItemDto } from "../types/cart";
+import type { RootState } from "../store/store"; // Перевірте шлях до стору
 import { FavoriteButton } from "../common/FavoriteButton";
 import { showNotify } from "../utils/showNotify";
 import { StockStatus } from "../common/StockStatus";
@@ -25,11 +26,15 @@ import { ReviewsSection } from "./ReviewsSection";
 import { ProductReviewStats } from "../common/ProductReviewStats";
 import { useGetMeQuery } from "../services/userApi";
 import { useGetProductReviewsQuery } from "../services/reviewsApi";
+import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 
 const ProductDetailsPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+
   const { data, isLoading, error } = useGetProductDetailsQuery(id!);
   const detailsSectionRef = useRef<HTMLDivElement>(null);
 
@@ -83,15 +88,34 @@ const ProductDetailsPage = () => {
   }
 
   const { product, relatedProducts } = data;
-
   const isOutOfStock = product.stockQuantity <= 0;
 
+  const existingItem = cartItems.find((item) => item.productId === product.id);
+  const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
+    if (product.stockQuantity <= 0) {
+      showNotify.error(`На жаль, "${product.name}" уже закінчився`);
+      return;
+    }
+
+    const totalPotentialQty = currentQtyInCart + selectedQuantity;
+
+    if (totalPotentialQty > product.stockQuantity) {
+      if (currentQtyInCart > 0) {
+        showNotify.error(
+          `У кошику вже ${currentQtyInCart} шт. Досягнуто ліміт залишку на складі (${product.stockQuantity} шт.)`,
+        );
+      } else {
+        showNotify.error(`Доступно лише ${product.stockQuantity} шт.`);
+      }
+      return;
+    }
+
     const image =
       product.images && product.images.length > 0
         ? product.images[0].image
-        : "";
-
+        : PLACEHOLDER_IMAGE_URL;
     const finalImage = product.image || image;
 
     const item: CartItemDto = {
@@ -100,10 +124,12 @@ const ProductDetailsPage = () => {
       productImage: finalImage,
       price: product.price,
       quantity: selectedQuantity,
+      stockQuantity: product.stockQuantity,
     };
 
     dispatch(addToCart(item));
-    showNotify.success(`"${product.name}" додано до кошика!`);
+    showNotify.success(`"${product.name}" додано до кошика`);
+    setQuantity(1);
   };
 
   const scrollToDescription = () => {
@@ -228,7 +254,7 @@ const ProductDetailsPage = () => {
             </div>
 
             <div className="mb-6 flex ">
-              <p className="text-gray-400 text-sm leading-relaxed inline">
+              <div className="text-gray-400 text-sm leading-relaxed inline">
                 {displayDescription || "Опис відсутній"}
                 {isLongDescription && (
                   <button
@@ -239,8 +265,9 @@ const ProductDetailsPage = () => {
                     <ArrowRight size={16} className="ml-1 inline" />
                   </button>
                 )}
-              </p>
+              </div>
             </div>
+
             <div className="flex items-center gap-3 py-6 border-t border-b border-gray-200 mb-8">
               <div className="flex items-center border border-gray-200 rounded-full h-11 bg-white">
                 <button
@@ -253,7 +280,15 @@ const ProductDetailsPage = () => {
                   {quantity}
                 </span>
                 <button
-                  onClick={() => setQuantity(quantity + 1)}
+                  onClick={() => {
+                    if (currentQtyInCart + quantity < product.stockQuantity) {
+                      setQuantity(quantity + 1);
+                    } else {
+                      showNotify.info(
+                        `Максимально доступно: ${product.stockQuantity} (у вас в кошику вже ${currentQtyInCart})`,
+                      );
+                    }
+                  }}
                   className="w-10 flex justify-center text-gray-400 hover:text-black"
                 >
                   <Plus size={16} />
@@ -273,7 +308,7 @@ const ProductDetailsPage = () => {
                 >
                   Покласти в кошик <ShoppingCart size={18} />
                 </button>
-              )}{" "}
+              )}
               <FavoriteButton product={product} />
             </div>
 

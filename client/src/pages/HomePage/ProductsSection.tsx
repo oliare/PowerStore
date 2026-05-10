@@ -8,9 +8,10 @@ import { Link } from "react-router-dom";
 import type { ProductDto } from "../../types/product";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import type { SerializedError } from "@reduxjs/toolkit/react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux"; // Додано useSelector
 import { addToCart } from "../../store/cartSlice";
 import type { CartItemDto } from "../../types/cart";
+import type { RootState } from "../../store/store"; // Переконайтеся, що шлях правильний
 import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { SkeletonCard } from "../../common/SkeletonCard";
@@ -30,14 +31,35 @@ export const ProductsSection = ({
 }: ProductsSectionProps) => {
   const dispatch = useDispatch();
 
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
-    if (product.stockQuantity <= 0) return;
+    if (product.stockQuantity <= 0) {
+      showNotify.error(`На жаль, "${product.name}" уже закінчився`);
+      return;
+    }
+
+    const existingItem = cartItems.find(
+      (item) => item.productId === product.id,
+    );
+    const currentQtyInCart = existingItem ? existingItem.quantity : 0;
+    const totalPotentialQty = currentQtyInCart + selectedQuantity;
+
+    if (totalPotentialQty > product.stockQuantity) {
+      if (currentQtyInCart > 0) {
+        showNotify.error(
+          `У кошику вже ${currentQtyInCart} шт. Досягнуто ліміт залишку на складі (${product.stockQuantity} шт.)`,
+        );
+      } else {
+        showNotify.error(`Доступно лише ${product.stockQuantity} шт.`);
+      }
+      return;
+    }
 
     const image =
       product.images && product.images.length > 0
         ? product.images[0].image
         : "";
-
     const finalImage = product.image || image;
 
     const item: CartItemDto = {
@@ -46,6 +68,7 @@ export const ProductsSection = ({
       productImage: finalImage,
       price: product.price,
       quantity: selectedQuantity,
+      stockQuantity: product.stockQuantity,
     };
 
     dispatch(addToCart(item));
@@ -148,7 +171,7 @@ export const ProductsSection = ({
                           )}
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex-1 flex flex-col">
                           <h3
                             className={`text-sm font-medium line-clamp-2 min-h-[40px] transition-colors
                             ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
@@ -156,7 +179,7 @@ export const ProductsSection = ({
                             {product.name}
                           </h3>
 
-                          <div className="flex items-center justify-between mt-4">
+                          <div className="flex items-center justify-between mt-auto pt-4">
                             <div className="flex flex-col">
                               <span
                                 className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}

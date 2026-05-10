@@ -70,6 +70,21 @@ export const CheckoutPage = () => {
   }, [deliveryMethod, form]);
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
+    const item = cartItems.find((i) => i.productId === productId);
+
+    console.log("Item found:", item);
+
+    if (!item) return;
+
+    console.log(`New: ${newQuantity}, Stock: ${item.stockQuantity}`);
+
+    if (newQuantity > (item.stockQuantity ?? 0)) {
+      showNotify.error(
+        `Вибачте, на складі залишилося лише ${item.stockQuantity} шт.`,
+      );
+      return;
+    }
+
     if (newQuantity >= 1) {
       dispatch(updateQuantity({ productId, quantity: newQuantity }));
     }
@@ -461,13 +476,16 @@ export const CheckoutPage = () => {
                             </span>
                             <button
                               type="button"
+                              disabled={
+                                item.quantity >= (item.stockQuantity ?? 0)
+                              }
                               onClick={() =>
                                 handleUpdateQuantity(
                                   item.productId,
                                   item.quantity + 1,
                                 )
                               }
-                              className="w-6 h-6 flex items-center justify-center hover:text-brand-primary transition-colors"
+                              className="w-6 h-6 flex items-center justify-center hover:text-brand-primary transition-colors cursor-pointer"
                             >
                               <Plus size={13} />
                             </button>

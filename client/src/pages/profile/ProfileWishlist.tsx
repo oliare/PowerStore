@@ -10,7 +10,9 @@ import type { RootState } from "../../store/store";
 import { Heart, Trash2, ArrowLeft, ChevronDown } from "lucide-react";
 import type { FavoriteItemDTO } from "../../types/favorite";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { showNotify } from "../../utils/showNotify";
+import type { CartItemDto } from "../../types/cart";
 
 export const ProfileWishlist = () => {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ export const ProfileWishlist = () => {
     skip: !accessToken,
     refetchOnMountOrArgChange: true,
   });
+
   useEffect(() => {
     if (serverItems && accessToken) {
       dispatch(setFavoriteItems(serverItems));
@@ -41,27 +44,44 @@ export const ProfileWishlist = () => {
     name: "Назва A-Z",
   };
 
-  const filteredItems = items
-    .filter((item) => {
-      if (activeFilter === "cheap") return item.productPrice < 1000;
-      if (activeFilter === "expensive") return item.productPrice >= 1000;
-      return true;
-    })
-    .sort((a, b) => {
-      if (sortBy === "price-asc") return a.productPrice - b.productPrice;
-      if (sortBy === "price-desc") return b.productPrice - a.productPrice;
-      if (sortBy === "name") return a.productName.localeCompare(b.productName);
-      return 0;
-    });
+  const filteredItems = useMemo(() => {
+    return items
+      .filter((item) => {
+        if (activeFilter === "cheap") return item.productPrice < 1000;
+        if (activeFilter === "expensive") return item.productPrice >= 1000;
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === "price-asc") return a.productPrice - b.productPrice;
+        if (sortBy === "price-desc") return b.productPrice - a.productPrice;
+        if (sortBy === "name")
+          return a.productName.localeCompare(b.productName);
+        return 0;
+      });
+  }, [items, activeFilter, sortBy]);
 
   const handleRemove = (item: FavoriteItemDTO) => {
     dispatch(toggleFavorites(item));
     if (accessToken) toggleServerFavorite({ productId: item.productId });
   };
 
-  const handleAddToCart = (item: FavoriteItemDTO) => {
-    dispatch(addToCart({ ...item, price: item.productPrice, quantity: 1 }));
-    handleRemove(item);
+  const handleAddToCartLogic = (item: FavoriteItemDTO) => {
+    if (item.stockQuantity <= 0) {
+      showNotify.error(`На жаль, "${item.productName}" уже закінчився`);
+      return;
+    }
+
+    const cartItem: CartItemDto = {
+      productId: item.productId,
+      productName: item.productName,
+      productImage: item.productImage || PLACEHOLDER_IMAGE_URL,
+      price: item.productPrice,
+      quantity: 1,
+      stockQuantity: item.stockQuantity,
+    };
+
+    dispatch(addToCart(cartItem));
+    showNotify.success(`"${item.productName}" додано до кошика`);
   };
 
   if (items.length === 0)
@@ -221,7 +241,7 @@ export const ProfileWishlist = () => {
                 </div>
 
                 <button
-                  onClick={() => !isOutOfStock && handleAddToCart(item)}
+                  onClick={() => !isOutOfStock && handleAddToCartLogic(item)}
                   disabled={isOutOfStock}
                   className={`w-full py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${
                     isOutOfStock
