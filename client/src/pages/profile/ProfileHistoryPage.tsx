@@ -1,15 +1,19 @@
 import { Table } from "antd";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChevronDown } from "lucide-react";
 import { OrderStatus } from "../../enums/enum";
 import { useGetMyOrdersQuery } from "../../services/orderApi";
 import { orderHistoryColumns } from "../../utils/orderHistoryColumns";
+import { Pagination } from "../../common/Pagination";
 
 export const ProfileHistoryPage = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [sortBy, setSortBy] = useState("newest");
-  const { data: orders } = useGetMyOrdersQuery();
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const { data: orders, isLoading } = useGetMyOrdersQuery();
+  const ordersPerPage = 5;
 
   const sortLabels: Record<string, string> = {
     newest: "Спочатку нові",
@@ -17,14 +21,17 @@ export const ProfileHistoryPage = () => {
     expensive: "Найдорожчі",
   };
 
-  const filteredData = orders
-    ?.filter((item) => {
+  const processedOrders = useMemo(() => {
+    if (!orders) return [];
+
+    const result = orders.filter((item) => {
       if (activeFilter === "active") return item.status === OrderStatus.Pending;
       if (activeFilter === "completed")
         return item.status === OrderStatus.Completed;
       return true;
-    })
-    .sort((a, b) => {
+    });
+
+    return [...result].sort((a, b) => {
       if (sortBy === "newest")
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -36,6 +43,17 @@ export const ProfileHistoryPage = () => {
       if (sortBy === "expensive") return b.totalPrice - a.totalPrice;
       return 0;
     });
+  }, [orders, activeFilter, sortBy]);
+
+  const totalPages = Math.ceil(processedOrders.length / ordersPerPage);
+
+  const activePage = currentPage > totalPages ? 1 : currentPage;
+
+  const currentOrders = useMemo(() => {
+    const lastIndex = activePage * ordersPerPage;
+    const firstIndex = lastIndex - ordersPerPage;
+    return processedOrders.slice(firstIndex, lastIndex);
+  }, [processedOrders, activePage]);
 
   return (
     <div className="font-montserrat animate-in fade-in duration-500">
@@ -52,7 +70,10 @@ export const ProfileHistoryPage = () => {
           ].map((filter) => (
             <button
               key={filter.id}
-              onClick={() => setActiveFilter(filter.id)}
+              onClick={() => {
+                setActiveFilter(filter.id);
+                setCurrentPage(1);
+              }}
               className={`px-6 py-2.5 rounded-full text-[13px] font-semibold transition-all duration-300 ${
                 activeFilter === filter.id
                   ? "bg-brand-dark text-white shadow-lg shadow-gray-200"
@@ -88,6 +109,7 @@ export const ProfileHistoryPage = () => {
                     key={key}
                     onClick={() => {
                       setSortBy(key);
+                      setCurrentPage(1);
                       setIsSortOpen(false);
                     }}
                     className={`w-full text-left px-5 py-3 text-[13px] font-semibold ${
@@ -105,27 +127,34 @@ export const ProfileHistoryPage = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-[28px] border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+      <div className="bg-white rounded-[28px] border border-gray-100 overflow-hidden shadow-sm shadow-gray-100 mb-8">
         <Table
           rowKey="id"
-          dataSource={filteredData}
+          dataSource={currentOrders}
           columns={orderHistoryColumns}
-          pagination={{
-            pageSize: 5,
-            position: ["bottomCenter"],
-          }}
+          pagination={false}
+          loading={isLoading}
           rowClassName="group hover:bg-gray-50/50 transition-colors cursor-pointer"
         />
-      </div>
-      <style>{`
-        .ant-table, 
-        .ant-table-container, 
-        .ant-table-thead > tr > th, 
-        .ant-table-tbody > tr > td,
-        .ant-pagination {
-          font-family: 'Montserrat', sans-serif !important;
-        }
 
+        {processedOrders.length === 0 && !isLoading && (
+          <div className="py-20 text-center text-gray-400">
+            Замовлень не знайдено
+          </div>
+        )}
+      </div>
+
+      {!isLoading && totalPages > 1 && (
+        <div className="flex justify-center">
+          <Pagination
+            currentPage={activePage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        </div>
+      )}
+
+      <style>{`
         .ant-table-thead > tr > th {
           background: #F9FAFB !important;
           color: #9CA3AF !important;
@@ -135,24 +164,11 @@ export const ProfileHistoryPage = () => {
           font-weight: 600 !important;
           border-bottom: 1px solid #F3F4F6 !important;
           padding: 14px 24px !important;
+          font-family: 'Montserrat', sans-serif !important;
         }
-
         .ant-table-tbody > tr > td {
           border-bottom: 1px solid #F9FAFB !important;
           padding: 18px 24px !important;
-        }
-
-        .ant-table-tbody > tr:hover > td {
-          background: rgba(0,0,0,0.02) !important;
-        }
-
-        .ant-table-pagination.ant-pagination {
-          margin: 0 !important;
-          border-top: 1px solid #F9FAFB;
-          padding: 20px 0;
-        }
-
-        .ant-pagination-item a, .ant-pagination-item-ellipsis {
           font-family: 'Montserrat', sans-serif !important;
         }
       `}</style>

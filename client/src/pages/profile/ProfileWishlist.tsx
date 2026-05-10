@@ -82,7 +82,7 @@ export const ProfileWishlist = () => {
         </h3>
         <Link
           to="/"
-          className="flex items-center gap-2 px-12 py-3 bg-brand-primary text-white rounded-full font-medium shadow-lg hover:bg-brand-dark transition-all"
+          className="flex items-center gap-2 px-12 py-2 mt-6 bg-brand-primary text-white rounded-full font-medium shadow-lg hover:bg-brand-dark transition-all"
         >
           <ArrowLeft size={20} /> <span>До каталогу</span>
         </Link>
