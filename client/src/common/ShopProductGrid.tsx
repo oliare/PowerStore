@@ -22,7 +22,6 @@ export const ShopProductGrid = ({
   isLoading,
 }: ShopProductGridProps) => {
   const dispatch = useDispatch();
-
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
@@ -103,6 +102,7 @@ export const ShopProductGrid = ({
                       : "hover:shadow-xl hover:border-brand-primary/40"
                   }`}
                 >
+                  {/* Зображення */}
                   <div className="relative h-44 rounded-lg overflow-hidden mb-6 bg-gray-50 flex items-center justify-center p-2">
                     <img
                       src={product.images?.[0]?.image || PLACEHOLDER_IMAGE_URL}
@@ -126,42 +126,44 @@ export const ShopProductGrid = ({
                       <FavoriteButton product={product} />
                     </div>
                   </div>
+
                   <div className="space-y-2">
                     <h3
                       className={`text-sm font-medium line-clamp-2 min-h-[40px] font-montserrat transition-colors
                       ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
                     >
-                      {product.name.length > 30
-                        ? product.name.slice(0, 20) + "..."
-                        : product.name}
+                      {product.name}
                     </h3>
 
-                    {!!product.rate && (
-                      <div className="flex items-center gap-1 mt-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            size={11}
-                            className={
-                              i < Math.round(product.rate || 0)
-                                ? "fill-[#fbd53c] text-[#fbd53c]"
-                                : "text-gray-200 fill-gray-200"
-                            }
-                          />
-                        ))}
-                        <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
-                          {(product.rate || 0).toFixed(1)}
-                        </span>
-                      </div>
-                    )}
-
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex flex-col">
+                      <div className="flex flex-col gap-1">
                         <span
                           className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
                         >
                           ₴ {product.price}
                         </span>
+
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map(
+                            (_, i) => (
+                              console.log(product.rate),
+                              (
+                                <Star
+                                  key={i}
+                                  size={11}
+                                  className={
+                                    i < Math.round(product.rate || 0)
+                                      ? "fill-[#fbd53c] text-[#fbd53c]"
+                                      : "text-gray-200 fill-gray-200"
+                                  }
+                                />
+                              )
+                            ),
+                          )}
+                          <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
+                            {(product.rate || 0).toFixed(1)}
+                          </span>
+                        </div>
 
                         {!isOutOfStock ? (
                           <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
@@ -178,6 +180,7 @@ export const ShopProductGrid = ({
                         )}
                       </div>
 
+                      {/* Кнопка кошика */}
                       <button
                         disabled={isOutOfStock}
                         className={`p-3 rounded-full transition-colors flex-shrink-0 

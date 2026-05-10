@@ -9,6 +9,7 @@ import { useSearchParams } from "react-router-dom";
 
 export const ShopPage = () => {
   const [priceRange, setPriceRange] = useState(5000);
+  const [ratingFilter, setRatingFilter] = useState(0);
   const [activeSort, setActiveSort] = useState("latest");
   const [isSortOpen, setIsSortOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,26 +35,21 @@ export const ShopPage = () => {
   const processedProducts = useMemo(() => {
     if (!products) return [];
 
-    let result = products.items.filter((p) => p.price <= priceRange);
+    return products.items
+      .filter((p) => {
+        const matchesPrice = p.price <= priceRange;
 
-    switch (activeSort) {
-      case "price_asc":
-        result = [...result].sort((a, b) => a.price - b.price);
-        break;
-      case "price_desc":
-        result = [...result].sort((a, b) => b.price - a.price);
-        break;
-      case "popular":
-        result = [...result].sort(
-          (a, b) => (b.stockQuantity || 0) - (a.stockQuantity || 0),
-        );
-        break;
-      default:
-        result = [...result];
-    }
+        const matchesRating =
+          ratingFilter === 0 || (p.rate || 0) >= ratingFilter;
 
-    return result;
-  }, [products, priceRange, activeSort]);
+        return matchesPrice && matchesRating;
+      })
+      .sort((a, b) => {
+        if (activeSort === "price_asc") return a.price - b.price;
+        if (activeSort === "price_desc") return b.price - a.price;
+        return 0;
+      });
+  }, [products, priceRange, activeSort, ratingFilter]);
 
   const totalPages = Math.ceil(processedProducts.length / productsPerPage);
 
@@ -82,8 +78,12 @@ export const ShopPage = () => {
     <div className="bg-gray-50 min-h-screen font-montserrat">
       <div className="max-w-7xl mx-auto px-4 pb-20 pt-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          <ShopSidebar priceRange={priceRange} setPriceRange={setPriceRange} />
-
+          <ShopSidebar
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            ratingFilter={ratingFilter}
+            setRatingFilter={setRatingFilter}
+          />
           <main className="w-full lg:w-3/4">
             <div className="flex flex-col min-h-[700px]">
               {isLoading ? (

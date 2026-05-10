@@ -215,7 +215,7 @@ const ProductDetailsPage = () => {
             </h1>
 
             <div className="flex items-center gap-3 mb-6 mt-3 text-sm">
-              <div className="flex text-orange-400">
+              <div className="flex text-[#fbd53c]">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}

@@ -9,10 +9,12 @@ namespace PowerStore.Application.Services;
 public class ReviewService : IReviewService
 {
     private readonly IRepository<ProductReviewEntity> _reviewRepository;
+    private readonly IRepository<ProductEntity> _productRepository;
 
-    public ReviewService(IRepository<ProductReviewEntity> reviewRepository)
+    public ReviewService(IRepository<ProductReviewEntity> reviewRepository, IRepository<ProductEntity> productRepository)
     {
         _reviewRepository = reviewRepository;
+        _productRepository = productRepository;
     }
 
     public async Task<IEnumerable<ReviewDto>> GetProductReviewsAsync(Guid productId)
@@ -37,7 +39,6 @@ public class ReviewService : IReviewService
     {
         var existing = await _reviewRepository.FirstOrDefaultAsync(r =>
             r.ProductId == dto.ProductId && r.UserId == userId);
-
         if (existing != null) return false;
 
         var review = new ProductReviewEntity
@@ -52,6 +53,22 @@ public class ReviewService : IReviewService
 
         await _reviewRepository.AddAsync(review);
         await _reviewRepository.SaveAsync();
+
+        var allRatings = await _reviewRepository.Query()
+            .Where(r => r.ProductId == dto.ProductId)
+            .Select(r => r.Rating)
+            .ToListAsync();
+
+        double average = allRatings.Any() ? allRatings.Average() : 0;
+
+        var product = await _productRepository.GetByIdAsync(dto.ProductId);
+        if (product != null)
+        {
+            product.Rate = (float)average;
+            _productRepository.Update(product);
+            await _productRepository.SaveAsync();
+        }
+
         return true;
     }
 

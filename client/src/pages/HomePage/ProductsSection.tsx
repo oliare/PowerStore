@@ -3,6 +3,7 @@ import {
   ShoppingCart,
   AlertCircle,
   PackageCheck,
+  Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { ProductDto } from "../../types/product";
@@ -187,6 +188,27 @@ export const ProductsSection = ({
                                 ₴ {product.price}
                               </span>
 
+                              <div className="flex items-center gap-1 mt-1 mb-2">
+                                {[...Array(5)].map(
+                                  (_, i) => (
+                                    console.log(product.rate),
+                                    (
+                                      <Star
+                                        key={i}
+                                        size={11}
+                                        className={
+                                          i < Math.round(product.rate || 0)
+                                            ? "fill-[#fbd53c] text-[#fbd53c]"
+                                            : "text-gray-200 fill-gray-200"
+                                        }
+                                      />
+                                    )
+                                  ),
+                                )}
+                                <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
+                                  {(product.rate || 0).toFixed(1)}
+                                </span>
+                              </div>
                               {!isOutOfStock ? (
                                 <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
                                   <PackageCheck size={12} />

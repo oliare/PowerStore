@@ -6,12 +6,16 @@ import { useGetCategoriesQuery } from "../services/categoryApi";
 interface ShopSidebarProps {
   priceRange: number;
   setPriceRange: (value: number) => void;
+  ratingFilter: number;
+  setRatingFilter: (value: number) => void;
   className?: string;
 }
 
 export const ShopSidebar = ({
   priceRange,
   setPriceRange,
+  ratingFilter,
+  setRatingFilter,
   className,
 }: ShopSidebarProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,6 +33,14 @@ export const ShopSidebar = ({
       searchParams.set("categoryId", id);
     }
     setSearchParams(searchParams);
+  };
+
+  const handleRatingChange = (rating: number) => {
+    if (ratingFilter === rating) {
+      setRatingFilter(0);
+    } else {
+      setRatingFilter(rating);
+    }
   };
 
   return (
@@ -151,6 +163,8 @@ export const ShopSidebar = ({
               >
                 <input
                   type="checkbox"
+                  checked={ratingFilter === rating}
+                  onChange={() => handleRatingChange(rating)}
                   className="w-4 h-4 accent-brand-primary rounded border-gray-300 cursor-pointer"
                 />
                 <div className="flex items-center gap-1">
@@ -158,7 +172,11 @@ export const ShopSidebar = ({
                     <Star
                       key={i}
                       size={16}
-                      className={`${i < rating ? "text-orange-400 fill-orange-400" : "text-gray-200 fill-gray-200"}`}
+                      className={`${
+                        i < rating
+                          ? "fill-[#fbd53c] text-[#fbd53c]"
+                          : "text-gray-200 fill-gray-200"
+                      }`}
                     />
                   ))}
                   <span className="text-sm text-gray-600 ml-1 font-montserrat italic">
@@ -168,6 +186,14 @@ export const ShopSidebar = ({
               </label>
             ))}
           </div>
+          {ratingFilter > 0 && (
+            <button
+              onClick={() => setRatingFilter(0)}
+              className="text-xs text-brand-primary mt-3 hover:underline font-montserrat"
+            >
+              Очистити фільтр рейтингу
+            </button>
+          )}
         </div>
 
         <button
