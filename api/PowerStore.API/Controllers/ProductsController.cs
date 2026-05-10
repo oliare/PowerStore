@@ -57,4 +57,11 @@ public class ProductsController : ControllerBase
 
         return Ok(results);
     }
+
+    [HttpPost("check-stock")]
+    public async Task<ActionResult<IEnumerable<ProductStockDto>>> CheckStock([FromBody] List<Guid> ids)
+    {
+        var result = await _productService.CheckStockAsync(ids);
+        return Ok(result);
+    }
 }

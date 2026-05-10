@@ -102,4 +102,19 @@ public class ProductService : IProductService
             .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<ProductStockDto>> CheckStockAsync(List<Guid> productIds)
+    {
+        if (productIds == null || !productIds.Any())
+            return Enumerable.Empty<ProductStockDto>();
+
+        return await _repo.Query()
+            .Where(p => productIds.Contains(p.Id))
+            .Select(p => new ProductStockDto
+            {
+                ProductId = p.Id,
+                StockQuantity = p.StockQuantity
+            })
+            .ToListAsync();
+    }
 }

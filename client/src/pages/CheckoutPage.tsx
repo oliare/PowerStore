@@ -503,7 +503,7 @@ export const CheckoutPage = () => {
                 <button
                   type="submit"
                   disabled={isCreatingOrder || cartItems.length === 0}
-                  className="w-full h-11 mt-8 bg-brand-primary hover:bg-brand-dark disabled:bg-gray-200 text-white rounded-full font-semibold shadow-2xl shadow-brand-primary/30 transition-all active:scale-[0.97] flex items-center justify-center gap-3 text-base"
+                  className="w-full h-11 mt-8 bg-brand-primary hover:bg-brand-dark disabled:bg-gray-200 text-white rounded-full font-semibold shadow-2xl shadow-brand-primary/30 transition-all active:scale-[0.97] flex items-center justify-center gap-3 text-sm"
                 >
                   {isCreatingOrder ? "Обробка..." : "Підтвердити замовлення"}
                 </button>

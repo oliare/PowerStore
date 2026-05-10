@@ -30,3 +30,9 @@ export interface ProductDetailsDto {
   relatedProducts: ProductDto[];
   reviews?: ReviewDto[];
 }
+
+export interface ProductStockDto {
+  productId: string;
+  stockQuantity: number;
+  isAvailable: boolean;
+}

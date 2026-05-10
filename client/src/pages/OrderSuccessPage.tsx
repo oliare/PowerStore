@@ -18,7 +18,7 @@ export const OrderSuccessPage = () => {
       <div className="min-h-screen bg-[#fcfcfc] flex flex-col items-center px-4 py-16">
         <div className="w-full max-w-7xl mb-12 px-4">
           <Link
-            to="/"
+            to="/shop"
             className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 transition-colors font-medium text-sm"
           >
             <ArrowLeft size={18} />

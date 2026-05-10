@@ -126,7 +126,7 @@ export const ProfileCart = () => {
           </div>
           <button
             onClick={handleCheckout}
-            className="w-full sm:w-auto px-12 py-2 bg-brand-primary text-white rounded-full font-semibold shadow-xl shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]"
+            className="w-full sm:w-auto px-12 py-2 bg-brand-primary text-sm text-white rounded-full font-semibold shadow-xl shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]"
           >
             Оформити замовлення
           </button>

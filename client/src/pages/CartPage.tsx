@@ -1,22 +1,54 @@
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { ArrowLeft, Minus, Plus, ShoppingBag, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { MailingSection } from "./HomePage/MailingSection";
+import { useCheckStockMutation } from "../services/productApi";
+import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 
 export const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { items } = useSelector((state: RootState) => state.cart);
 
+  const [serverStock, setServerStock] = useState<Record<string, number>>({});
+  const [checkStock, { isLoading: isChecking }] = useCheckStockMutation();
+
+  useEffect(() => {
+    if (items.length > 0) {
+      const ids = items.map((item) => item.productId);
+      checkStock(ids)
+        .unwrap()
+        .then((res) => {
+          const stockMap = res.reduce(
+            (acc, curr) => ({
+              ...acc,
+              [curr.productId]: curr.stockQuantity,
+            }),
+            {},
+          );
+          setServerStock(stockMap);
+        })
+        .catch((err) => console.error("Stock sync error:", err));
+    }
+  }, [items, checkStock]);
+
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
 
+  const hasOutOfStockItems = items.some((item) => {
+    const stock = serverStock[item.productId];
+    return stock !== undefined && stock <= 0;
+  });
+
   const handleCheckout = () => {
-    navigate("/checkout");
+    if (!hasOutOfStockItems && !isChecking) {
+      navigate("/checkout");
+    }
   };
 
   if (items.length === 0) {
@@ -50,7 +82,7 @@ export const CartPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8">
           <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-full">
-            <div className={`h-[300px] overflow-y-auto`}>
+            <div className={`h-[400px] overflow-y-auto`}>
               <table className="w-full text-left flex-grow">
                 <thead className="border-b border-gray-100 text-gray-400 uppercase text-[11px] tracking-widest">
                   <tr>
@@ -62,70 +94,121 @@ export const CartPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {items.map((item) => (
-                    <tr key={item.productId} className="group">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-4">
-                          <img
-                            src={item.productImage || "placeholder.png"}
-                            className="w-16 h-16 object-cover rounded-xl"
-                          />
-                          <span className="font-semibold text-gray-900">
-                            {item.productName}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 text-gray-900 font-medium font-manrope">
-                        ₴ {item.price}
-                      </td>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center gap-3 border border-gray-200 rounded-full w-max px-3 py-1">
-                          <button
-                            onClick={() =>
-                              dispatch(
-                                updateQuantity({
-                                  productId: item.productId,
-                                  quantity: item.quantity - 1,
-                                }),
-                              )
-                            }
-                            className="hover:text-brand-primary transition-colors"
-                          >
-                            <Minus size={16} />
-                          </button>
-                          <span className="w-6 text-center font-semibold text-gray-900 font-manrope">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              dispatch(
-                                updateQuantity({
-                                  productId: item.productId,
-                                  quantity: item.quantity + 1,
-                                }),
-                              )
-                            }
-                            className="hover:text-brand-primary transition-colors"
-                          >
-                            <Plus size={16} />
-                          </button>
-                        </div>
-                      </td>
-                      <td className="px-6 py-6 font-semibold text-gray-900 font-manrope">
-                        ₴{(item.price * item.quantity).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-6">
-                        <button
-                          onClick={() =>
-                            dispatch(removeFromCart(item.productId))
-                          }
-                          className="text-gray-300 hover:text-red-500 transition-colors"
+                  {items.map((item) => {
+                    const stock = serverStock[item.productId];
+                    const isOutOfStock = stock !== undefined && stock <= 0;
+
+                    return (
+                      <tr
+                        key={item.productId}
+                        className={`group ${isOutOfStock ? "bg-red-50/20" : ""}`}
+                      >
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-4">
+                            <img
+                              src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                              className={`w-16 h-16 object-cover rounded-xl transition-opacity ${
+                                isOutOfStock ? "grayscale opacity-50" : ""
+                              }`}
+                            />
+                            <div className="flex flex-col">
+                              <span
+                                className={`font-semibold ${
+                                  isOutOfStock
+                                    ? "text-gray-400"
+                                    : "text-gray-900"
+                                }`}
+                              >
+                                {item.productName}
+                              </span>
+                              {isOutOfStock && (
+                                <span className="text-xs text-red-500 font-semibold mt-2">
+                                  Немає в наявності
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td
+                          className={`px-6 py-6 font-medium font-manrope ${
+                            isOutOfStock ? "text-gray-400" : "text-gray-900"
+                          }`}
                         >
-                          <X size={20} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                          ₴ {item.price}
+                        </td>
+                        <td className="px-6 py-6">
+                          <div
+                            className={`flex items-center gap-3 border rounded-full w-max px-3 py-1 ${
+                              isOutOfStock
+                                ? "border-gray-100 bg-gray-50"
+                                : "border-gray-200"
+                            }`}
+                          >
+                            <button
+                              disabled={isOutOfStock}
+                              onClick={() =>
+                                dispatch(
+                                  updateQuantity({
+                                    productId: item.productId,
+                                    quantity: item.quantity - 1,
+                                  }),
+                                )
+                              }
+                              className={
+                                isOutOfStock
+                                  ? "text-gray-200"
+                                  : "hover:text-brand-primary transition-colors"
+                              }
+                            >
+                              <Minus size={16} />
+                            </button>
+                            <span
+                              className={`w-6 text-center font-semibold font-manrope ${
+                                isOutOfStock ? "text-gray-300" : "text-gray-900"
+                              }`}
+                            >
+                              {item.quantity}
+                            </span>
+                            <button
+                              disabled={isOutOfStock}
+                              onClick={() =>
+                                dispatch(
+                                  updateQuantity({
+                                    productId: item.productId,
+                                    quantity: item.quantity + 1,
+                                  }),
+                                )
+                              }
+                              className={
+                                isOutOfStock
+                                  ? "text-gray-200"
+                                  : "hover:text-brand-primary transition-colors"
+                              }
+                            >
+                              <Plus size={16} />
+                            </button>
+                          </div>
+                        </td>
+                        <td
+                          className={`px-6 py-6 font-semibold font-manrope ${
+                            isOutOfStock ? "text-gray-400" : "text-gray-900"
+                          }`}
+                        >
+                          ₴{(item.price * item.quantity).toFixed(2)}
+                        </td>
+                        <td className="px-6 py-6">
+                          <button
+                            onClick={() =>
+                              dispatch(removeFromCart(item.productId))
+                            }
+                            className="text-gray-300 hover:text-red-500 transition-colors"
+                          >
+                            <X size={20} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -133,7 +216,7 @@ export const CartPage = () => {
             <div className="p-6 bg-gray-50/50 flex justify-between items-center mt-auto">
               <Link
                 to="/shop"
-                className="flex items-center gap-2 px-8 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-all active:scale-[0.98]"
+                className="flex items-center text-sm gap-2 px-8 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-all active:scale-[0.98]"
               >
                 <ArrowLeft size={18} />
                 Повернутися до магазину
@@ -167,11 +250,22 @@ export const CartPage = () => {
               <span className="font-manrope">₴{subtotal.toFixed(2)}</span>
             </div>
 
+            {hasOutOfStockItems && (
+              <p className="text-red-500 text-[11px] text-center mb-4 font-medium">
+                Деякі товари недоступні. Видаліть їх, щоб продовжити.
+              </p>
+            )}
+
             <button
               onClick={handleCheckout}
-              className="mt-auto w-full py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98]"
+              disabled={items.length === 0 || hasOutOfStockItems || isChecking}
+              className="mt-auto text-sm w-full py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.98] disabled:bg-gray-300 disabled:cursor-not-allowed disabled:shadow-none"
             >
-              Оформити замовлення
+              {isChecking
+                ? "Перевірка..."
+                : hasOutOfStockItems
+                  ? "Є недоступні товари"
+                  : "Оформити замовлення"}
             </button>
           </div>
         </div>
