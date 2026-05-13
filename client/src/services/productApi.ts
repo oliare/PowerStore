@@ -1,4 +1,8 @@
-import type { ProductDetailsDto, ProductDto, ProductStockDto } from "../types/product";
+import type {
+  ProductDetailsDto,
+  ProductDto,
+  ProductStockDto,
+} from "../types/product";
 import { baseApi } from "../api/baseApi";
 import type { PagedResponse } from "../types/common";
 
@@ -26,14 +30,14 @@ export const productApi = baseApi.injectEndpoints({
       { query: string; count: number }
     >({
       query: ({ query, count }) => ({
-        url: "/products/search",
+        url: "/Products/search",
         method: "GET",
         params: { query, count },
       }),
     }),
     checkStock: builder.mutation<ProductStockDto[], string[]>({
       query: (ids) => ({
-        url: "products/check-stock",
+        url: "/Products/check-stock",
         method: "POST",
         body: ids,
       }),

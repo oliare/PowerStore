@@ -4,7 +4,6 @@ import { toggleFavorites } from "../store/favoriteSlice";
 import { useToggleFavoriteMutation } from "../services/favoritesApi";
 import type { RootState } from "../store/store";
 import type { ProductDto } from "../types/product";
-import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 import type { FavoriteItemDTO } from "../types/favorite";
 import { showNotify } from "../utils/showNotify";
 
@@ -22,7 +21,9 @@ export const FavoriteButton = ({
 
   const localItems = useSelector((state: RootState) => state.favorites.items);
 
-  const isFavorite = localItems.some((item) => item.productId === product.id);
+  const isFavorite = localItems.some(
+    (item) => item?.product?.id === product?.id,
+  );
 
   const [toggleServerFavorites] = useToggleFavoriteMutation();
 
@@ -38,10 +39,10 @@ export const FavoriteButton = ({
 
     dispatch(
       toggleFavorites({
+        id: product.id,
         productId: product.id,
-        productName: product.name,
-        productImage: product.image || PLACEHOLDER_IMAGE_URL,
-        productPrice: product.price,
+        addedAt: new Date().toISOString(),
+        product: product,
       } as FavoriteItemDTO),
     );
 

@@ -54,7 +54,7 @@ export const ProductReviewsPage = () => {
             </div>
             <div className="flex items-center gap-4 bg-gray-50 p-2 rounded-2xl border border-gray-100">
               <div className="px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100">
-                <span className="text-xs text-gray-400 block uppercase tracking-wider font-semibold text-[8px]">
+                <span className="text-gray-400 block uppercase tracking-wider font-semibold text-[10px]">
                   Середній бал
                 </span>
                 <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export const ProductReviewsPage = () => {
                 </div>
               </div>
               <div className="px-4 py-2 bg-white rounded-xl shadow-sm border border-gray-100 text-right">
-                <span className="text-xs text-gray-400 block uppercase tracking-wider font-semibold text-[8px]">
+                <span className="text-gray-400 block uppercase tracking-wider font-semibold text-[10px]">
                   Відгуків
                 </span>
                 <span className="text-xl font-black text-gray-900 font-manrope">
@@ -82,7 +82,7 @@ export const ProductReviewsPage = () => {
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Filter size={18} /> Фільтрація
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {[5, 4, 3, 2, 1].map((star) => (
                   <button
                     key={star}
@@ -174,12 +174,12 @@ export const ProductReviewsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-24 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+              <div className="text-center py-28 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
                 <MessageSquare
-                  className="mx-auto text-gray-300 mb-4"
+                  className="mx-auto text-gray-300 mb-10"
                   size={48}
                 />
-                <p className="text-gray-500 font-montserrat text-lg italic">
+                <p className="text-gray-500 font-montserrat text-sm italic">
                   Відгуків поки немає. Будьте першим, хто залишить свій
                   коментар!
                 </p>

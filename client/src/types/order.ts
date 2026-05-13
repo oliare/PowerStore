@@ -29,6 +29,8 @@ export interface OrderItemDto {
   image?: string;
   quantity: number;
   price: number;
+  isOnSale?: boolean;
+  discountPrice?: number;
 }
 
 export interface OrderDto {

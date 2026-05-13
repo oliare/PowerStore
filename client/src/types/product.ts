@@ -15,7 +15,6 @@ export interface ProductDto {
   image?: string;
   rate?: number;
   stockQuantity: number;
-  discount?: number;
   categoryName?: string;
   categoryId: string;
   isFavorite: boolean;
@@ -23,6 +22,9 @@ export interface ProductDto {
   brand?: string;
   tags?: string[];
   reviews?: ReviewDto[];
+  discountPercentage?: number;
+  isOnSale: boolean;
+  discountPrice: number | null;
 }
 
 export interface ProductDetailsDto {
@@ -35,4 +37,25 @@ export interface ProductStockDto {
   productId: string;
   stockQuantity: number;
   isAvailable: boolean;
+}
+
+export function getActualPrice(
+  product: Pick<ProductDto, "price" | "isOnSale" | "discountPrice">,
+): number {
+  return product.isOnSale &&
+    product.discountPrice != null &&
+    product.discountPrice > 0
+    ? product.discountPrice
+    : product.price;
+}
+
+export function hasActiveDiscount(
+  product: Pick<ProductDto, "price" | "isOnSale" | "discountPrice">,
+): boolean {
+  return (
+    product.isOnSale &&
+    product.discountPrice != null &&
+    product.discountPrice > 0 &&
+    product.discountPrice < product.price
+  );
 }

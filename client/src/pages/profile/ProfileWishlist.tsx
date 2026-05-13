@@ -13,6 +13,7 @@ import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { useEffect, useState, useMemo } from "react";
 import { showNotify } from "../../utils/showNotify";
 import type { CartItemDto } from "../../types/cart";
+import { getActualPrice, hasActiveDiscount } from "../../types/product";
 
 export const ProfileWishlist = () => {
   const dispatch = useDispatch();
@@ -47,41 +48,49 @@ export const ProfileWishlist = () => {
   const filteredItems = useMemo(() => {
     return items
       .filter((item) => {
-        if (activeFilter === "cheap") return item.productPrice < 1000;
-        if (activeFilter === "expensive") return item.productPrice >= 1000;
+        // ВИПРАВЛЕНО: фільтр по актуальній ціні (з урахуванням знижки)
+        const actualPrice = getActualPrice(item.product);
+        if (activeFilter === "cheap") return actualPrice < 1000;
+        if (activeFilter === "expensive") return actualPrice >= 1000;
         return true;
       })
       .sort((a, b) => {
-        if (sortBy === "price-asc") return a.productPrice - b.productPrice;
-        if (sortBy === "price-desc") return b.productPrice - a.productPrice;
+        // ВИПРАВЛЕНО: сортування по актуальній ціні
+        if (sortBy === "price-asc")
+          return getActualPrice(a.product) - getActualPrice(b.product);
+        if (sortBy === "price-desc")
+          return getActualPrice(b.product) - getActualPrice(a.product);
         if (sortBy === "name")
-          return a.productName.localeCompare(b.productName);
+          return a.product.name.localeCompare(b.product.name);
         return 0;
       });
   }, [items, activeFilter, sortBy]);
 
   const handleRemove = (item: FavoriteItemDTO) => {
     dispatch(toggleFavorites(item));
-    if (accessToken) toggleServerFavorite({ productId: item.productId });
+    if (accessToken) toggleServerFavorite({ productId: item.product.id });
   };
 
   const handleAddToCartLogic = (item: FavoriteItemDTO) => {
-    if (item.stockQuantity <= 0) {
-      showNotify.error(`На жаль, "${item.productName}" уже закінчився`);
+    if (item.product.stockQuantity <= 0) {
+      showNotify.error(`На жаль, "${item.product.name}" уже закінчився`);
       return;
     }
 
     const cartItem: CartItemDto = {
-      productId: item.productId,
-      productName: item.productName,
-      productImage: item.productImage || PLACEHOLDER_IMAGE_URL,
-      price: item.productPrice,
+      productId: item.product.id,
+      productName: item.product.name,
+      productImage: item.product.image || PLACEHOLDER_IMAGE_URL,
+      price: getActualPrice(item.product), // ВИПРАВЛЕНО: фактична ціна
       quantity: 1,
-      stockQuantity: item.stockQuantity,
+      stockQuantity: item.product.stockQuantity,
+      isOnSale: item.product.isOnSale,
+      discountPrice: item.product.discountPrice,
+      discountPercentage: item.product.discountPercentage,
     };
 
     dispatch(addToCart(cartItem));
-    showNotify.success(`"${item.productName}" додано до кошика`);
+    showNotify.success(`"${item.product.name}" додано до кошика`);
   };
 
   if (items.length === 0)
@@ -101,10 +110,10 @@ export const ProfileWishlist = () => {
           Ваш список бажань порожній
         </h3>
         <Link
-          to="/"
+          to="/shop"
           className="flex items-center gap-2 px-12 py-2 mt-6 bg-brand-primary text-white rounded-full font-medium shadow-lg hover:bg-brand-dark transition-all"
         >
-          <ArrowLeft size={20} /> <span>До каталогу</span>
+          <ArrowLeft size={20} /> <span>До магазину</span>
         </Link>
       </div>
     );
@@ -177,14 +186,15 @@ export const ProfileWishlist = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredItems.map((item) => {
-          console.log(`${item.productName}: ${item.stockQuantity}`);
-          const isOutOfStock = item.stockQuantity === 0;
+          const isOutOfStock = item.product.stockQuantity === 0;
+          const hasDiscount = hasActiveDiscount(item.product);
+          const actualPrice = getActualPrice(item.product);
 
           return (
             <div
-              key={item.productId}
+              key={item.product.id}
               className={`group relative bg-white border border-gray-100 rounded-[28px] overflow-hidden transition-all duration-500 ${
                 isOutOfStock
                   ? "grayscale opacity-70 shadow-none"
@@ -193,8 +203,8 @@ export const ProfileWishlist = () => {
             >
               <div className="relative aspect-square overflow-hidden bg-gray-50">
                 <img
-                  src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                  alt={item.productName}
+                  src={item.product.image || PLACEHOLDER_IMAGE_URL}
+                  alt={item.product.name}
                   className={`w-full h-full object-cover transition-transform duration-[1s] ${
                     !isOutOfStock && "group-hover:scale-110"
                   }`}
@@ -221,7 +231,7 @@ export const ProfileWishlist = () => {
                 <div className="flex flex-col justify-between items-start mb-5">
                   <div className="flex-1 max-w-40">
                     <h3 className="font-semibold text-gray-900 text-sm truncate mb-1">
-                      {item.productName}
+                      {item.product.name}
                     </h3>
                   </div>
                   <div className="flex justify-between items-center w-full">
@@ -230,13 +240,24 @@ export const ProfileWishlist = () => {
                         В наявності
                       </span>
                     )}
-                    <span
-                      className={`text-lg font-semibold ${
-                        isOutOfStock ? "text-gray-400" : "text-brand-primary"
-                      }`}
-                    >
-                      ₴{item.productPrice.toLocaleString()}
-                    </span>
+                    <div className="flex flex-col items-end">
+                      {hasDiscount && (
+                        <span className="text-xs text-gray-400 line-through font-manrope leading-none">
+                          ₴{item.product.price.toLocaleString()}
+                        </span>
+                      )}
+                      <span
+                        className={`text-lg font-semibold ${
+                          isOutOfStock
+                            ? "text-gray-400"
+                            : hasDiscount
+                              ? "text-red-500"
+                              : "text-brand-primary"
+                        }`}
+                      >
+                        ₴{actualPrice.toLocaleString()}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

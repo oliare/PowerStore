@@ -6,13 +6,17 @@ import {
   Star,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { ProductDto } from "../../types/product";
+import {
+  type ProductDto,
+  getActualPrice,
+  hasActiveDiscount,
+} from "../../types/product";
 import type { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import type { SerializedError } from "@reduxjs/toolkit/react";
-import { useDispatch, useSelector } from "react-redux"; // Додано useSelector
+import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../store/cartSlice";
 import type { CartItemDto } from "../../types/cart";
-import type { RootState } from "../../store/store"; // Переконайтеся, що шлях правильний
+import type { RootState } from "../../store/store";
 import { FavoriteButton } from "../../common/FavoriteButton";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { SkeletonCard } from "../../common/SkeletonCard";
@@ -31,7 +35,6 @@ export const ProductsSection = ({
   error,
 }: ProductsSectionProps) => {
   const dispatch = useDispatch();
-
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
   const handleAddToCart = (product: ProductDto, selectedQuantity: number) => {
@@ -67,9 +70,12 @@ export const ProductsSection = ({
       productId: product.id,
       productName: product.name,
       productImage: finalImage,
-      price: product.price,
+      price: getActualPrice(product),
       quantity: selectedQuantity,
       stockQuantity: product.stockQuantity,
+      isOnSale: product.isOnSale,
+      discountPrice: product.discountPrice,
+      discountPercentage: product.discountPercentage,
     };
 
     dispatch(addToCart(item));
@@ -101,7 +107,7 @@ export const ProductsSection = ({
           {!isLoading && !error && (
             <Link
               to="/shop"
-              className="flex items-center gap-2 text-brand-primary font-semibold hover:underline group"
+              className="flex items-center gap-2 text-brand-primary font-semibold hover:underline group cursor-pointer z-10"
             >
               Переглянути всі
               <ArrowRight
@@ -133,6 +139,7 @@ export const ProductsSection = ({
                 ))
               : products.map((product) => {
                   const isOutOfStock = product.stockQuantity <= 0;
+                  const hasDiscount = hasActiveDiscount(product);
 
                   return (
                     <Link
@@ -141,7 +148,7 @@ export const ProductsSection = ({
                       className="group"
                     >
                       <div
-                        className={`h-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm transition-all relative
+                        className={`h-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm transition-all relative flex flex-col
                           ${
                             isOutOfStock
                               ? "opacity-70 grayscale-[0.4]"
@@ -180,35 +187,46 @@ export const ProductsSection = ({
                             {product.name}
                           </h3>
 
-                          <div className="flex items-center justify-between mt-auto pt-4">
-                            <div className="flex flex-col">
-                              <span
-                                className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
-                              >
-                                ₴ {product.price}
-                              </span>
+                          <div className="flex items-center justify-between mt-auto pt-1">
+                            <div>
+                              {hasDiscount ? (
+                                <div className="flex flex-col">
+                                  <span className="text-[15px] text-gray-400 line-through font-manrope">
+                                    ₴ {product.price}
+                                  </span>
+                                  <span className="text-xl font-bold font-manrope text-red-500">
+                                    ₴ {product.discountPrice}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span
+                                  className={`text-xl font-bold font-manrope ${
+                                    isOutOfStock
+                                      ? "text-gray-500"
+                                      : "text-gray-900"
+                                  }`}
+                                >
+                                  ₴ {product.price}
+                                </span>
+                              )}
 
-                              <div className="flex items-center gap-1 mt-1 mb-2">
-                                {[...Array(5)].map(
-                                  (_, i) => (
-                                    console.log(product.rate),
-                                    (
-                                      <Star
-                                        key={i}
-                                        size={11}
-                                        className={
-                                          i < Math.round(product.rate || 0)
-                                            ? "fill-[#fbd53c] text-[#fbd53c]"
-                                            : "text-gray-200 fill-gray-200"
-                                        }
-                                      />
-                                    )
-                                  ),
-                                )}
+                              <div className="flex items-center gap-0.5 mb-2 pb-2">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={11}
+                                    className={
+                                      i < Math.round(product.rate || 0)
+                                        ? "fill-[#fbd53c] text-[#fbd53c]"
+                                        : "text-gray-200 fill-gray-200"
+                                    }
+                                  />
+                                ))}
                                 <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
                                   {(product.rate || 0).toFixed(1)}
                                 </span>
                               </div>
+
                               {!isOutOfStock ? (
                                 <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
                                   <PackageCheck size={12} />

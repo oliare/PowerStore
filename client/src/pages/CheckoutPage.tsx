@@ -37,10 +37,6 @@ export const CheckoutPage = () => {
   const isAuth = !!user;
   const [clearCartApi] = useClearCartMutation();
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const cartTotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
 
   const [createOrder, { isLoading: isCreatingOrder }] =
     useCreateOrderMutation();
@@ -69,14 +65,15 @@ export const CheckoutPage = () => {
       .catch(() => {});
   }, [deliveryMethod, form]);
 
+  const cartTotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
     const item = cartItems.find((i) => i.productId === productId);
 
-    console.log("Item found:", item);
-
     if (!item) return;
-
-    console.log(`New: ${newQuantity}, Stock: ${item.stockQuantity}`);
 
     if (newQuantity > (item.stockQuantity ?? 0)) {
       showNotify.error(
@@ -101,12 +98,11 @@ export const CheckoutPage = () => {
       paymentType: values.paymentType,
       totalPrice: cartTotal,
       customerNote: values.customerNote,
-
       street: isCourier ? values.street : undefined,
       house: isCourier ? values.house : undefined,
       apartment: isCourier ? values.apartment : undefined,
-
       warehouseNumber: isPostalDelivery ? values.warehouseNumber : undefined,
+      // ВИПРАВЛЕНО: item.price вже є фактичною (знижена або звичайна)
       items: cartItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -420,86 +416,102 @@ export const CheckoutPage = () => {
                 </h2>
 
                 <div className="space-y-6 min-h-[270px] max-h-[300px] overflow-y-auto mb-4 pr-2 custom-scrollbar">
-                  {cartItems.length === 0 && (
-                    <p className="text-center text-gray-400 py-8">
-                      Кошик порожній
-                    </p>
-                  )}
-                  {cartItems.map((item) => (
-                    <div
-                      key={item.productId}
-                      className="group flex gap-4 pb-5 border-b border-gray-50 last:border-none"
-                    >
-                      <div className="relative w-20 h-20 shrink-0">
-                        <img
-                          src={item.productImage || PLACEHOLDER_IMAGE_URL}
-                          alt={item.productName}
-                          className="w-full h-full object-cover rounded-2xl border border-gray-100"
-                        />
-                        <span className="mt-1.5 absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
-                          {item.quantity}
-                        </span>
-                      </div>
+                  {cartItems.map((item) => {
+                    // item.price вже є фактичною ціною (знижена або звичайна)
+                    // discountPrice зберігається для відображення бейджа знижки
+                    const hasDiscount =
+                      item.isOnSale &&
+                      item.discountPrice != null &&
+                      item.discountPrice > 0 &&
+                      item.discountPrice < item.price;
 
-                      <div className="flex flex-col justify-between flex-1 min-w-0">
-                        <div className="flex justify-between items-start gap-2">
-                          <h3 className="text-sm font-bold text-gray-900 leading-tight line-clamp-2">
-                            {item.productName}
-                          </h3>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              dispatch(removeFromCart(item.productId))
-                            }
-                            className="text-gray-300 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 size={14} />
-                          </button>
+                    // Оригінальна ціна для відображення перекресленої
+                    // item.price = знижена ціна (якщо є знижка), тому originalPrice беремо окремо
+                    // Але CartItemDto зберігає лише price (фактичну) — відображаємо без перекресленої
+                    // якщо хочемо показувати стару ціну, потрібно додати originalPrice в CartItemDto
+                    // Наразі: просто показуємо знижку через бейдж відсотка
+
+                    return (
+                      <div
+                        key={item.productId}
+                        className="group flex gap-4 pb-5 border-b border-gray-50 last:border-none"
+                      >
+                        <div className="relative w-20 h-20 shrink-0">
+                          <img
+                            src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                            alt={item.productName}
+                            className="w-full h-full object-cover rounded-2xl border border-gray-100"
+                          />
+                          {hasDiscount && (
+                            <span className="absolute -bottom-1 -left-1 bg-brand-primary text-white text-[8px] px-1.5 py-0.5 rounded-md font-bold">
+                              -{item.discountPercentage}%
+                            </span>
+                          )}
+                          <span className="mt-1.5 absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                            {item.quantity}
+                          </span>
                         </div>
 
-                        <div className="flex items-center justify-between mt-auto">
-                          <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+                        <div className="flex flex-col justify-between flex-1 min-w-0">
+                          <div className="flex justify-between items-start gap-2">
+                            <h3 className="text-sm font-bold text-gray-900 leading-tight line-clamp-2">
+                              {item.productName}
+                            </h3>
                             <button
                               type="button"
                               onClick={() =>
-                                handleUpdateQuantity(
-                                  item.productId,
-                                  item.quantity - 1,
-                                )
+                                dispatch(removeFromCart(item.productId))
                               }
-                              className="w-6 h-6 flex items-center justify-center hover:text-brand-primary transition-colors"
+                              className="text-gray-300 hover:text-red-500 transition-colors"
                             >
-                              <Minus size={13} />
-                            </button>
-                            <span className="px-2 text-sm font-bold font-manrope">
-                              {item.quantity}
-                            </span>
-                            <button
-                              type="button"
-                              disabled={
-                                item.quantity >= (item.stockQuantity ?? 0)
-                              }
-                              onClick={() =>
-                                handleUpdateQuantity(
-                                  item.productId,
-                                  item.quantity + 1,
-                                )
-                              }
-                              className="w-6 h-6 flex items-center justify-center hover:text-brand-primary transition-colors cursor-pointer"
-                            >
-                              <Plus size={13} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
 
-                          <span className="text-lg font-black text-gray-700 font-manrope">
-                            ₴{(item.price * item.quantity).toLocaleString()}
-                          </span>
+                          <div className="flex items-center justify-between mt-auto">
+                            <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    item.productId,
+                                    item.quantity - 1,
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center hover:text-brand-primary"
+                              >
+                                <Minus size={13} />
+                              </button>
+                              <span className="px-2 text-sm font-bold font-manrope">
+                                {item.quantity}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleUpdateQuantity(
+                                    item.productId,
+                                    item.quantity + 1,
+                                  )
+                                }
+                                className="w-6 h-6 flex items-center justify-center hover:text-brand-primary"
+                              >
+                                <Plus size={13} />
+                              </button>
+                            </div>
+
+                            <div className="flex flex-col items-end">
+                              <span
+                                className={`text-lg font-black font-manrope leading-none ${hasDiscount ? "text-red-500" : "text-gray-700"}`}
+                              >
+                                ₴{(item.price * item.quantity).toLocaleString()}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-
                 <div className="space-y-4 pt-6 border-t border-dashed border-gray-200">
                   <div className="flex justify-between text-gray-500 font-medium text-sm px-1">
                     <span>Товари на суму:</span>

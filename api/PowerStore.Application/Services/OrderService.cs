@@ -13,7 +13,10 @@ public class OrderService : IOrderService
     private readonly IMapper _mapper;
     private readonly IRepository<ProductEntity> _productRepo;
 
-    public OrderService(IRepository<OrderEntity> orderRepo, IMapper mapper, IRepository<ProductEntity> productRepo)
+    public OrderService(
+        IRepository<OrderEntity> orderRepo,
+        IMapper mapper,
+        IRepository<ProductEntity> productRepo)
     {
         _orderRepo = orderRepo;
         _mapper = mapper;
@@ -40,7 +43,6 @@ public class OrderService : IOrderService
             Street = dto.Street,
             House = dto.House,
             Apartment = dto.Apartment,
-            TotalPrice = dto.TotalPrice,
             DeliveryMethod = dto.DeliveryMethod,
             PaymentType = dto.PaymentType,
             TrackingNumber = GenerateShortTrackingNumber(),
@@ -48,29 +50,39 @@ public class OrderService : IOrderService
             DeliveryAddress = deliveryAddress,
             CustomerNote = dto.CustomerNote,
             UserId = userId ?? Guid.Empty,
+            Items = new List<OrderItemEntity>()
         };
+
+        decimal calculatedTotal = 0;
 
         foreach (var itemDto in dto.Items)
         {
-            var product = await _productRepo.GetByIdAsync(itemDto.ProductId);
-
-            if (product == null)
-                throw new Exception($"Product ID {itemDto.ProductId} didn`t found");
+            var product = await _productRepo.GetByIdAsync(itemDto.ProductId)
+                ?? throw new Exception($"Товар з ID {itemDto.ProductId} не знайдено.");
 
             if (product.StockQuantity < itemDto.Quantity)
-                throw new Exception($"There is not enough {product.Name} in stock. It`s left: {product.StockQuantity}");
+                throw new Exception(
+                    $"Недостатньо товару '{product.Name}' на складі. Залишилось: {product.StockQuantity}");
+
+            // Єдине джерело правди — поле DiscountPrice з БД
+            decimal actualPrice = (product.IsOnSale && product.DiscountPrice > 0)
+                ? product.DiscountPrice
+                : product.Price;
+
+            calculatedTotal += actualPrice * itemDto.Quantity;
 
             product.StockQuantity -= itemDto.Quantity;
-
             _productRepo.Update(product);
 
             order.Items.Add(new OrderItemEntity
             {
                 ProductId = itemDto.ProductId,
                 Quantity = itemDto.Quantity,
-                Price = itemDto.Price,
+                Price = actualPrice
             });
         }
+
+        order.TotalPrice = calculatedTotal;
 
         await _orderRepo.AddAsync(order);
         await _orderRepo.SaveAsync();
@@ -123,14 +135,11 @@ public class OrderService : IOrderService
         await _orderRepo.SaveAsync();
     }
 
-    private string GenerateShortTrackingNumber()
+    private static string GenerateShortTrackingNumber()
     {
         const string chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
         var random = new Random();
-
-        var result = new string(Enumerable.Repeat(chars, 6)
+        return new string(Enumerable.Repeat(chars, 6)
             .Select(s => s[random.Next(s.Length)]).ToArray());
-
-        return result;
     }
 }

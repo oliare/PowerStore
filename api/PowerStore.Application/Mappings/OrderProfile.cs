@@ -35,6 +35,7 @@ public class OrderMappingProfile : Profile
         CreateMap<OrderItemEntity, OrderItemDto>()
             .ForMember(dest => dest.Id,
                 opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
             .ForMember(dest => dest.ProductName,
                 opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : "Невідомий товар"))
             .ForMember(dest => dest.Image,

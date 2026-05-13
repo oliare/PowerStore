@@ -119,7 +119,9 @@ export const CartPage = () => {
                                     : "text-gray-900"
                                 }`}
                               >
-                                {item.productName}
+                                {item.productName.length > 25
+                                  ? item.productName.slice(0, 25) + "..."
+                                  : item.productName}
                               </span>
                               {isOutOfStock && (
                                 <span className="text-xs text-red-500 font-semibold mt-2">

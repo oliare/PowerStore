@@ -12,12 +12,13 @@ public class ProductDto
     public string? Image { get; set; }
     public double? Rate { get; set; }
     public int StockQuantity { get; set; }
-    public decimal? Discount { get; set; }
     public string? CategoryName { get; set; }
     public Guid CategoryId { get; set; }
     public bool IsFavorite { get; set; }
     public string? Brand { get; set; }
+    public int? DiscountPercentage { get; set; }
+    public bool IsOnSale { get; set; }
+    public decimal? DiscountPrice { get; set; }
     public List<string> Tags { get; set; } = [];
     public List<ProductImageDto>? Images { get; set; }
-
 }

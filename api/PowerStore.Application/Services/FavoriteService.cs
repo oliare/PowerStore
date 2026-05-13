@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PowerStore.Application.DTOs.Favorite;
+using PowerStore.Application.DTOs.Product;
 using PowerStore.Application.Interfaces;
 using PowerStore.Domain.Entities;
 
@@ -9,10 +11,13 @@ public class FavoriteService : IFavoriteService
 {
     private readonly IRepository<FavoriteEntity> _favRepo;
     private readonly IRepository<ProductEntity> _productRepo;
-    public FavoriteService(IRepository<FavoriteEntity> favoriteRepository, IRepository<ProductEntity> productRepo)
+    private readonly IMapper _mapper;
+
+    public FavoriteService(IRepository<FavoriteEntity> favoriteRepository, IRepository<ProductEntity> productRepo, IMapper mapper)
     {
         _favRepo = favoriteRepository;
         _productRepo = productRepo;
+        _mapper = mapper;
     }
 
     public async Task<IEnumerable<FavoriteResponseDto>> GetUserFavoritesAsync(Guid userId)
@@ -27,12 +32,8 @@ public class FavoriteService : IFavoriteService
         return favorites.Select(f => new FavoriteResponseDto
         {
             Id = f.Id,
-            ProductId = f.ProductId,
-            ProductName = f.Product?.Name ?? "Unknown",
-            ProductPrice = f.Product?.Price ?? 0,
-            ProductImage = f.Product?.Images?.FirstOrDefault()?.Image,
             AddedAt = f.AddedAt,
-            StockQuantity = f.Product?.StockQuantity ?? 0
+            Product = _mapper.Map<ProductDto>(f.Product)
         });
     }
 

@@ -197,12 +197,19 @@ public class DbSeeder
             Tags = "WiFi,Безпека,Розумний дім"
         },
 
-            new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id, Brand = "Eaton",
-            Tags = "Захист,Автоматика,Щит" },
-            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id, Brand = "ABB",
-            Tags = "Захист,Надійність,Professional" },
+           new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id, Brand = "Eaton",
+                DiscountPercentage = 20, IsOnSale = false,  
+                Tags = "Захист,Автоматика,Щит" },
 
-            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id, Brand = "Livolo", Tags = "Сенсор,WiFi,Modern" },
+            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id, Brand = "ABB",
+                DiscountPercentage = 20, IsOnSale = true,
+                DiscountPrice = Math.Round(115 * (1 - 20m / 100), 2),
+                Tags = "Захист,Надійність,Professional" },
+
+            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id, Brand = "Livolo",
+                DiscountPercentage = 20, IsOnSale = true,
+                DiscountPrice = Math.Round(650 * (1 - 20m / 100), 2),  
+                Tags = "Сенсор,WiFi,Modern" },
         };
 
         await _context.Products.AddRangeAsync(products);

@@ -12,11 +12,11 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { MailingSection } from "./HomePage/MailingSection";
-import type { ProductDto } from "../types/product";
+import { type ProductDto, getActualPrice, hasActiveDiscount } from "../types/product";
 import { addToCart } from "../store/cartSlice";
-import { useDispatch, useSelector } from "react-redux"; // Додано useSelector
+import { useDispatch, useSelector } from "react-redux";
 import type { CartItemDto } from "../types/cart";
-import type { RootState } from "../store/store"; // Перевірте шлях до стору
+import type { RootState } from "../store/store";
 import { FavoriteButton } from "../common/FavoriteButton";
 import { showNotify } from "../utils/showNotify";
 import { StockStatus } from "../common/StockStatus";
@@ -122,9 +122,12 @@ const ProductDetailsPage = () => {
       productId: product.id,
       productName: product.name,
       productImage: finalImage,
-      price: product.price,
+      price: getActualPrice(product), // ВИПРАВЛЕНО: фактична ціна
       quantity: selectedQuantity,
       stockQuantity: product.stockQuantity,
+      isOnSale: product.isOnSale,
+      discountPrice: product.discountPrice,
+      discountPercentage: product.discountPercentage,
     };
 
     dispatch(addToCart(item));
@@ -168,6 +171,8 @@ const ProductDetailsPage = () => {
     ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
     : 0;
 
+  const hasDiscount = hasActiveDiscount(product);
+
   return (
     <div className="bg-white font-manrope">
       <div className="max-w-7xl mx-auto px-6 py-12 min-h-screen mb-10">
@@ -210,12 +215,12 @@ const ProductDetailsPage = () => {
           </div>
 
           <div className="flex flex-col">
-            <h1 className="text-4xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-3xl font-semibold text-gray-900 mb-2">
               {product.name}
             </h1>
 
             <div className="flex items-center gap-3 mb-6 mt-3 text-sm">
-              <div className="flex text-[#fbd53c]">
+              <div className="flex text-[#fbd53c] gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star
                     key={i}
@@ -234,16 +239,29 @@ const ProductDetailsPage = () => {
               <StockStatus quantity={product.stockQuantity} />
             </div>
 
-            <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-200">
-              {/* <span className="text-gray-400 line-through text-lg font-light">
-                ₴{oldPrice}
-              </span> */}
-              <span className="text-3xl font-semibold text-brand-primary">
-                ₴ {product.price}
-              </span>
-              {/* <span className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-xs font-medium">
-                64% Знижка
-              </span> */}
+            <div className="flex flex-col mb-6 pb-6 border-b border-gray-200">
+              <div className="flex items-center gap-3">
+                {hasDiscount ? (
+                  <>
+                    <span className="text-gray-400 line-through text-lg font-light">
+                      ₴ {product.price}
+                    </span>
+                    <span className="text-3xl font-semibold text-red-500">
+                      ₴ {product.discountPrice}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-3xl font-semibold text-gray-900">
+                    ₴ {product.price}
+                  </span>
+                )}
+
+                {hasDiscount && product.discountPercentage && (
+                  <span className="bg-red-50 text-red-500 px-3 py-1 rounded-full text-xs font-medium">
+                    -{product.discountPercentage}%
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="text-sm flex items-center gap-4 mb-6">
@@ -304,7 +322,7 @@ const ProductDetailsPage = () => {
               ) : (
                 <button
                   onClick={() => handleAddToCart(product, quantity)}
-                  className="flex-1 h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
+                  className="flex-1  h-11 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-full font-semibold text-md flex items-center justify-center gap-3 transition-colors"
                 >
                   Покласти в кошик <ShoppingCart size={18} />
                 </button>
@@ -433,36 +451,52 @@ const ProductDetailsPage = () => {
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
-              {relatedProducts.map((item) => (
-                <Link
-                  to={`/product/${item.id}`}
-                  key={item.id}
-                  className="group flex flex-col h-full"
-                >
-                  <div className="bg-white border border-gray-100 rounded-xl p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-primary/10 hover:border-brand-primary/20 flex flex-col h-full">
-                    <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-6 p-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="flex flex-col flex-1 px-2">
-                      <h3 className="font-bold text-gray-900 group-hover:text-brand-primary transition-colors text-sm mb-2 line-clamp-2 leading-snug">
-                        {item.name}
-                      </h3>
-                      <div className="mt-auto pt-4 flex items-center justify-between">
-                        <span className="font-black text-lg text-gray-950">
-                          ₴ {item.price}
-                        </span>
-                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand-primary group-hover:text-white transition-all">
-                          <ShoppingCart size={18} />
+              {relatedProducts.map((item) => {
+                const relatedHasDiscount = hasActiveDiscount(item);
+                return (
+                  <Link
+                    to={`/product/${item.id}`}
+                    key={item.id}
+                    className="group flex flex-col h-full"
+                  >
+                    <div className="bg-white border border-gray-100 rounded-xl p-4 transition-all duration-500 hover:shadow-2xl hover:shadow-brand-primary/10 hover:border-brand-primary/20 flex flex-col h-full">
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-gray-50 mb-6 p-4">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="flex flex-col flex-1 px-2">
+                        <h3 className="font-bold text-gray-900 group-hover:text-brand-primary transition-colors text-sm mb-2 line-clamp-2 leading-snug">
+                          {item.name}
+                        </h3>
+                        <div className="mt-auto pt-4 flex items-center justify-between">
+                          <div className="flex flex-col">
+                            {relatedHasDiscount ? (
+                              <>
+                                <span className="text-gray-400 line-through text-xs font-light">
+                                  ₴ {item.price}
+                                </span>
+                                <span className="font-black text-lg text-red-500">
+                                  ₴ {item.discountPrice}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="font-black text-lg text-gray-950">
+                                ₴ {item.price}
+                              </span>
+                            )}
+                          </div>
+                          <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-brand-primary group-hover:text-white transition-all">
+                            <ShoppingCart size={18} />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}

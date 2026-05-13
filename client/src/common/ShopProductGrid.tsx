@@ -2,7 +2,11 @@ import { PackageCheck, ShoppingCart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../store/cartSlice";
-import type { ProductDto } from "../types/product";
+import {
+  type ProductDto,
+  getActualPrice,
+  hasActiveDiscount,
+} from "../types/product";
 import type { CartItemDto } from "../types/cart";
 import type { RootState } from "../store/store";
 import { FavoriteButton } from "./FavoriteButton";
@@ -37,29 +41,27 @@ export const ShopProductGrid = ({
     }
 
     if (totalPotentialQty > product.stockQuantity) {
-      if (currentQtyInCart > 0) {
-        showNotify.error(
-          `У кошику вже ${currentQtyInCart} шт. Досягнуто ліміт залишку на складі (${product.stockQuantity} шт.)`,
-        );
-      } else {
-        showNotify.error(`Доступно лише ${product.stockQuantity} шт.`);
-      }
+      showNotify.error(
+        currentQtyInCart > 0
+          ? `У кошику вже ${currentQtyInCart} шт. Досягнуто ліміт залишку (${product.stockQuantity} шт.)`
+          : `Доступно лише ${product.stockQuantity} шт.`,
+      );
       return;
     }
 
-    const image =
-      product.images && product.images.length > 0
-        ? product.images[0].image
-        : PLACEHOLDER_IMAGE_URL;
-    const finalImage = product.image || image;
+    const finalImage =
+      product.image || product.images?.[0]?.image || PLACEHOLDER_IMAGE_URL;
 
     const item: CartItemDto = {
       productId: product.id,
       productName: product.name,
       productImage: finalImage,
-      price: product.price,
+      price: getActualPrice(product),
       quantity: selectedQuantity,
       stockQuantity: product.stockQuantity,
+      isOnSale: product.isOnSale,
+      discountPrice: product.discountPrice,
+      discountPercentage: product.discountPercentage,
     };
 
     dispatch(addToCart(item));
@@ -87,6 +89,14 @@ export const ShopProductGrid = ({
         ? Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
         : products.map((product) => {
             const isOutOfStock = product.stockQuantity <= 0;
+            const hasDiscount = hasActiveDiscount(product);
+            console.log(
+              "Rendering product:",
+              product.discountPercentage,
+              product.discountPrice,
+              product.discountPrice,
+              product.price,
+            );
 
             return (
               <Link
@@ -102,7 +112,6 @@ export const ShopProductGrid = ({
                       : "hover:shadow-xl hover:border-brand-primary/40"
                   }`}
                 >
-                  {/* Зображення */}
                   <div className="relative h-44 rounded-lg overflow-hidden mb-6 bg-gray-50 flex items-center justify-center p-2">
                     <img
                       src={product.images?.[0]?.image || PLACEHOLDER_IMAGE_URL}
@@ -136,30 +145,36 @@ export const ShopProductGrid = ({
                     </h3>
 
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex flex-col gap-1">
-                        <span
-                          className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
-                        >
-                          ₴ {product.price}
-                        </span>
+                      <div>
+                        {hasDiscount ? (
+                          <div className="flex flex-col">
+                            <span className="text-[13px] text-gray-400 line-through font-manrope leading-none">
+                              ₴ {Number(product.price).toFixed(2)}
+                            </span>
+                            <span className="text-lg font-bold font-manrope text-red-500">
+                              ₴ {Number(product.discountPrice).toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span
+                            className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
+                          >
+                            ₴ {Number(product.price).toFixed(2)}
+                          </span>
+                        )}
 
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map(
-                            (_, i) => (
-                              console.log(product.rate),
-                              (
-                                <Star
-                                  key={i}
-                                  size={11}
-                                  className={
-                                    i < Math.round(product.rate || 0)
-                                      ? "fill-[#fbd53c] text-[#fbd53c]"
-                                      : "text-gray-200 fill-gray-200"
-                                  }
-                                />
-                              )
-                            ),
-                          )}
+                        <div className="flex items-center gap-0.5 pb-2">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={11}
+                              className={
+                                i < Math.round(product.rate || 0)
+                                  ? "fill-[#fbd53c] text-[#fbd53c]"
+                                  : "text-gray-200 fill-gray-200"
+                              }
+                            />
+                          ))}
                           <span className="text-[10px] text-gray-400 font-manrope ml-0.5">
                             {(product.rate || 0).toFixed(1)}
                           </span>
@@ -180,7 +195,6 @@ export const ShopProductGrid = ({
                         )}
                       </div>
 
-                      {/* Кнопка кошика */}
                       <button
                         disabled={isOutOfStock}
                         className={`p-3 rounded-full transition-colors flex-shrink-0 

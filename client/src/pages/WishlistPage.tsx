@@ -41,22 +41,29 @@ export const WishlistPage = () => {
 
   const handleRemove = (item: FavoriteItemDTO) => {
     dispatch(toggleFavorites(item));
-    showNotify.warn(`"${item.productName}" видалено з обраного`);
+    showNotify.warn(`"${item.product.name}" видалено з обраного`);
 
     if (accessToken) {
-      toggleServerFavorites({ productId: item.productId });
+      toggleServerFavorites({ productId: item.product.id });
     }
   };
 
   const handleMoveToCart = (item: FavoriteItemDTO) => {
+    const { product } = item;
+
+    const finalPrice =
+      product.isOnSale && product.discountPrice
+        ? product.discountPrice
+        : product.price;
+
     const existingInCart = cartItems.find(
-      (c) => c.productId === item.productId,
+      (c) => c.productId === item.product.id,
     );
     const currentQtyInCart = existingInCart ? existingInCart.quantity : 0;
-    const stockLimit = Number(item.stockQuantity);
+    const stockLimit = Number(item.product.stockQuantity);
 
     if (stockLimit <= 0) {
-      showNotify.error(`На жаль, "${item.productName}" закінчився`);
+      showNotify.error(`На жаль, "${item.product.name}" закінчився`);
       return;
     }
 
@@ -73,16 +80,16 @@ export const WishlistPage = () => {
 
     dispatch(
       addToCart({
-        productId: item.productId,
-        productName: item.productName,
-        productImage: item.productImage,
-        price: item.productPrice,
+        productId: item.product.id,
+        productName: item.product.name,
+        productImage: item.product.image || PLACEHOLDER_IMAGE_URL,
+        price: finalPrice,
         quantity: 1,
         stockQuantity: stockLimit,
       }),
     );
 
-    showNotify.success(`"${item.productName}" додано до кошика`);
+    showNotify.success(`"${item.product.name}" додано до кошика`);
   };
 
   if (isLoading)
@@ -108,7 +115,7 @@ export const WishlistPage = () => {
           to="/shop"
           className="flex items-center gap-2 px-10 py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all"
         >
-          <ArrowLeft size={20} /> До каталогу
+          <ArrowLeft size={20} /> До магазину
         </Link>
       </div>
     );
@@ -138,11 +145,23 @@ export const WishlistPage = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {items.map((item) => {
-                  const isOutOfStock = Number(item.stockQuantity) <= 0;
+                  if (!item || !item.product) return null;
+
+                  const { product } = item;
+                  const isOutOfStock = Number(product.stockQuantity) <= 0;
+                  const currentPrice =
+                    product.isOnSale && product.discountPrice
+                      ? product.discountPrice
+                      : product.price;
+
+                  const showOldPrice =
+                    product.isOnSale &&
+                    product.discountPrice &&
+                    product.discountPrice < product.price;
 
                   return (
                     <tr
-                      key={item.productId}
+                      key={item.product.id}
                       className={`group transition-colors ${
                         isOutOfStock ? "bg-gray-50/50" : "hover:bg-gray-50/50"
                       }`}
@@ -150,23 +169,52 @@ export const WishlistPage = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-5">
                           <img
-                            src={item.productImage || PLACEHOLDER_IMAGE_URL}
+                            src={
+                              item.product.image ||
+                              (item.product.images &&
+                                item.product.images[0]?.image) ||
+                              PLACEHOLDER_IMAGE_URL
+                            }
                             className={`w-16 h-16 object-cover rounded-lg border border-gray-100 transition-all ${
                               isOutOfStock ? "grayscale opacity-60" : ""
                             }`}
-                            alt={item.productName}
+                            alt={item.product.name}
                           />
                           <span
                             className={`font-semibold ${isOutOfStock ? "text-gray-400" : "text-gray-900"}`}
                           >
-                            {item.productName}
+                            {item.product.name}
                           </span>
                         </div>
                       </td>
                       <td
-                        className={`px-6 py-6 font-semibold font-manrope ${isOutOfStock ? "text-gray-400" : "text-gray-900"}`}
+                        className={`px-6 py-6 font-manrope ${isOutOfStock ? "text-gray-400" : "text-gray-900"}`}
                       >
-                        ₴{Number(item.productPrice).toFixed(2)}
+                        <div className="flex flex-col items-start">
+                          {showOldPrice && !isOutOfStock && (
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl font-bold">
+                                ₴{" "}
+                                {product.discountPrice != null && product.discountPrice > 0
+                                  ? product.discountPrice
+                                  : product.price}
+                              </span>
+
+                              {product.discountPercentage &&
+                                product.discountPercentage > 0 && (
+                                  <span className="bg-red-50 text-red-500 px-2 py-1 rounded-full text-sm font-semibold">
+                                    -{product.discountPercentage}%
+                                  </span>
+                                )}
+                            </div>
+                          )}
+
+                          <span
+                            className={`font-bold text-base ${showOldPrice ? "text-red-500" : "text-gray-900"}`}
+                          >
+                            ₴{Number(currentPrice).toFixed(2)}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-6 text-center">
                         {isOutOfStock ? (
