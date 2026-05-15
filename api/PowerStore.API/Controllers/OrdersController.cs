@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using PowerStore.Application.DTOs.Cart;
 using PowerStore.Application.DTOs.Order;
 using PowerStore.Application.Interfaces;
-using PowerStore.Application.Services;
 using System.Security.Claims;
 
 namespace PowerStore.API.Controllers;

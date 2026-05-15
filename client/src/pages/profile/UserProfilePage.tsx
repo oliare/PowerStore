@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Table, Input } from "antd";
 import { User, Mail, Calendar, Phone, SquarePen } from "lucide-react";
 import {
@@ -10,7 +10,9 @@ import { showNotify } from "../../utils/showNotify";
 import { ImageCropperModal } from "../../common/ImageCropperModal";
 import type { UserProfile } from "../../types/user";
 import { useGetMyOrdersQuery } from "../../services/orderApi";
-import { orderHistoryColumns } from "../../utils/orderHistoryColumns";
+import { getOrderHistoryColumns } from "../../utils/orderHistoryColumns";
+import type { OrderDto } from "../../types/order";
+import { OrderDetailsModal } from "../../common/OrderDetailsModal";
 
 export const UserProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -18,6 +20,8 @@ export const UserProfilePage = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [pendingImageFile, setPendingImageFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderDto | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -148,6 +152,13 @@ export const UserProfilePage = () => {
     (user?.image
       ? `${IMAGE_BASE_URL}/avatars/${user.image}`
       : PLACEHOLDER_IMAGE_URL);
+
+  const handleOpenDetails = (order: OrderDto) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const columns = useMemo(() => getOrderHistoryColumns(handleOpenDetails), []);
 
   return (
     <>
@@ -350,9 +361,12 @@ export const UserProfilePage = () => {
               <div className="rounded-2xl border border-gray-50 overflow-hidden">
                 <Table
                   dataSource={orders?.slice(0, 2)}
-                  columns={orderHistoryColumns}
+                  columns={columns}
                   pagination={false}
                   rowKey="id"
+                  onRow={(record) => ({
+                    onClick: () => handleOpenDetails(record),
+                  })}
                   loading={isLoading}
                   locale={{ emptyText: "У вас поки немає замовлень" }}
                   rowClassName="group hover:bg-gray-50/50 transition-colors cursor-pointer"
@@ -360,6 +374,12 @@ export const UserProfilePage = () => {
               </div>
             </div>
           </div>
+
+          <OrderDetailsModal
+            order={selectedOrder}
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+          />
 
           <style>{`
             .ant-table { font-family: 'Montserrat', sans-serif !important; }

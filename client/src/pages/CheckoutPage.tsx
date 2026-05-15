@@ -70,6 +70,17 @@ export const CheckoutPage = () => {
     0,
   );
 
+  console.log("Cart total ", cartTotal);
+
+  const totalBeforeDiscount = cartItems.reduce((sum, item) => {
+    const originalPrice =
+      item.isOnSale && item.discountPrice ? item.discountPrice : item.price;
+
+    return sum + originalPrice * item.quantity;
+  }, 0);
+
+  const hasAnyDiscount = totalBeforeDiscount > cartTotal;
+
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
     const item = cartItems.find((i) => i.productId === productId);
 
@@ -102,7 +113,6 @@ export const CheckoutPage = () => {
       house: isCourier ? values.house : undefined,
       apartment: isCourier ? values.apartment : undefined,
       warehouseNumber: isPostalDelivery ? values.warehouseNumber : undefined,
-      // ВИПРАВЛЕНО: item.price вже є фактичною (знижена або звичайна)
       items: cartItems.map((item) => ({
         productId: item.productId,
         quantity: item.quantity,
@@ -133,7 +143,7 @@ export const CheckoutPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#fcfcfc]">
+    <div className="min-h-screen">
       <div className="py-12 px-4 max-w-7xl mx-auto mb-10">
         <ConfigProvider
           theme={{
@@ -407,7 +417,7 @@ export const CheckoutPage = () => {
                 </section>
               </div>
 
-              <div className="border border-gray-100 rounded-[35px] p-6 lg:sticky lg:top-8 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
+              <div className="border border-gray-100 rounded-3xl p-6 lg:sticky lg:top-8 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.04)]">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   Ваше замовлення
                   <span className="text-brand-primary text-sm font-bold bg-brand-primary/10 px-3 py-1 rounded-full">
@@ -417,19 +427,7 @@ export const CheckoutPage = () => {
 
                 <div className="space-y-6 min-h-[270px] max-h-[300px] overflow-y-auto mb-4 pr-2 custom-scrollbar">
                   {cartItems.map((item) => {
-                    // item.price вже є фактичною ціною (знижена або звичайна)
-                    // discountPrice зберігається для відображення бейджа знижки
-                    const hasDiscount =
-                      item.isOnSale &&
-                      item.discountPrice != null &&
-                      item.discountPrice > 0 &&
-                      item.discountPrice < item.price;
-
-                    // Оригінальна ціна для відображення перекресленої
-                    // item.price = знижена ціна (якщо є знижка), тому originalPrice беремо окремо
-                    // Але CartItemDto зберігає лише price (фактичну) — відображаємо без перекресленої
-                    // якщо хочемо показувати стару ціну, потрібно додати originalPrice в CartItemDto
-                    // Наразі: просто показуємо знижку через бейдж відсотка
+                    const hasDiscount = item.isOnSale && item.discountPrice;
 
                     return (
                       <div
@@ -440,14 +438,18 @@ export const CheckoutPage = () => {
                           <img
                             src={item.productImage || PLACEHOLDER_IMAGE_URL}
                             alt={item.productName}
-                            className="w-full h-full object-cover rounded-2xl border border-gray-100"
+                            className={`w-full h-full object-cover rounded-2xl border border-gray-100 relative z-0 ${
+                              item.stockQuantity === 0
+                                ? "grayscale opacity-50"
+                                : ""
+                            }`}
                           />
                           {hasDiscount && (
-                            <span className="absolute -bottom-1 -left-1 bg-brand-primary text-white text-[8px] px-1.5 py-0.5 rounded-md font-bold">
+                            <span className="absolute -bottom-1 left-0.5 bg-brand-primary text-white text-[9px] px-1.5 py-0.5 rounded-md font-semibold z-10 shadow-sm">
                               -{item.discountPercentage}%
                             </span>
                           )}
-                          <span className="mt-1.5 absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
+                          <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white z-10">
                             {item.quantity}
                           </span>
                         </div>
@@ -462,14 +464,14 @@ export const CheckoutPage = () => {
                               onClick={() =>
                                 dispatch(removeFromCart(item.productId))
                               }
-                              className="text-gray-300 hover:text-red-500 transition-colors"
+                              className="text-gray-300 hover:text-red-500 transition-colors p-1"
                             >
                               <Trash2 size={14} />
                             </button>
                           </div>
 
                           <div className="flex items-center justify-between mt-auto">
-                            <div className="flex items-center bg-gray-50 rounded-full p-1 border border-gray-100">
+                            <div className="flex items-center bg-gray-50 rounded-full p-0.5 border border-gray-100">
                               <button
                                 type="button"
                                 onClick={() =>
@@ -478,11 +480,11 @@ export const CheckoutPage = () => {
                                     item.quantity - 1,
                                   )
                                 }
-                                className="w-6 h-6 flex items-center justify-center hover:text-brand-primary"
+                                className="w-7 h-7 flex items-center justify-center hover:text-brand-primary"
                               >
                                 <Minus size={13} />
                               </button>
-                              <span className="px-2 text-sm font-bold font-manrope">
+                              <span className="px-2 text-xs font-bold font-manrope">
                                 {item.quantity}
                               </span>
                               <button
@@ -493,18 +495,31 @@ export const CheckoutPage = () => {
                                     item.quantity + 1,
                                   )
                                 }
-                                className="w-6 h-6 flex items-center justify-center hover:text-brand-primary"
+                                className="w-7 h-7 flex items-center justify-center hover:text-brand-primary"
                               >
                                 <Plus size={13} />
                               </button>
                             </div>
 
                             <div className="flex flex-col items-end">
-                              <span
-                                className={`text-lg font-black font-manrope leading-none ${hasDiscount ? "text-red-500" : "text-gray-700"}`}
-                              >
-                                ₴{(item.price * item.quantity).toLocaleString()}
-                              </span>
+                              {hasDiscount ? (
+                                <>
+                                  <span className="text-[13px] text-gray-400 line-through font-manrope leading-none mb-1">
+                                    ₴
+                                    {(
+                                      item.discountPrice! * item.quantity
+                                    ).toFixed(2)}
+                                  </span>
+
+                                  <span className="text-base font-black font-manrope leading-none text-red-500">
+                                    ₴{(item.price * item.quantity).toFixed(2)}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-base font-black font-manrope leading-none text-gray-900">
+                                  ₴{(item.price * item.quantity).toFixed(2)}
+                                </span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -512,11 +527,20 @@ export const CheckoutPage = () => {
                     );
                   })}
                 </div>
+
                 <div className="space-y-4 pt-6 border-t border-dashed border-gray-200">
+                  {hasAnyDiscount && (
+                    <div className="flex justify-between text-gray-400 text-sm px-1">
+                      <span>Без знижки:</span>
+                      <span className="line-through font-manrope text-[15px]">
+                        ₴{totalBeforeDiscount.toFixed(2)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-gray-500 font-medium text-sm px-1">
                     <span>Товари на суму:</span>
-                    <span className="text-gray-900 font-semibold text-[16px] font-manrope">
-                      ₴{cartTotal.toLocaleString()}
+                    <span className="text-gray-900 font-semibold text-base font-manrope">
+                      ₴{cartTotal.toFixed(2)}
                     </span>
                   </div>
                   <Divider className="my-2" />
@@ -525,7 +549,7 @@ export const CheckoutPage = () => {
                       До сплати:
                     </span>
                     <span className="text-2xl font-black text-brand-primary font-manrope">
-                      ₴{cartTotal.toLocaleString()}
+                      ₴{cartTotal.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -546,6 +570,14 @@ export const CheckoutPage = () => {
       <style>{`
         .ant-form-item-has-error input, 
           .ant-form-item-has-error .ant-input-password {
+            border-color: #ff4d4f !important;
+            background-color: #fff6f5 !important;
+          }
+          .ant-form-item-has-error .ant-input-affix-wrapper {
+            border-color: #ff4d4f !important;
+            background-color: #fff6f5 !important;
+          }
+          .ant-form-item-has-error .custom-radio-pill {
             border-color: #ff4d4f !important;
             background-color: #fff6f5 !important;
           }

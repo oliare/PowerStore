@@ -1,7 +1,9 @@
 import { OrderStatus } from "../enums/enum";
 import type { OrderDto } from "../types/order";
 
-export const orderHistoryColumns = [
+export const getOrderHistoryColumns = (
+  onDetailsClick: (order: OrderDto) => void,
+) => [
   {
     title: "ID Замовлення",
     dataIndex: "trackingNumber",
@@ -12,15 +14,18 @@ export const orderHistoryColumns = [
     title: "Дата",
     dataIndex: "createdAt",
     key: "createdAt",
-    render: (date: string) => new Date(date).toLocaleDateString("uk-UA"),
-    className: "text-sm text-gray-500",
+    render: (date: string) => (
+      <span className="text-sm text-gray-500 font-manrope">
+        {new Date(date).toLocaleDateString("uk-UA")}
+      </span>
+    ),
   },
   {
     title: "Сума",
     key: "total",
     render: (_: number, record: OrderDto) => (
-      <span className="font-semibold text-gray-900">
-        ₴{record.totalPrice} (
+      <span className="font-semibold text-gray-900 font-manrope">
+        ₴{record.totalPrice.toFixed(2)} (
         {record.items.reduce((acc, item) => acc + item.quantity, 0)})
       </span>
     ),
@@ -61,8 +66,14 @@ export const orderHistoryColumns = [
     title: "",
     key: "action",
     align: "right" as const,
-    render: () => (
-      <button className="text-brand-primary text-sm font-semibold hover:underline">
+    render: (record: OrderDto) => (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDetailsClick(record);
+        }}
+        className="text-brand-primary text-sm font-semibold hover:underline bg-transparent border-none cursor-pointer"
+      >
         Детальніше
       </button>
     ),

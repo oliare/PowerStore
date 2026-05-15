@@ -17,6 +17,12 @@ public class CartProfile : Profile
                     ? src.Product.DiscountPrice
                     : src.Product.Price))
 
+            .ForMember(dest => dest.DiscountPrice,
+                opt => opt.MapFrom(src =>
+                    src.Product.IsOnSale
+                        ? src.Product.Price
+                        : (decimal?)null))
+
             .ForMember(dest => dest.StockQuantity,
                 opt => opt.MapFrom(src => src.Product.StockQuantity))
 
@@ -26,11 +32,6 @@ public class CartProfile : Profile
             .ForMember(dest => dest.DiscountPercentage,
                 opt => opt.MapFrom(src =>
                     src.Product.IsOnSale ? src.Product.DiscountPercentage : null))
-
-            .ForMember(dest => dest.DiscountPrice, opt => opt.MapFrom(src =>
-                src.Product.IsOnSale && src.Product.DiscountPrice > 0
-                    ? (decimal?)src.Product.DiscountPrice
-                    : null))
 
             .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src =>
                 src.Product.Images

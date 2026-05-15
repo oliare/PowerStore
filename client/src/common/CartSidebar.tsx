@@ -102,7 +102,7 @@ export const CartSidebar = () => {
                 <p className="text-gray-500 text-xs mt-1 font-manrope">
                   {item.quantity}x
                   <span className="text-base font-bold text-gray-900 pl-2">
-                    ₴{item.price}
+                    ₴{item.price.toFixed(2)}
                   </span>
                 </p>
               </div>

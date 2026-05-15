@@ -64,7 +64,6 @@ public class OrderService : IOrderService
                 throw new Exception(
                     $"Недостатньо товару '{product.Name}' на складі. Залишилось: {product.StockQuantity}");
 
-            // Єдине джерело правди — поле DiscountPrice з БД
             decimal actualPrice = (product.IsOnSale && product.DiscountPrice > 0)
                 ? product.DiscountPrice
                 : product.Price;
@@ -92,6 +91,7 @@ public class OrderService : IOrderService
             .Where(o => o.Id == order.Id)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Product)
+                    .ThenInclude(p => p.Images)
             .FirstOrDefaultAsync();
 
         return _mapper.Map<OrderDto>(saved);
@@ -104,6 +104,7 @@ public class OrderService : IOrderService
             .Where(o => o.UserId == userId)
             .Include(o => o.Items)
                 .ThenInclude(i => i.Product)
+                    .ThenInclude(p => p.Images)
             .OrderByDescending(o => o.CreatedAt)
             .ToListAsync();
 

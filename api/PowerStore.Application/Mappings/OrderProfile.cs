@@ -33,12 +33,9 @@ public class OrderMappingProfile : Profile
                 opt => opt.MapFrom(src => src.Items));
 
         CreateMap<OrderItemEntity, OrderItemDto>()
-            .ForMember(dest => dest.Id,
-                opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
-            .ForMember(dest => dest.ProductName,
-                opt => opt.MapFrom(src => src.Product != null ? src.Product.Name : "Невідомий товар"))
-            .ForMember(dest => dest.Image,
-                opt => opt.MapFrom(src => src.Product != null ? src.Product.Image : null));
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src =>
+                src.Product != null ? src.Product.Name : "Unknown product"))
+            .ForMember(dest => dest.Image, opt => opt.MapFrom(src =>
+                src.Product != null ? src.Product.Image : null));
     }
 }

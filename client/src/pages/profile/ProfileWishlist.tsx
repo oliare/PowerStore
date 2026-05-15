@@ -7,7 +7,14 @@ import {
   useToggleFavoriteMutation,
 } from "../../services/favoritesApi";
 import type { RootState } from "../../store/store";
-import { Heart, Trash2, ArrowLeft, ChevronDown } from "lucide-react";
+import {
+  Heart,
+  Trash2,
+  ArrowLeft,
+  ChevronDown,
+  PackageCheck,
+  PackageX,
+} from "lucide-react";
 import type { FavoriteItemDTO } from "../../types/favorite";
 import { PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { useEffect, useState, useMemo } from "react";
@@ -48,14 +55,12 @@ export const ProfileWishlist = () => {
   const filteredItems = useMemo(() => {
     return items
       .filter((item) => {
-        // ВИПРАВЛЕНО: фільтр по актуальній ціні (з урахуванням знижки)
         const actualPrice = getActualPrice(item.product);
         if (activeFilter === "cheap") return actualPrice < 1000;
         if (activeFilter === "expensive") return actualPrice >= 1000;
         return true;
       })
       .sort((a, b) => {
-        // ВИПРАВЛЕНО: сортування по актуальній ціні
         if (sortBy === "price-asc")
           return getActualPrice(a.product) - getActualPrice(b.product);
         if (sortBy === "price-desc")
@@ -81,7 +86,7 @@ export const ProfileWishlist = () => {
       productId: item.product.id,
       productName: item.product.name,
       productImage: item.product.image || PLACEHOLDER_IMAGE_URL,
-      price: getActualPrice(item.product), // ВИПРАВЛЕНО: фактична ціна
+      price: getActualPrice(item.product),
       quantity: 1,
       stockQuantity: item.product.stockQuantity,
       isOnSale: item.product.isOnSale,
@@ -193,87 +198,97 @@ export const ProfileWishlist = () => {
           const actualPrice = getActualPrice(item.product);
 
           return (
-            <div
+            <Link
+              to={`/product/${item.product.id}`}
               key={item.product.id}
-              className={`group relative bg-white border border-gray-100 rounded-[28px] overflow-hidden transition-all duration-500 ${
-                isOutOfStock
-                  ? "grayscale opacity-70 shadow-none"
-                  : "hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
-              }`}
+              className="group"
             >
-              <div className="relative aspect-square overflow-hidden bg-gray-50">
-                <img
-                  src={item.product.image || PLACEHOLDER_IMAGE_URL}
-                  alt={item.product.name}
-                  className={`w-full h-full object-cover transition-transform duration-[1s] ${
-                    !isOutOfStock && "group-hover:scale-110"
-                  }`}
-                />
+              <div
+                key={item.product.id}
+                className={`group relative bg-white border border-gray-100 rounded-[28px] overflow-hidden transition-all duration-500 ${
+                  isOutOfStock
+                    ? "grayscale opacity-70 shadow-none"
+                    : "hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)]"
+                }`}
+              >
+                <div className="relative aspect-square overflow-hidden bg-gray-50">
+                  <img
+                    src={item.product.image || PLACEHOLDER_IMAGE_URL}
+                    alt={item.product.name}
+                    className={`w-full h-full object-cover transition-transform duration-[1s] ${
+                      !isOutOfStock && "group-hover:scale-110"
+                    }`}
+                  />
 
-                {isOutOfStock && (
-                  <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] flex items-center justify-center z-10">
-                    <span className="bg-gray-700/70 text-white px-4 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest shadow-xl">
-                      Товар закінчився
-                    </span>
-                  </div>
-                )}
-
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <button
-                  onClick={() => handleRemove(item)}
-                  className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all translate-y-[-10px] group-hover:translate-y-0 z-20"
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
-
-              <div className="p-6">
-                <div className="flex flex-col justify-between items-start mb-5">
-                  <div className="flex-1 max-w-40">
-                    <h3 className="font-semibold text-gray-900 text-sm truncate mb-1">
-                      {item.product.name}
-                    </h3>
-                  </div>
-                  <div className="flex justify-between items-center w-full">
-                    {!isOutOfStock && (
-                      <span className="inline-block px-2 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wider bg-green-50 text-green-600">
-                        В наявності
-                      </span>
-                    )}
-                    <div className="flex flex-col items-end">
-                      {hasDiscount && (
-                        <span className="text-xs text-gray-400 line-through font-manrope leading-none">
-                          ₴{item.product.price.toLocaleString()}
-                        </span>
-                      )}
-                      <span
-                        className={`text-lg font-semibold ${
-                          isOutOfStock
-                            ? "text-gray-400"
-                            : hasDiscount
-                              ? "text-red-500"
-                              : "text-brand-primary"
-                        }`}
-                      >
-                        ₴{actualPrice.toLocaleString()}
+                  {isOutOfStock && (
+                    <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] flex items-center justify-center z-10">
+                      <span className="bg-gray-700/70 text-white px-4 py-1 rounded-full text-[10px] font-semibold uppercase tracking-widest shadow-xl">
+                        Товар закінчився
                       </span>
                     </div>
-                  </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <button
+                    onClick={() => handleRemove(item)}
+                    className="absolute top-4 right-4 p-2.5 bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all translate-y-[-10px] group-hover:translate-y-0 z-20"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
 
-                <button
-                  onClick={() => !isOutOfStock && handleAddToCartLogic(item)}
-                  disabled={isOutOfStock}
-                  className={`w-full py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${
-                    isOutOfStock
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
-                      : "bg-brand-primary text-white hover:bg-brand-primary-dark shadow-gray-200 active:scale-[0.97]"
-                  }`}
-                >
-                  {isOutOfStock ? "Недоступно" : "Купити"}
-                </button>
+                <div className="p-6">
+                  <div className="flex flex-col justify-between items-start mb-5">
+                    <div className="flex-1 max-w-40">
+                      <h3 className="font-semibold text-gray-900 text-sm truncate mb-1">
+                        {item.product.name}
+                      </h3>
+                    </div>
+                    <div className="flex justify-between items-center w-full">
+                      {!isOutOfStock ? (
+                        <span className="inline-block px-2 py-2 rounded-full text-[9px] font-semibold uppercase tracking-wider bg-green-100/70 text-green-600">
+                          <PackageCheck size={16} strokeWidth={1.5} />
+                        </span>
+                      ) : (
+                        <span className="inline-block px-2 py-2 rounded-full text-[9px] font-semibold uppercase tracking-wider bg-red-100/70 text-red-600">
+                          <PackageX size={16} strokeWidth={1.5} />
+                        </span>
+                      )}
+                      <div className="flex flex-col items-end mt-2">
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-400 line-through font-manrope leading-none">
+                            ₴{item.product.price.toFixed(2)}
+                          </span>
+                        )}
+                        <span
+                          className={`text-lg font-semibold font-manrope ${
+                            isOutOfStock
+                              ? "text-gray-400"
+                              : hasDiscount
+                                ? "text-red-500"
+                                : "text-gray-900"
+                          }`}
+                        >
+                          ₴{actualPrice.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => !isOutOfStock && handleAddToCartLogic(item)}
+                    disabled={isOutOfStock}
+                    className={`w-full py-2 rounded-full text-sm font-semibold transition-all shadow-lg ${
+                      isOutOfStock
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed shadow-none"
+                        : "bg-brand-primary text-white hover:bg-brand-primary-dark shadow-gray-200 active:scale-[0.97]"
+                    }`}
+                  >
+                    {isOutOfStock ? "Недоступно" : "Купити"}
+                  </button>
+                </div>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
