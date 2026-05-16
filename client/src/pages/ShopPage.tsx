@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2 } from "lucide-react";
+import { ChevronDown, Loader2, X } from "lucide-react";
 import { useEffect, useRef, useState, useMemo } from "react";
 import { MailingSection } from "./HomePage/MailingSection";
 import { ShopSidebar } from "../common/ShopSidebar";
@@ -37,6 +37,9 @@ export const ShopPage = () => {
     { id: "popular", label: "Популярні" },
   ];
 
+  const DEFAULT_SORT = "latest";
+  const isSortActive = activeSort !== DEFAULT_SORT;
+
   const processedProducts = useMemo(() => {
     if (!products) return [];
 
@@ -54,7 +57,6 @@ export const ShopPage = () => {
       });
   }, [products, priceRange, activeSort, ratingFilter]);
 
-  // Пагінація — повністю серверна
   const totalPages = products?.totalPages ?? 1;
 
   useEffect(() => {
@@ -98,39 +100,57 @@ export const ShopPage = () => {
                       <span className="text-gray-500 text-sm whitespace-nowrap">
                         Сортувати:
                       </span>
-                      <div className="relative" ref={dropdownRef}>
-                        <button
-                          onClick={() => setIsSortOpen(!isSortOpen)}
-                          className="flex items-center gap-3 px-5 py-2.5 rounded-full text-[13px] font-semibold bg-brand-bg border border-brand-accent text-brand-primary transition-all active:scale-95"
-                        >
-                          {currentSortLabel}
-                          <ChevronDown
-                            size={16}
-                            className={`transition-transform duration-300 ${isSortOpen ? "rotate-180" : ""}`}
-                          />
-                        </button>
 
-                        {isSortOpen && (
-                          <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
-                            <div className="py-2">
-                              {sortOptions.map((option) => (
-                                <button
-                                  key={option.id}
-                                  onClick={() => {
-                                    setActiveSort(option.id);
-                                    setIsSortOpen(false);
-                                  }}
-                                  className={`w-full text-left px-5 py-3 text-[13px] font-medium transition-colors hover:bg-gray-50 ${
-                                    activeSort === option.id
-                                      ? "text-brand-primary bg-brand-primary/5"
-                                      : "text-gray-600"
-                                  }`}
-                                >
-                                  {option.label}
-                                </button>
-                              ))}
+                      <div className="flex items-center gap-2">
+                        {/* Дропдаун сортування */}
+                        <div className="relative" ref={dropdownRef}>
+                          <button
+                            onClick={() => setIsSortOpen(!isSortOpen)}
+                            className={`flex items-center gap-3 px-5 py-2.5 rounded-full text-[13px] font-semibold border transition-all active:scale-95 ${
+                              isSortActive
+                                ? "bg-brand-primary/10 border-brand-primary text-brand-primary"
+                                : "bg-brand-bg border-brand-accent text-brand-primary"
+                            }`}
+                          >
+                            {currentSortLabel}
+                            <ChevronDown
+                              size={16}
+                              className={`transition-transform duration-300 ${isSortOpen ? "rotate-180" : ""}`}
+                            />
+                          </button>
+
+                          {isSortOpen && (
+                            <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in duration-200">
+                              <div className="py-2">
+                                {sortOptions.map((option) => (
+                                  <button
+                                    key={option.id}
+                                    onClick={() => {
+                                      setActiveSort(option.id);
+                                      setIsSortOpen(false);
+                                    }}
+                                    className={`w-full text-left px-5 py-3 text-[13px] font-medium transition-colors hover:bg-gray-50 ${
+                                      activeSort === option.id
+                                        ? "text-brand-primary bg-brand-primary/5"
+                                        : "text-gray-600"
+                                    }`}
+                                  >
+                                    {option.label}
+                                  </button>
+                                ))}
+                              </div>
                             </div>
-                          </div>
+                          )}
+                        </div>
+
+                        {isSortActive && (
+                          <button
+                            onClick={() => setActiveSort(DEFAULT_SORT)}
+                            title="Скинути сортування"
+                            className="flex items-center gap-1.5 px-2.5 py-2.5 rounded-full text-[12px] font-medium text-gray-500 hover:text-red-500 border border-gray-200 hover:border-red-300 bg-white transition-all active:scale-95"
+                          >
+                            <X size={13} />
+                          </button>
                         )}
                       </div>
                     </div>
