@@ -65,7 +65,6 @@ export default function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 80);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -115,9 +114,7 @@ export default function Header() {
       ),
       icon: <Settings className="text-gray-500" size={16} />,
     },
-    {
-      type: "divider",
-    },
+    { type: "divider" },
     {
       key: "logout",
       label: (
@@ -128,6 +125,79 @@ export default function Header() {
       icon: <LogOut size={16} className="text-red-600/80" />,
       className: "hover:!bg-red-50",
       onClick: handleLogout,
+    },
+  ];
+
+  const mobileMenuItems: MenuProps["items"] = [
+    {
+      key: "home",
+      label: (
+        <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
+          Головна
+        </Link>
+      ),
+    },
+    {
+      key: "shop",
+      label: (
+        <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>
+          Магазин
+        </Link>
+      ),
+    },
+    {
+      key: "catalog",
+      label: "Каталог товарів",
+      children: categories?.map((cat) => ({
+        key: cat.id,
+        label: cat.name,
+        children:
+          cat.childrens && cat.childrens.length > 0
+            ? cat.childrens.map((sub) => ({
+                key: sub.id,
+                label: (
+                  <Link
+                    to={`/shop?categoryId=${sub.id}`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {sub.name}
+                  </Link>
+                ),
+              }))
+            : undefined,
+      })),
+    },
+    {
+      key: "about",
+      label: (
+        <Link to="/about" onClick={() => setIsMobileMenuOpen(false)}>
+          Про нас
+        </Link>
+      ),
+    },
+    {
+      key: "for-buyers",
+      label: (
+        <Link to="/for-buyers" onClick={() => setIsMobileMenuOpen(false)}>
+          Для покупця
+        </Link>
+      ),
+    },
+    {
+      key: "faq",
+      label: (
+        <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)}>
+          FAQ
+        </Link>
+      ),
+    },
+    {
+      key: "contact",
+      label: (
+        <Link to="/contact" onClick={() => setIsMobileMenuOpen(false)}>
+          Контакти
+        </Link>
+      ),
     },
   ];
 
@@ -149,13 +219,7 @@ export default function Header() {
               >
                 <div className="flex items-center gap-2 cursor-pointer group">
                   {user.image ? (
-                    <Avatar
-                      src={
-                        user.image
-                          ? `${IMAGE_BASE_URL}/avatars/${user.image}`
-                          : PLACEHOLDER_IMAGE_URL
-                      }
-                    />
+                    <Avatar src={`${IMAGE_BASE_URL}/avatars/${user.image}`} />
                   ) : (
                     <Avatar
                       style={{
@@ -180,17 +244,15 @@ export default function Header() {
                   className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
                 >
                   Увійти
-                  <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                  <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0" />
                 </Link>
-
-                <div className="h-4 w-[1px] bg-gray-300"></div>
-
+                <div className="h-4 w-[1px] bg-gray-300" />
                 <Link
                   to="/register"
                   className="relative text-gray-600 transition-colors duration-300 hover:text-brand-primary group"
                 >
                   Зареєструватися
-                  <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
+                  <span className="absolute left-1/2 -bottom-1 w-0 h-[2px] bg-brand-primary transition-all duration-300 group-hover:w-full group-hover:left-0" />
                 </Link>
               </div>
             )}
@@ -235,14 +297,12 @@ export default function Header() {
                    border border-transparent focus:border-brand-primary/30
                    outline-none transition-all shadow-sm"
               />
-
               <Search
                 className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
                   isFocused ? "text-brand-primary" : "text-gray-400"
                 }`}
                 size={18}
               />
-
               {isFetching && (
                 <div className="absolute right-4 top-1/2 -translate-y-1/2">
                   <Loader className="text-brand-primary" />
@@ -308,7 +368,7 @@ export default function Header() {
               )}
             </button>
 
-            <div className="h-4 w-[1px] bg-gray-300 hidden sm:block"></div>
+            <div className="h-4 w-[1px] bg-gray-300 hidden sm:block" />
 
             <button
               onClick={() => dispatch(openCartSidebar())}
@@ -493,7 +553,6 @@ export default function Header() {
         styles={{ body: { padding: 0 } }}
       >
         <div className="flex flex-col h-full font-montserrat">
-          {/* Header Drawer */}
           <div className="p-4 border-b flex justify-between items-center bg-gray-50">
             <img src="/header-logo.png" alt="logo" className="h-10 w-auto" />
             <button
@@ -504,7 +563,6 @@ export default function Header() {
             </button>
           </div>
 
-          {/* Search Drawer */}
           <div className="p-4 border-b">
             <div className="relative w-full">
               <input
@@ -519,93 +577,18 @@ export default function Header() {
             </div>
           </div>
 
-          {/* Menu Items */}
           <div className="flex-1 overflow-y-auto">
             <Menu
               mode="inline"
               className="border-none font-semibold text-gray-700 font-montserrat"
-              items={[
-                {
-                  key: "1",
-                  label: (
-                    <Link to="/" onClick={() => setIsMobileMenuOpen(false)}>
-                      Головна
-                    </Link>
-                  ),
-                },
-                {
-                  key: "2",
-                  label: (
-                    <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)}>
-                      Магазин
-                    </Link>
-                  ),
-                },
-                {
-                  key: "sub1",
-                  label: "Каталог товарів",
-                  children: categories?.map((cat) => ({
-                    key: cat.id,
-                    label: (
-                      <Link
-                        to={`/shop?category=${cat.id}`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {cat.name}
-                      </Link>
-                    ),
-                  })),
-                },
-                {
-                  key: "3",
-                  label: (
-                    <Link
-                      to="/about"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Про нас
-                    </Link>
-                  ),
-                },
-                {
-                  key: "4",
-                  label: (
-                    <Link
-                      to="/for-buyers"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Для покупця
-                    </Link>
-                  ),
-                },
-                {
-                  key: "5",
-                  label: (
-                    <Link to="/faq" onClick={() => setIsMobileMenuOpen(false)}>
-                      FAQ
-                    </Link>
-                  ),
-                },
-                {
-                  key: "6",
-                  label: (
-                    <Link
-                      to="/contact"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Контакти
-                    </Link>
-                  ),
-                },
-              ]}
+              items={mobileMenuItems}
             />
           </div>
 
-          {/* Footer Drawer */}
           <div className="p-4 bg-gray-50 border-t space-y-4">
             <div className="flex items-center gap-3 text-brand-primary">
               <Phone size={20} />
-              <span className="font-bold">(219) 555-0114</span>
+              <span className="font-bold font-manrope">(219) 555-0114</span>
             </div>
 
             {!user ? (
