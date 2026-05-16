@@ -148,22 +148,22 @@ export const ProductsSection = ({
                       className="group"
                     >
                       <div
-                        className={`h-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm transition-all relative flex flex-col
-                          ${
-                            isOutOfStock
-                              ? "opacity-70 grayscale-[0.4]"
-                              : "hover:shadow-xl hover:border-brand-primary/40"
-                          }`}
+                        className={`h-full bg-white p-4 border border-gray-100 rounded-2xl shadow-sm transition-all relative flex flex-col ${
+                          isOutOfStock
+                            ? "opacity-70 grayscale-[0.4]"
+                            : "hover:shadow-xl hover:border-brand-primary/40"
+                        }`}
                       >
-                        <div className="relative h-44 rounded-xl overflow-hidden mb-6 bg-gray-50 flex items-center justify-center p-2">
+                        <div className="relative h-44 rounded-xl overflow-hidden mb-4 bg-gray-50 flex items-center justify-center p-2 flex-shrink-0">
                           <img
                             src={
                               product.images?.[0]?.image ||
                               PLACEHOLDER_IMAGE_URL
                             }
                             alt={product.name}
-                            className={`w-full h-full object-contain mix-blend-multiply transition-transform duration-500 
-                              ${!isOutOfStock && "group-hover:scale-110"}`}
+                            className={`w-full h-full object-contain mix-blend-multiply transition-transform duration-500 ${
+                              !isOutOfStock && "group-hover:scale-110"
+                            }`}
                           />
 
                           <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all duration-300">
@@ -179,19 +179,24 @@ export const ProductsSection = ({
                           )}
                         </div>
 
-                        <div className="space-y-2 flex-1 flex flex-col">
-                          <h3
-                            className={`text-sm font-medium line-clamp-2 min-h-[40px] transition-colors
-                            ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
-                          >
-                            {product.name}
-                          </h3>
+                        <div className="flex-1 flex flex-col justify-between">
+                          <div className="flex-1 mb-3">
+                            <h3
+                              className={`text-sm font-medium line-clamp-2 min-h-[40px] transition-colors ${
+                                isOutOfStock
+                                  ? "text-gray-500"
+                                  : "text-gray-800 group-hover:text-brand-primary"
+                              }`}
+                            >
+                              {product.name}
+                            </h3>
+                          </div>
 
-                          <div className="flex items-center justify-between mt-auto pt-1">
-                            <div>
+                          <div className="flex items-end justify-between pt-1 w-full">
+                            <div className="flex flex-col gap-1">
                               {hasDiscount ? (
-                                <div className="flex flex-col">
-                                  <span className="text-[15px] text-gray-400 line-through font-manrope">
+                                <div className="flex flex-col leading-tight">
+                                  <span className="text-[13px] text-gray-400 line-through font-manrope">
                                     ₴ {product.price}
                                   </span>
                                   <span className="text-xl font-bold font-manrope text-red-500">
@@ -199,18 +204,20 @@ export const ProductsSection = ({
                                   </span>
                                 </div>
                               ) : (
-                                <span
-                                  className={`text-xl font-bold font-manrope ${
-                                    isOutOfStock
-                                      ? "text-gray-500"
-                                      : "text-gray-900"
-                                  }`}
-                                >
-                                  ₴ {product.price}
-                                </span>
+                                <div className="leading-tight">
+                                  <span
+                                    className={`text-xl font-bold font-manrope ${
+                                      isOutOfStock
+                                        ? "text-gray-500"
+                                        : "text-gray-900"
+                                    }`}
+                                  >
+                                    ₴ {product.price}
+                                  </span>
+                                </div>
                               )}
 
-                              <div className="flex items-center gap-0.5 mb-2 pb-2">
+                              <div className="flex items-center gap-0.5">
                                 {[...Array(5)].map((_, i) => (
                                   <Star
                                     key={i}
@@ -228,7 +235,7 @@ export const ProductsSection = ({
                               </div>
 
                               {!isOutOfStock ? (
-                                <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
+                                <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-0.5 rounded-full w-fit mt-0.5">
                                   <PackageCheck size={12} />
                                   <span className="text-[10px] font-medium">
                                     В наявності
@@ -236,20 +243,20 @@ export const ProductsSection = ({
                                 </div>
                               ) : (
                                 <StockStatus
-                                  className="mt-1"
+                                  className="mt-0.5"
                                   quantity={product.stockQuantity}
                                 />
                               )}
                             </div>
 
                             <button
+                              type="button"
                               disabled={isOutOfStock}
-                              className={`p-3 rounded-full transition-colors flex-shrink-0 
-                                ${
-                                  isOutOfStock
-                                    ? "bg-gray-50 text-gray-300 cursor-not-allowed"
-                                    : "bg-gray-100 hover:text-white hover:bg-brand-primary"
-                                }`}
+                              className={`p-3 rounded-full transition-colors flex-shrink-0 self-end ${
+                                isOutOfStock
+                                  ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                                  : "bg-gray-100 text-gray-700 hover:text-white hover:bg-brand-primary"
+                              }`}
                               onClick={(e) => handleCartClick(e, product)}
                             >
                               <ShoppingCart size={18} />

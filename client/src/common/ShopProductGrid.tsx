@@ -95,17 +95,17 @@ export const ShopProductGrid = ({
               <Link
                 to={`/product/${product.id}`}
                 key={product.id}
-                className="group"
+                className="group flex"
               >
                 <div
-                  className={`h-full bg-white p-4 border border-gray-100 rounded-xl shadow-sm transition-all relative 
+                  className={`w-full bg-white p-4 border border-gray-100 rounded-xl shadow-sm transition-all relative flex flex-col 
                   ${
                     isOutOfStock
                       ? "opacity-60 grayscale-[0.5]"
                       : "hover:shadow-xl hover:border-brand-primary/40"
                   }`}
                 >
-                  <div className="relative h-44 rounded-lg overflow-hidden mb-6 bg-gray-50 flex items-center justify-center p-2">
+                  <div className="relative h-44 rounded-lg overflow-hidden mb-4 bg-gray-50 flex items-center justify-center p-2 flex-shrink-0">
                     <img
                       src={product.images?.[0]?.image || PLACEHOLDER_IMAGE_URL}
                       alt={product.name}
@@ -129,19 +129,21 @@ export const ShopProductGrid = ({
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <h3
-                      className={`text-sm font-medium line-clamp-2 min-h-[40px] font-montserrat transition-colors
-                      ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
-                    >
-                      {product.name}
-                    </h3>
+                  <div className="flex-1 flex flex-col justify-between">
+                    <div className="flex-1 mb-3">
+                      <h3
+                        className={`text-sm font-medium line-clamp-2 min-h-[40px] font-montserrat transition-colors
+                        ${isOutOfStock ? "text-gray-500" : "text-gray-800 group-hover:text-brand-primary"}`}
+                      >
+                        {product.name}
+                      </h3>
+                    </div>
 
-                    <div className="flex items-center justify-between mt-4">
-                      <div>
+                    <div className="flex items-end justify-between pt-1 w-full mt-auto">
+                      <div className="flex flex-col gap-1.5">
                         {hasDiscount ? (
-                          <div className="flex flex-col">
-                            <span className="text-[13px] text-gray-400 line-through font-manrope leading-none">
+                          <div className="flex flex-col leading-tight">
+                            <span className="text-[13px] text-gray-400 line-through font-manrope">
                               ₴ {Number(product.price).toFixed(2)}
                             </span>
                             <span className="text-lg font-bold font-manrope text-red-500">
@@ -149,14 +151,16 @@ export const ShopProductGrid = ({
                             </span>
                           </div>
                         ) : (
-                          <span
-                            className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
-                          >
-                            ₴ {Number(product.price).toFixed(2)}
-                          </span>
+                          <div className="leading-tight">
+                            <span
+                              className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
+                            >
+                              ₴ {Number(product.price).toFixed(2)}
+                            </span>
+                          </div>
                         )}
 
-                        <div className="flex items-center gap-0.5 pb-2">
+                        <div className="flex items-center gap-0.5">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
@@ -174,23 +178,24 @@ export const ShopProductGrid = ({
                         </div>
 
                         {!isOutOfStock ? (
-                          <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-1 rounded-full w-fit mt-1">
-                            <PackageCheck size={12} />
+                          <div className="flex items-center gap-1.5 text-green-700 bg-green-50 px-2 py-0.5 rounded-full w-fit">
+                            <PackageCheck size={11} />
                             <span className="text-[10px] font-medium">
                               В наявності
                             </span>
                           </div>
                         ) : (
                           <StockStatus
-                            className="mt-1"
+                            className="mt-0"
                             quantity={product.stockQuantity}
                           />
                         )}
                       </div>
 
                       <button
+                        type="button"
                         disabled={isOutOfStock}
-                        className={`p-3 rounded-full transition-colors flex-shrink-0 
+                        className={`p-3 rounded-full transition-colors flex-shrink-0 self-end
                           ${
                             isOutOfStock
                               ? "bg-gray-50 text-gray-300 cursor-not-allowed"
