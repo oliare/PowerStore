@@ -90,13 +90,6 @@ export const ShopProductGrid = ({
         : products.map((product) => {
             const isOutOfStock = product.stockQuantity <= 0;
             const hasDiscount = hasActiveDiscount(product);
-            console.log(
-              "Rendering product:",
-              product.discountPercentage,
-              product.discountPrice,
-              product.discountPrice,
-              product.price,
-            );
 
             return (
               <Link

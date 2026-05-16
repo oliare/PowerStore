@@ -19,12 +19,13 @@ public class ProductsController : ControllerBase
     public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 12,
-        [FromQuery] Guid? categoryId = null)
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] List<string>? brands = null)
     {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 12;
 
-        var products = await _productService.GetAllAsync(page, pageSize, categoryId);
+        var products = await _productService.GetAllAsync(page, pageSize, categoryId, brands);
         return Ok(products);
     }
 
@@ -63,5 +64,12 @@ public class ProductsController : ControllerBase
     {
         var result = await _productService.CheckStockAsync(ids);
         return Ok(result);
+    }
+
+    [HttpGet("brands")]
+    public async Task<ActionResult<IEnumerable<string>>> GetBrands()
+    {
+        var brands = await _productService.GetAllBrandsAsync();
+        return Ok(brands);
     }
 }

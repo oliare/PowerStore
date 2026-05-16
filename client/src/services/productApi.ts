@@ -10,13 +10,24 @@ interface GetProductsArgs {
   page: number;
   pageSize: number;
   categoryId?: string;
+  brands?: string[];
 }
 
 export const productApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<PagedResponse<ProductDto>, GetProductsArgs>({
-      query: ({ page, pageSize, categoryId }) =>
-        `/Products?page=${page}&pageSize=${pageSize}${categoryId ? `&categoryId=${categoryId}` : ""}`,
+      query: ({ page, pageSize, categoryId, brands }) => {
+        // Будуємо URL вручну — бекенд (ASP.NET List<string>) очікує:
+        // brands=Nike&brands=Adidas  (а НЕ brands=Nike,Adidas)
+        const params = new URLSearchParams();
+        params.set("page", String(page));
+        params.set("pageSize", String(pageSize));
+        if (categoryId) params.set("categoryId", categoryId);
+        if (brands && brands.length > 0) {
+          brands.forEach((b) => params.append("brands", b));
+        }
+        return `/Products?${params.toString()}`;
+      },
       providesTags: ["Products"],
     }),
 
@@ -35,12 +46,17 @@ export const productApi = baseApi.injectEndpoints({
         params: { query, count },
       }),
     }),
+
     checkStock: builder.mutation<ProductStockDto[], string[]>({
       query: (ids) => ({
         url: "/Products/check-stock",
         method: "POST",
         body: ids,
       }),
+    }),
+
+    getBrands: builder.query<string[], void>({
+      query: () => "/Products/brands",
     }),
   }),
 });
@@ -50,4 +66,5 @@ export const {
   useGetProductDetailsQuery,
   useSearchProductsQuery,
   useCheckStockMutation,
+  useGetBrandsQuery,
 } = productApi;

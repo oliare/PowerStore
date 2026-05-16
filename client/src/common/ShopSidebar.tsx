@@ -1,7 +1,8 @@
-import { Filter, Star, X } from "lucide-react";
+import { Filter, Star, X, Check } from "lucide-react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useGetCategoriesQuery } from "../services/categoryApi";
+import { useGetBrandsQuery } from "../services/productApi";
 
 interface ShopSidebarProps {
   priceRange: number;
@@ -22,17 +23,47 @@ export const ShopSidebar = ({
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { data: categories } = useGetCategoriesQuery();
+  const { data: brands = [] } = useGetBrandsQuery();
 
   const activeCategoryId = searchParams.get("categoryId");
+
+  const activeBrandsParam = searchParams.get("brand");
+  const activeBrands = activeBrandsParam
+    ? activeBrandsParam.split(",").filter(Boolean)
+    : [];
+
   const rootCategories = categories?.filter((cat) => !cat.parentId) || [];
 
   const handleCategoryChange = (id: string) => {
+    const newParams = new URLSearchParams(searchParams);
     if (activeCategoryId === id) {
-      searchParams.delete("categoryId");
+      newParams.delete("categoryId");
     } else {
-      searchParams.set("categoryId", id);
+      newParams.set("categoryId", id);
     }
-    setSearchParams(searchParams);
+    setSearchParams(newParams);
+  };
+
+  const handleBrandChange = (brand: string) => {
+    const newParams = new URLSearchParams(searchParams);
+
+    const updatedBrands = activeBrands.includes(brand)
+      ? activeBrands.filter((b) => b !== brand)
+      : [...activeBrands, brand];
+
+    if (updatedBrands.length > 0) {
+      newParams.set("brand", updatedBrands.join(","));
+    } else {
+      newParams.delete("brand");
+    }
+
+    setSearchParams(newParams);
+  };
+
+  const clearBrandFilter = () => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.delete("brand");
+    setSearchParams(newParams);
   };
 
   const handleRatingChange = (rating: number) => {
@@ -55,7 +86,6 @@ export const ShopSidebar = ({
       <div
         className={`
         ${isOpen ? "fixed inset-0 z-50 bg-white p-6 overflow-y-auto block" : "hidden"}
-        
         lg:block lg:relative lg:inset-auto lg:z-0 lg:bg-white lg:p-6 lg:rounded-xl lg:border lg:border-gray-100 lg:shadow-sm
       `}
       >
@@ -70,7 +100,6 @@ export const ShopSidebar = ({
           <h3 className="text-lg font-semibold mb-4 border-b pb-2 font-montserrat text-black">
             Категорії
           </h3>
-
           <ul className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {rootCategories.map((cat) => {
               const isParentOfActive = cat.childrens?.some(
@@ -85,14 +114,15 @@ export const ShopSidebar = ({
                     onClick={() => handleCategoryChange(cat.id)}
                   >
                     <div className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={
-                          activeCategoryId === cat.id || isParentOfActive
-                        }
-                        onChange={() => {}}
-                        className="w-4 h-4 accent-brand-primary rounded cursor-pointer"
-                      />
+                      <div
+                        className={`w-4 h-4 border rounded flex items-center justify-center transition-colors ${
+                          isActive
+                            ? "bg-brand-primary border-brand-primary"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {isActive && <Check size={12} className="text-white" />}
+                      </div>
                       <span
                         className={`text-sm transition-colors font-montserrat ${
                           isActive
@@ -117,8 +147,9 @@ export const ShopSidebar = ({
                           }`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            searchParams.set("categoryId", sub.id);
-                            setSearchParams(searchParams);
+                            const newParams = new URLSearchParams(searchParams);
+                            newParams.set("categoryId", sub.id);
+                            setSearchParams(newParams);
                           }}
                         >
                           {sub.name}
@@ -131,6 +162,60 @@ export const ShopSidebar = ({
             })}
           </ul>
         </div>
+
+        {brands.length > 0 && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between border-b pb-2 mb-4">
+              <h3 className="text-lg font-semibold font-montserrat text-black">
+                Бренди
+              </h3>
+              {activeBrands.length > 0 && (
+                <button
+                  onClick={clearBrandFilter}
+                  className="text-xs text-brand-primary hover:underline font-montserrat flex items-center gap-1"
+                >
+                  <X size={12} />
+                  Скинути ({activeBrands.length})
+                </button>
+              )}
+            </div>
+            <ul className="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+              {brands.map((brand) => {
+                const isActive = activeBrands.includes(brand);
+                return (
+                  <li key={brand}>
+                    <label
+                      className="flex items-center gap-3 group cursor-pointer py-0.5"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleBrandChange(brand);
+                      }}
+                    >
+                      <div
+                        className={`w-4 h-4 border rounded flex items-center justify-center transition-colors flex-shrink-0 ${
+                          isActive
+                            ? "bg-brand-primary border-brand-primary"
+                            : "border-gray-300"
+                        }`}
+                      >
+                        {isActive && <Check size={12} className="text-white" />}
+                      </div>
+                      <span
+                        className={`text-sm font-montserrat transition-colors ${
+                          isActive
+                            ? "text-brand-primary font-bold"
+                            : "text-gray-700 group-hover:text-brand-primary"
+                        }`}
+                      >
+                        {brand}
+                      </span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
 
         <div className="my-8">
           <h3 className="text-lg font-semibold mb-4 border-b pb-2 font-montserrat text-black">
@@ -151,7 +236,7 @@ export const ShopSidebar = ({
           </div>
         </div>
 
-        <div>
+        <div className="mb-6">
           <h3 className="text-lg font-semibold mb-4 border-b pb-2 font-montserrat text-black">
             Рейтинг
           </h3>

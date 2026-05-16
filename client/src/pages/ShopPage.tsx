@@ -17,12 +17,17 @@ export const ShopPage = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const productsPerPage = 28;
-  const categoryId = searchParams.get("categoryId");
+  const categoryId = searchParams.get("categoryId") || undefined;
+  const brandsParam = searchParams.get("brand");
+  const brands = brandsParam
+    ? brandsParam.split(",").filter(Boolean)
+    : undefined;
 
   const { data: products, isLoading } = useGetProductsQuery({
     page: currentPage,
     pageSize: productsPerPage,
-    categoryId: categoryId || undefined,
+    categoryId,
+    brands,
   });
 
   const sortOptions = [
@@ -38,10 +43,8 @@ export const ShopPage = () => {
     return products.items
       .filter((p) => {
         const matchesPrice = p.price <= priceRange;
-
         const matchesRating =
           ratingFilter === 0 || (p.rate || 0) >= ratingFilter;
-
         return matchesPrice && matchesRating;
       })
       .sort((a, b) => {
@@ -51,13 +54,8 @@ export const ShopPage = () => {
       });
   }, [products, priceRange, activeSort, ratingFilter]);
 
-  const totalPages = Math.ceil(processedProducts.length / productsPerPage);
-
-  const currentProducts = useMemo(() => {
-    const lastIndex = currentPage * productsPerPage;
-    const firstIndex = lastIndex - productsPerPage;
-    return processedProducts.slice(firstIndex, lastIndex);
-  }, [processedProducts, currentPage]);
+  // Пагінація — повністю серверна
+  const totalPages = products?.totalPages ?? 1;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -149,7 +147,7 @@ export const ShopPage = () => {
 
                   <div className="flex-grow">
                     <ShopProductGrid
-                      products={currentProducts}
+                      products={processedProducts}
                       isLoading={isLoading}
                     />
 

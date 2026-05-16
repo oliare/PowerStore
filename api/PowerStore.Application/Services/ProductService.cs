@@ -18,7 +18,11 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
 
-    public async Task<PagedResponse<ProductDto>> GetAllAsync(int page = 1, int pageSize = 12, Guid? categoryId = null)
+    public async Task<PagedResponse<ProductDto>> GetAllAsync(
+        int page = 1,
+        int pageSize = 12,
+        Guid? categoryId = null,
+        List<string>? brands = null)
     {
         var query = _repo.Query();
 
@@ -26,6 +30,11 @@ public class ProductService : IProductService
         {
             query = query.Where(p => p.CategoryId == categoryId.Value
                                   || p.Category.ParentId == categoryId.Value);
+        }
+
+        if (brands != null && brands.Count > 0)
+        {
+            query = query.Where(p => brands.Contains(p.Brand!));
         }
 
         var totalItems = await query.CountAsync();
@@ -115,6 +124,16 @@ public class ProductService : IProductService
                 ProductId = p.Id,
                 StockQuantity = p.StockQuantity
             })
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<string>> GetAllBrandsAsync()
+    {
+        return await _repo.Query()
+            .Where(p => p.Brand != null && p.Brand != "")
+            .Select(p => p.Brand!)
+            .Distinct()
+            .OrderBy(b => b)
             .ToListAsync();
     }
 }
