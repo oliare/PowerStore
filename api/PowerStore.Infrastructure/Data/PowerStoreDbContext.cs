@@ -20,6 +20,7 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
     public DbSet<OrderItemEntity> OrderItems { get; set; }
     public DbSet<ContactMessageEntity> ContactMessages { get; set; }
     public DbSet<ProductReviewEntity> ProductReviews { get; set; }
+    public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -77,6 +78,22 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
 
             entity.HasIndex(r => new { r.UserId, r.ProductId })
                 .IsUnique();
+        });
+
+        builder.Entity<RefreshTokenEntity>(entity =>
+        {
+            entity.HasKey(t => t.Id);
+
+            entity.HasIndex(t => t.TokenHash).IsUnique();
+            entity.HasIndex(t => t.UserId);
+            entity.HasIndex(t => t.TokenFamilyId);
+
+            entity.Property(t => t.TokenHash).HasMaxLength(128).IsRequired();
+
+            entity.HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

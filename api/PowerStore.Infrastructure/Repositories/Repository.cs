@@ -26,6 +26,11 @@ public class GenericRepository<TEntity> : IRepository<TEntity> where TEntity : c
         return await _dbSet.FirstOrDefaultAsync(predicate);
     }
 
+    public async Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return await _dbSet.Where(predicate).ToListAsync();
+    }
+
     public async Task AddAsync(TEntity entity)
     {
         await _dbSet.AddAsync(entity);

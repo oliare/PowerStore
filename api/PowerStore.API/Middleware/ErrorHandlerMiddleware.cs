@@ -25,6 +25,7 @@ public class ErrorHandlerMiddleware
 
             context.Response.StatusCode = error switch
             {
+                UnauthorizedException => (int)HttpStatusCode.Unauthorized,
                 AppException => (int)HttpStatusCode.BadRequest,
                 KeyNotFoundException => (int)HttpStatusCode.NotFound,
                 _ => (int)HttpStatusCode.InternalServerError

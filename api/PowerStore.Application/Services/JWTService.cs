@@ -41,10 +41,21 @@ public class JwtService : IJwtService
         var token = new JwtSecurityToken(
             issuer: _config["Jwt:Issuer"],
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:ExpiresMinutes"]!)),
+            expires: DateTime.UtcNow.AddMinutes(GetAccessTokenMinutes()),
             signingCredentials: creds
         );
 
         return _jwtTokenHandler.WriteToken(token);
+    }
+
+    private int GetAccessTokenMinutes()
+    {
+        if (int.TryParse(_config["Jwt:AccessTokenMinutes"], out var accessMinutes))
+            return accessMinutes;
+
+        if (int.TryParse(_config["Jwt:ExpiresMinutes"], out var legacyMinutes))
+            return legacyMinutes;
+
+        return 15;
     }
 }

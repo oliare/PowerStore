@@ -1,9 +1,8 @@
-﻿namespace PowerStore.Application.DTOs.Auth;
+namespace PowerStore.Application.DTOs.Auth;
 
-public class AuthResponseDto
+public class RefreshResponseDto
 {
     public required string AccessToken { get; set; }
     public required string Email { get; set; }
     public int ExpiresIn { get; set; }
-    public string? RefreshToken { get; set; }
 }

@@ -6,6 +6,7 @@ namespace PowerStore.Application.Interfaces
     {
         Task<TEntity?> GetByIdAsync(Guid id);
         Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<List<TEntity>> WhereAsync(Expression<Func<TEntity, bool>> predicate);
 
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(IEnumerable<TEntity> entities);
