@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { JSX } from "react";
-import { logOut } from "../store/authSlice";
+import { logOut, setLoggingOut } from "../store/authSlice";
 import { useLogoutMutation } from "../services/authApi";
 import { useDispatch } from "react-redux";
 import { baseApi } from "../api/baseApi";
@@ -45,6 +45,7 @@ export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleLogout = async () => {
+    dispatch(setLoggingOut(true));
     try {
       await logout().unwrap();
       dispatch(clearCart());

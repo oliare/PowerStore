@@ -1,10 +1,8 @@
 import { useMemo, useRef, useState } from "react";
 import { Table, Input } from "antd";
 import { User, Mail, Calendar, Phone, SquarePen } from "lucide-react";
-import {
-  useGetMeQuery,
-  useUpdateProfileMutation,
-} from "../../services/userApi";
+import { useUpdateProfileMutation } from "../../services/userApi";
+import { useAuthMeQuery } from "../../hooks/useAuthMe";
 import { IMAGE_BASE_URL, PLACEHOLDER_IMAGE_URL } from "../../api/api";
 import { showNotify } from "../../utils/showNotify";
 import { ImageCropperModal } from "../../common/ImageCropperModal";
@@ -26,7 +24,7 @@ export const UserProfilePage = () => {
   const [imageToCrop, setImageToCrop] = useState<string | null>(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
-  const { data: user, isLoading } = useGetMeQuery();
+  const { data: user, isLoading } = useAuthMeQuery();
   const [updateProfile, { isLoading: isSaving }] = useUpdateProfileMutation();
   const { data: orders } = useGetMyOrdersQuery();
 
@@ -149,9 +147,9 @@ export const UserProfilePage = () => {
 
   const avatarSrc =
     previewImage ??
-    (user?.image
-      ? `${IMAGE_BASE_URL}/avatars/${user.image}`
-      : PLACEHOLDER_IMAGE_URL);
+    (user?.image ? `${IMAGE_BASE_URL}/avatars/${user.image}` : PLACEHOLDER_IMAGE_URL);
+
+  console.log("User data:", avatarSrc);
 
   const handleOpenDetails = (order: OrderDto) => {
     setSelectedOrder(order);

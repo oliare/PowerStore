@@ -6,6 +6,7 @@ export type LoginRequest = {
 export type AuthResponse = {
   email: string;
   accessToken: string;
+  expiresIn: number;
 };
 
 export type RegisterRequest = {
@@ -16,14 +17,6 @@ export type RegisterRequest = {
   password: string;
 };
 
-export type AuthState = {
-  // user: User | null;
-  accessToken: string | null;
-  auth: UserAuth;
-  refreshToken?: string | null;
-  isLoggingOut?: boolean;
-};
-
 export type UserAuth = {
   isAdmin: boolean;
   isUser: boolean;
@@ -31,6 +24,17 @@ export type UserAuth = {
   roles: string[];
 };
 
-// export type LogoutRequest = {
-//   accessToken: string;
-// }
+export type AuthState = {
+  accessToken: string | null;
+  expiresAt: number | null;
+  auth: UserAuth;
+  isLoggingOut: boolean;
+};
+
+export type JwtPayload = {
+  sub: string;
+  email: string;
+  role?: string | string[];
+  exp: number;
+  iss?: string;
+};

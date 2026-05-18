@@ -132,6 +132,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await db.Database.MigrateAsync();
+        await DatabaseSchemaBootstrap.EnsureRefreshTokensTableAsync(db);
         await seeder.SeedAsync();
         Console.WriteLine("Database ready");
     }

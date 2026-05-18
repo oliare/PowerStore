@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useGetProductReviewsQuery } from "../services/reviewsApi";
 import { Star, ChevronLeft, MessageSquare, Filter } from "lucide-react";
 import { ReviewForm } from "./ReviewForm";
-import { useGetMeQuery } from "../services/userApi";
+import { useAuthMeQuery } from "../hooks/useAuthMe";
 
 export const ProductReviewsPage = () => {
   const { productId } = useParams<{ productId: string }>();
@@ -10,7 +10,7 @@ export const ProductReviewsPage = () => {
   const { data: reviews, isLoading } = useGetProductReviewsQuery(
     productId ?? "",
   );
-  const { data: user } = useGetMeQuery();
+  const { data: user } = useAuthMeQuery();
 
   if (isLoading)
     return (

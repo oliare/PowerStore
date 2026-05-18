@@ -29,13 +29,18 @@ export const LoginPage = () => {
   const onFinish = async (values: LoginRequest) => {
     try {
       const result = await login(values).unwrap();
-      dispatch(setCredentials({ accessToken: result.accessToken }));
+      dispatch(
+        setCredentials({
+          accessToken: result.accessToken,
+          expiresIn: result.expiresIn,
+        }),
+      );
 
       const cart = await syncCart({ items }).unwrap();
       dispatch(setCartItems(cart));
 
       const mergedFavorites = await syncFavorites({
-        productIds: favorites.map((item) => item.productId),
+        productIds: favorites.map((item) => item.product.id),
       }).unwrap();
       dispatch(setFavoriteItems(mergedFavorites));
 

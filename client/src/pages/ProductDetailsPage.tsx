@@ -24,7 +24,7 @@ import { ProductSpecifications } from "../common/ProductSpecifications";
 import { ReviewForm } from "./ReviewForm";
 import { ReviewsSection } from "./ReviewsSection";
 import { ProductReviewStats } from "../common/ProductReviewStats";
-import { useGetMeQuery } from "../services/userApi";
+import { useAuthMeQuery } from "../hooks/useAuthMe";
 import { useGetProductReviewsQuery } from "../services/reviewsApi";
 import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 
@@ -41,7 +41,7 @@ const ProductDetailsPage = () => {
   const [activeImage, setActiveImage] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
-  const { data: user } = useGetMeQuery();
+  const { data: user } = useAuthMeQuery();
   const { data: reviews } = useGetProductReviewsQuery(id!);
 
   if (isLoading)

@@ -18,7 +18,7 @@ import type { OrderCreateDto } from "../types/order";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../store/store";
 import { useClearCartMutation } from "../services/cartApi";
-import { useGetMeQuery } from "../services/userApi";
+import { useAuthMeQuery } from "../hooks/useAuthMe";
 import {
   clearCart as clearCartLocal,
   removeFromCart,
@@ -33,7 +33,7 @@ export const CheckoutPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { data: user } = useGetMeQuery();
+  const { data: user } = useAuthMeQuery();
   const isAuth = !!user;
   const [clearCartApi] = useClearCartMutation();
   const cartItems = useSelector((state: RootState) => state.cart.items);

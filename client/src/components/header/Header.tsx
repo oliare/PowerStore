@@ -16,13 +16,13 @@ import {
 } from "lucide-react";
 import { Drawer, Menu, Avatar, Dropdown } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { useGetMeQuery } from "../../services/userApi";
+import { useAuthMeQuery } from "../../hooks/useAuthMe";
 import type { MenuProps } from "antd/es/menu/menu";
 import type { RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
 import { openCartSidebar } from "../../store/uiSlice";
 import { useLogoutMutation } from "../../services/authApi";
-import { logOut } from "../../store/authSlice";
+import { logOut, setLoggingOut } from "../../store/authSlice";
 import { baseApi } from "../../api/baseApi";
 import { clearFavorites } from "../../store/favoriteSlice";
 import { clearCart } from "../../store/cartSlice";
@@ -40,7 +40,13 @@ export default function Header() {
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: user } = useGetMeQuery();
+  const token = useSelector((state: RootState) => state.account.accessToken);
+  const isLoggingOut = useSelector(
+    (state: RootState) => state.account.isLoggingOut,
+  );
+
+  const { data: user } = useAuthMeQuery(undefined);
+
   const [logout] = useLogoutMutation();
   const { data: categories, isLoading } = useGetCategoryTreeQuery();
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
@@ -90,6 +96,7 @@ export default function Header() {
   }, []);
 
   const handleLogout = async () => {
+    dispatch(setLoggingOut(true));
     try {
       await logout().unwrap();
       dispatch(clearCart());
@@ -99,6 +106,7 @@ export default function Header() {
     } finally {
       dispatch(logOut());
       dispatch(baseApi.util.resetApiState());
+      dispatch(setLoggingOut(false));
       navigate("/login");
       setIsMobileMenuOpen(false);
     }
@@ -211,7 +219,7 @@ export default function Header() {
           </div>
 
           <div className="flex items-center gap-4 my-1.5">
-            {user ? (
+            {token && user && !isLoggingOut ? (
               <Dropdown
                 menu={{ items: userMenuItems }}
                 placement="bottomRight"
@@ -591,7 +599,8 @@ export default function Header() {
               <span className="font-bold font-manrope">(219) 555-0114</span>
             </div>
 
-            {!user ? (
+            {/* Мобільна авторизація: реагує на токен, юзера та логаут */}
+            {!token || !user || isLoggingOut ? (
               <div className="flex flex-col gap-2">
                 <Link
                   to="/login"

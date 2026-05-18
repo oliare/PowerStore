@@ -24,7 +24,12 @@ export const RegistrationPage = () => {
     try {
       const result = await register(values).unwrap();
       showNotify.success("Вітаємо! Ви успішно зареєструвалися.");
-      dispatch(setCredentials({ accessToken: result.accessToken }));
+      dispatch(
+        setCredentials({
+          accessToken: result.accessToken,
+          expiresIn: result.expiresIn,
+        }),
+      );
       dispatch(baseApi.util.invalidateTags(["User"]));
 
       navigate(redirectPath);
