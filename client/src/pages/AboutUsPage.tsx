@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import {
   Check,
   ShieldCheck,
@@ -16,12 +17,52 @@ import { MailingSection } from "./HomePage/MailingSection";
 import { Link } from "react-router-dom";
 
 export const AboutUsPage = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo =
+        direction === "left"
+          ? scrollLeft - clientWidth
+          : scrollLeft + clientWidth;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
+  const testimonials = [
+    {
+      name: "Андрій Шевченко",
+      role: "Електрик-монтажник",
+      text: "Якість обладнання на найвищому рівні. Купував автоматику Schneider для виробництва — все працює як годинник. Окреме дякую за швидку відправку.",
+      avatar: "https://i.pravatar.cc/150?u=9",
+    },
+    {
+      name: "Марина Олійник",
+      role: "Дизайнер інтер'єру",
+      text: "Замовляла дизайнерські вимикачі Livolo. Дуже задоволена сервісом: менеджер допоміг підібрати колір під проект, а доставка прийшла наступного дня.",
+      avatar: "https://i.pravatar.cc/150?u=3",
+    },
+    {
+      name: "Віктор Павлов",
+      role: "Приватний забудовник",
+      text: "Збирав щитову для дому. Тут знайшов все в одному місці — від ПЗВ до маркування. Ціни дуже конкурентні, а консультанти реально розуміються на техніці.",
+      avatar: "https://i.pravatar.cc/150?u=2",
+    },
+    {
+      name: "Сергій Кравчук",
+      role: "Виконроб",
+      text: "Працюємо з PowerStore на постійній основі. Для нас головне — наявність на складі та оригінальність товару. Жодного разу не підвели з термінами.",
+      avatar: "https://i.pravatar.cc/150?u=52",
+    },
+  ];
+
   return (
     <div className="bg-white font-montserrat">
       <section className="max-w-7xl mx-auto px-4 py-16 grid md:grid-cols-2 gap-12 items-center">
         <div>
           <h2 className="text-4xl font-semibold text-gray-900 mb-6 leading-tight">
-            100% Надійна електротехніка для вашого дому
+            100% Надійна electroтехніка для вашого дому
           </h2>
           <p className="text-gray-600 text-lg leading-relaxed mb-6 yexy">
             Ми почали свій шлях з невеликого магазину автоматики, а сьогодні ми
@@ -32,19 +73,18 @@ export const AboutUsPage = () => {
         </div>
         <div className="rounded-3xl overflow-hidden">
           <img
-            src="aboutus_1.jpg"
+            src="https://images.unsplash.com/photo-1558444479-c8f027d6a5ad?q=80&w=1000&auto=format&fit=crop"
             alt="Наш магазин"
             className="w-full h-full object-cover"
           />
         </div>
       </section>
 
-      {/* Section 2: Features (Green Icons Style) */}
       <section className="bg-gray-50 py-16">
         <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="rounded-3xl overflow-hidden order-2 md:order-1">
             <img
-              src="aboutus_2.jpg"
+              src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1000&auto=format&fit=crop"
               alt="Наші фахівці"
               className="w-full h-full object-cover"
             />
@@ -103,7 +143,6 @@ export const AboutUsPage = () => {
         </div>
       </section>
 
-      {/* Section 3: Delivery Promo */}
       <section className="max-w-7xl mx-auto px-4 py-20 flex flex-col md:flex-row items-center gap-12">
         <div className="flex-1">
           <h2 className="text-4xl font-semibold mb-6">
@@ -133,9 +172,9 @@ export const AboutUsPage = () => {
         </div>
         <div className="flex-1 rounded-3xl overflow-hidden">
           <img
-            src="aboutus_3.jpg"
+            src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=1000&auto=format&fit=crop"
             alt="Доставка"
-            className="max-h-[500px] mx-auto"
+            className="max-h-[500px] mx-auto rounded-3xl"
           />
         </div>
       </section>
@@ -158,24 +197,33 @@ export const AboutUsPage = () => {
               {
                 name: "Олександр Коваль",
                 role: "Головний інженер",
-                img: "team1.jpg",
+                img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&h=500&auto=format&fit=crop",
               },
               {
                 name: "Анна Петренко",
                 role: "Менеджер з продажів",
-                img: "team2.jpg",
+                img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&h=500&auto=format&fit=crop",
               },
-              { name: "Іван Мазур", role: "Логіст", img: "team3.jpg" },
-              { name: "Сергій Бондар", role: "Консультант", img: "team4.jpg" },
+              {
+                name: "Іван Мазур",
+                role: "Логіст",
+                img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=400&h=500&auto=format&fit=crop",
+              },
+              {
+                name: "Сергій Бондар",
+                role: "Консультант",
+                img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFuysYoz3j2ewq_V5kz_W49gOyQuqNiwRsAMdSWJcPdw&s",
+              },
             ].map((member, idx) => (
-              <div key={idx} className="group cursor-pointer">
-                <div className="rounded-2xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow">
-                  <img
-                    src={member.img}
-                    alt={member.name}
-                    className="w-full h-64 object-cover"
-                  />
-                </div>
+              <div
+                key={idx}
+                className="group cursor-pointer flex flex-col items-center"
+              >
+                <img
+                  src={member.img}
+                  alt={member.name}
+                  className="rounded-2xl overflow-hidden mb-4 shadow-md group-hover:shadow-xl transition-shadow bg-gray-50 flex items-center justify-center h-64"
+                />
                 <h4 className="font-semibold text-xl">{member.name}</h4>
                 <p className="text-gray-500">{member.role}</p>
               </div>
@@ -194,38 +242,49 @@ export const AboutUsPage = () => {
               </h2>
             </div>
             <div className="flex gap-3">
-              <button className="bg-white p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition-all">
+              <button
+                onClick={() => scroll("left")}
+                className="bg-white p-3 rounded-full border border-gray-200 hover:bg-gray-100 transition-all active:scale-95"
+              >
                 <ArrowLeft size={20} />
               </button>
-              <button className="bg-brand-primary p-3 rounded-full text-white hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20">
+              <button
+                onClick={() => scroll("right")}
+                className="bg-brand-primary p-3 rounded-full text-white hover:bg-brand-dark transition-all shadow-lg shadow-brand-primary/20 active:scale-95"
+              >
                 <ArrowRight size={20} />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[1, 2, 3].map((i) => (
+          <div
+            ref={scrollRef}
+            className="flex gap-8 overflow-x-auto snap-x snap-mandatory pb-4 no-scrollbar"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {testimonials.map((t, i) => (
               <div
                 key={i}
-                className="bg-white p-10 rounded-2xl shadow-sm relative border border-gray-100"
+                className="bg-white p-10 rounded-2xl shadow-sm relative border border-gray-100 min-w-full md:min-w-[calc(50%-16px)] lg:min-w-[calc(33.333%-22px)] snap-start flex flex-col justify-between"
               >
                 <Quote
                   className="absolute top-8 left-8 text-brand-primary/10"
                   size={48}
                 />
                 <p className="text-gray-600 mb-8 relative z-10 leading-relaxed italic">
-                  "Якість обладнання на найвищому рівні. Купував автоматику
-                  Schneider для виробництва — все працює як годинник. Окреме
-                  дякую за швидку відправку."
+                  "{t.text}"
                 </p>
-                <div className="flex items-center justify-between border-t pt-6">
+                <div className="flex items-center justify-between border-t pt-6 mt-auto">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full" />
+                    <img
+                      src={t.avatar}
+                      alt={t.name}
+                      className="w-12 h-12 bg-gray-200 rounded-full object-cover"
+                    />
                     <div>
-                      <h5 className="font-bold text-gray-900">
-                        Андрій Шевченко
-                      </h5>
-                      <div className="flex text-yellow-400 mt-2">
+                      <h5 className="font-bold text-gray-900">{t.name}</h5>
+                      <p className="text-xs text-gray-400 mb-1">{t.role}</p>
+                      <div className="flex text-yellow-400 mt-1">
                         {[...Array(5)].map((_, star) => (
                           <Star key={star} size={14} fill="currentColor" />
                         ))}
@@ -240,6 +299,11 @@ export const AboutUsPage = () => {
       </section>
 
       <MailingSection />
+
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      `}</style>
     </div>
   );
 };
