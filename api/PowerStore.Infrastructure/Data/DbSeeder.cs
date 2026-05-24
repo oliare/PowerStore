@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using PowerStore.Domain;
 using PowerStore.Domain.Entities;
+using static System.Net.WebRequestMethods;
 
 namespace PowerStore.Infrastructure.Data;
 
@@ -35,16 +35,13 @@ public class DbSeeder
         foreach (var role in Roles.All)
         {
             if (!await _roleManager.RoleExistsAsync(role))
-            {
                 await _roleManager.CreateAsync(new RoleEntity { Name = role });
-            }
         }
     }
 
     private async Task SeedUsersAsync()
     {
-        if (_userManager.Users.Any())
-            return;
+        if (_userManager.Users.Any()) return;
 
         var admin = new UserEntity
         {
@@ -52,184 +49,778 @@ public class DbSeeder
             Email = "admin@gmail.com",
             FirstName = "Doris",
             LastName = "Lewicki",
-            Image = "/image-resources2.jpg",
             EmailConfirmed = true
         };
-
         var user = new UserEntity
         {
             UserName = "User",
             Email = "user@gmail.com",
             FirstName = "Test",
             LastName = "User",
-            Image = "/SampleImage1-Dog-small.png",
             EmailConfirmed = true
         };
 
-        var resultAdmin = await _userManager.CreateAsync(admin, "Qwerty123!");
-        if (!resultAdmin.Succeeded)
-            throw new Exception(string.Join(", ", resultAdmin.Errors.Select(e => e.Description)));
-
-        var resultUser = await _userManager.CreateAsync(user, "User123!");
-        if (!resultUser.Succeeded)
-            throw new Exception(string.Join(", ", resultUser.Errors.Select(e => e.Description)));
+        var r1 = await _userManager.CreateAsync(admin, "Qwerty123!");
+        if (!r1.Succeeded) throw new Exception(string.Join(", ", r1.Errors.Select(e => e.Description)));
+        var r2 = await _userManager.CreateAsync(user, "User123!");
+        if (!r2.Succeeded) throw new Exception(string.Join(", ", r2.Errors.Select(e => e.Description)));
 
         await _userManager.AddToRoleAsync(admin, Roles.Admin);
         await _userManager.AddToRoleAsync(user, Roles.User);
-
-        Console.WriteLine($"Users seeded: {admin.UserName}, {user.UserName}");
     }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    private static string Specs(params (string key, string val)[] pairs)
+        => System.Text.Json.JsonSerializer.Serialize(
+            pairs.Select(p => new { name = p.key, value = p.val }).ToArray());
+
+    // ─── CATEGORIES ───────────────────────────────────────────────────────────
 
     private async Task SeedCategoriesAsync()
     {
         if (_context.Categories.Any()) return;
 
+        // ── Parent categories ──────────────────────────────────────────────────
         var cabling = new CategoryEntity
         {
             Name = "Кабельна продукція",
-            Description = "Все для монтажу мереж",
-            Image = "https://media.istockphoto.com/id/1150199550/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%96%D0%BD%D0%B6%D0%B5%D0%BD%D0%B5%D1%80-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D0%BA-%D0%BF%D1%80%D0%B0%D1%86%D1%8E%D1%94-%D1%82%D0%B5%D1%81%D1%82%D0%B5%D1%80%D0%BE%D0%BC-%D1%89%D0%BE-%D0%B2%D0%B8%D0%BC%D1%96%D1%80%D1%8E%D1%94-%D0%BD%D0%B0%D0%BF%D1%80%D1%83%D0%B3%D1%83-%D1%96-%D1%81%D1%82%D1%80%D1%83%D0%BC-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%BD%D0%BE%D1%97-%D0%BB%D1%96%D0%BD%D1%96%D1%97-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BF%D0%B5%D1%80%D0%B5%D0%B4%D0%B0%D1%87-%D0%B2.jpg?s=612x612&w=0&k=20&c=LToBdaP1afPEsp_XNqs0g_pWvs0Jmvp2E-RBqfvqFMw="
+            Description = "Силові, сигнальні та мережеві кабелі для будь-яких умов монтажу",
+            Image = "https://media.istockphoto.com/id/2159121612/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%80%D1%96%D0%B7%D0%BD%D1%96-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D1%87%D0%BD%D1%96-%D0%B4%D1%80%D0%BE%D1%82%D0%B8-%D0%B7-%D0%BE%D0%B3%D0%BE%D0%BB%D0%B5%D0%BD%D0%B8%D0%BC%D0%B8-%D0%BC%D1%96%D0%B4%D0%BD%D0%B8%D0%BC%D0%B8-%D0%B6%D0%B8%D0%BB%D0%B0%D0%BC%D0%B8-%D0%BD%D0%B0-%D0%B1%D1%96%D0%BB%D0%BE%D0%BC%D1%83-%D1%82%D0%BB%D1%96.jpg?s=612x612&w=0&k=20&c=Aez6RL6WkdxKzxzkUYiGf0hhqEllAN8QAGqxNUZ5SxI="
         };
         var lighting = new CategoryEntity
         {
             Name = "Освітлення",
-            Description = "Лампи та світильники",
+            Description = "LED-лампи, прожектори, стрічки та аварійне освітлення",
             Image = "https://media.istockphoto.com/id/1934009955/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BC%D0%BE%D0%BB%D0%BE%D0%B4%D0%B0-%D0%B6%D1%96%D0%BD%D0%BA%D0%B0-%D0%B7%D0%BC%D1%96%D0%BD%D1%8E%D1%94-%D0%BB%D0%B0%D0%BC%D0%BF%D0%BE%D1%87%D0%BA%D1%83-%D0%B7-%D0%BB%D0%B0%D0%BC%D0%BF%D0%B8-%D1%80%D0%BE%D0%B7%D0%B6%D0%B0%D1%80%D1%8E%D0%B2%D0%B0%D0%BD%D0%BD%D1%8F-%D0%BD%D0%B0-%D1%81%D0%B2%D1%96%D1%82%D0%BB%D0%BE%D0%B4%D1%96%D0%BE%D0%B4%D0%BD%D1%83.jpg?s=612x612&w=0&k=20&c=mvRLvQXTgmY4PzCvLs5SP_J8L1KLBhgWXzHnYsaIKA0="
         };
         var tools = new CategoryEntity
         {
             Name = "Інструменти",
-            Description = "Електроінструмент",
-            Image = "https://media.istockphoto.com/id/1186871403/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%81%D0%B2%D0%B5%D1%80%D0%B4%D0%BB%D0%B0-%D1%82%D0%B0-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D1%96%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B8-%D0%B2-%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%D1%96.jpg?s=612x612&w=0&k=20&c=6mVBdJyyki_S5iemNaXv5cne_QiV1no9FMI0jWHZLpg="
+            Description = "Ручний та електровимірювальний інструмент для електромонтажу",
+            Image = "https://media.istockphoto.com/id/1644600181/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BD%D0%B0%D0%B1%D1%96%D1%80-%D1%96%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D1%96%D0%B2-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%B8%D0%BA%D0%B0-%D1%96%D0%B7%D0%BE%D0%BB%D1%8C%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B9-%D0%BD%D0%B0-%D0%B1%D1%96%D0%BB%D0%BE%D0%BC%D1%83-%D1%82%D0%BB%D1%96-%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD-%D0%B1%D0%B0%D0%BD%D0%B5%D1%80%D0%B0-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BE%D0%B1%D0%BB%D0%B0%D0%B4%D0%BD%D0%B0%D0%BD%D0%BD%D1%8F.jpg?s=612x612&w=0&k=20&c=WHfDv3dITzqI2YNifRp12TOu1NEYZcKoBALGnXRh-Yo="
         };
         var smartHome = new CategoryEntity
         {
             Name = "Розумний дім",
-            Description = "Датчики та контролери",
+            Description = "Датчики, реле, хаби та системи автоматизації",
             Image = "https://media.istockphoto.com/id/870664542/uk/%D1%84%D0%BE%D1%82%D0%BE/stem-%D0%B0%D0%B1%D0%BE-diy-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BD%D0%BD%D0%B8%D0%B9-%D0%BA%D0%BE%D0%BC%D0%BF%D0%BB%D0%B5%D0%BA%D1%82-%D0%BB%D1%96%D0%BD%D1%96%D1%8F-%D0%B2%D1%96%D0%B4%D1%81%D1%82%D0%B5%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F-%D1%85%D0%BE%D0%B4%D1%8C%D0%B1%D0%B8-%D1%80%D0%BE%D0%B1%D0%BE%D1%82-%D0%BA%D0%BE%D0%BD%D0%BA%D1%83%D1%80%D0%B5%D0%BD%D1%86%D1%96%D1%97-%D1%96%D0%B4%D0%B5%D1%97.jpg?s=612x612&w=0&k=20&c=p5KnhZyUw2HM0gIbkolQBePESIMm1_VVxD909ze2pBI="
         };
         var sockets = new CategoryEntity
         {
             Name = "Розетки та вимикачі",
-            Description = "Електрофурнітура",
+            Description = "Електрофурнітура внутрішнього та зовнішнього монтажу",
             Image = "https://media.istockphoto.com/id/1288881663/uk/%D0%B2%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%BD%D1%96-%D0%B7%D0%BE%D0%B1%D1%80%D0%B0%D0%B6%D0%B5%D0%BD%D0%BD%D1%8F/%D1%80%D0%BE%D0%B7%D0%B5%D1%82%D0%BA%D0%B8-%D0%B2%D0%B8%D0%BC%D0%B8%D0%BA%D0%B0%D1%87%D1%96-%D1%81%D0%B2%D1%96%D1%82%D0%BB%D0%B0-%D0%BD%D0%B0%D1%80%D1%8F%D0%B4%D0%B8-%D1%80%D1%96%D0%B7%D0%BD%D0%BE%D0%B3%D0%BE-%D0%B4%D0%B8%D0%B7%D0%B0%D0%B9%D0%BD%D1%83-%D1%80%D0%B5%D0%B0%D0%BB%D1%96%D1%81%D1%82%D0%B8%D1%87%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BD%D0%B0%D0%B1%D0%BE%D1%80%D1%83.jpg?s=612x612&w=0&k=20&c=FzoI7E3S9wvtVScDlO0lZ8QcpSK85FDe3g0hGhwNEaQ="
         };
         var protection = new CategoryEntity
         {
             Name = "Автоматика",
-            Description = "Захист та щитове обладнання",
+            Description = "Захисне обладнання, автоматичні вимикачі та щитова автоматика",
             Image = "https://media.istockphoto.com/id/950865552/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BF%D0%BB%D0%B0%D1%81%D1%82%D0%B8%D0%BA%D0%BE%D0%B2%D1%96-%D0%BA%D0%BE%D1%80%D0%BE%D0%B1%D0%BA%D0%B8-%D0%B4%D0%BB%D1%8F-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D0%BC%D0%BE%D0%BD%D1%82%D0%B0%D0%B6%D1%83-%D0%B2-%D0%BC%D0%B0%D0%B3%D0%B0%D0%B7%D0%B8%D0%BD%D1%96.jpg?s=612x612&w=0&k=20&c=R2Ya4lnn13ZrcSxz2jhZA8XbbdIMnupE2wGrbPAsxg0="
         };
-
-
-        await _context.Categories.AddRangeAsync(cabling, lighting, tools, smartHome, sockets, protection);
-
-        await _context.SaveChangesAsync();
-
-        var subCategories = new List<CategoryEntity>
+        var charging = new CategoryEntity
         {
-            new() { Name = "Силовий кабель", ParentId = cabling.Id },
-            new() { Name = "Кручена пара (LAN)", ParentId = cabling.Id },
-            new() { Name = "Кабель-канали", ParentId = cabling.Id },
-
-            new() { Name = "LED Стрічки", ParentId = lighting.Id },
-            new() { Name = "Вуличні ліхтарі", ParentId = lighting.Id },
-
-            new() { Name = "Вимірювальні прилади", ParentId = tools.Id },
-            new() { Name = "Викрутки та плоскогубці", ParentId = tools.Id },
-
-            new() { Name = "Датчики руху та витоку", ParentId = smartHome.Id },
-            new() { Name = "Розумні реле та хаби", ParentId = smartHome.Id },
-            new() { Name = "Системи відеоспостереження", ParentId = smartHome.Id },
-
-            new() { Name = "Внутрішні розетки", ParentId = sockets.Id },
-            new() { Name = "Сенсорні вимикачі", ParentId = sockets.Id },
-            new() { Name = "Рамки та аксесуари", ParentId = sockets.Id },
-
-            new() { Name = "Автоматичні вимикачі", ParentId = protection.Id },
-            new() { Name = "Пристрої захисного вимкнення (ПЗВ)", ParentId = protection.Id },
-            new() { Name = "Електричні щити та бокси", ParentId = protection.Id }
+            Name = "Зарядні пристрої та ДБЖ",
+            Description = "Блоки живлення, UPS та зарядні станції",
+            Image = "https://marketnet.ua/image/catalog/!!!!!blog/enerhetychna_nezalezhnist_pry_vidklyuchenni_svitla/enerhetychna_nezalezhnist_pry_vidklyuchenni_svitla_9.jpg"
+        };
+        var connectors = new CategoryEntity
+        {
+            Name = "З'єднувачі та клемники",
+            Description = "Клемні колодки, коннектори, гільзи та наконечники",
+            Image = "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ3k_D7Xdp59goxetKpLMCgq43_SceukjpLugEvaQ6JcYpYgdm9xXkTG4GccLncpywlFcCR3qe_OanF8MDSHwgZA4lX19qwCUL9HGwVQGa9eO6MTV25X0ipZjFdbn0Fhln8sJ11kVMARyU&usqp=CAc"
         };
 
-        await _context.Categories.AddRangeAsync(subCategories);
+        await _context.Categories.AddRangeAsync(
+            cabling, lighting, tools, smartHome, sockets, protection, charging, connectors);
         await _context.SaveChangesAsync();
+
+        // ── Sub-categories ─────────────────────────────────────────────────────
+        var subs = new List<CategoryEntity>
+        {
+            // Кабельна продукція
+            new() { Name = "Силовий кабель",            ParentId = cabling.Id },   // [0]
+            new() { Name = "Кручена пара (LAN)",         ParentId = cabling.Id },   // [1]
+            new() { Name = "Кабель-канали та лотки",     ParentId = cabling.Id },   // [2]
+            new() { Name = "HDMI / DisplayPort кабелі",  ParentId = cabling.Id },   // [3]
+
+            // Освітлення
+            new() { Name = "LED лампи",                  ParentId = lighting.Id },  // [4]
+            new() { Name = "LED стрічки",                ParentId = lighting.Id },  // [5]
+            new() { Name = "Прожектори",                 ParentId = lighting.Id },  // [6]
+            new() { Name = "Аварійне освітлення",        ParentId = lighting.Id },  // [7]
+
+            // Інструменти
+            new() { Name = "Вимірювальні прилади",       ParentId = tools.Id },     // [8]
+            new() { Name = "Монтажний інструмент",       ParentId = tools.Id },     // [9]
+
+            // Розумний дім
+            new() { Name = "Датчики руху та витоку",     ParentId = smartHome.Id }, // [10]
+            new() { Name = "Розумні реле та хаби",       ParentId = smartHome.Id }, // [11]
+            new() { Name = "Системи відеоспостереження", ParentId = smartHome.Id }, // [12]
+
+            // Розетки та вимикачі
+            new() { Name = "Внутрішні розетки",          ParentId = sockets.Id },   // [13]
+            new() { Name = "Сенсорні вимикачі",          ParentId = sockets.Id },   // [14]
+            new() { Name = "Рамки та аксесуари",         ParentId = sockets.Id },   // [15]
+
+            // Автоматика
+            new() { Name = "Автоматичні вимикачі",       ParentId = protection.Id },// [16]
+            new() { Name = "ПЗВ / диференційні автомати",ParentId = protection.Id },// [17]
+            new() { Name = "Електричні щити та бокси",   ParentId = protection.Id },// [18]
+
+            // Зарядні пристрої та ДБЖ
+            new() { Name = "Безперебійні джерела живлення (ДБЖ)", ParentId = charging.Id }, // [19]
+            new() { Name = "Блоки живлення для LED",               ParentId = charging.Id }, // [20]
+            new() { Name = "USB зарядні станції",                  ParentId = charging.Id }, // [21]
+
+            // З'єднувачі та клемники
+            new() { Name = "Клемні колодки WAGO",        ParentId = connectors.Id },// [22]
+            new() { Name = "Обжимні наконечники",        ParentId = connectors.Id },// [23]
+        };
+
+        await _context.Categories.AddRangeAsync(subs);
+        await _context.SaveChangesAsync();
+
+        // store for product seeding
+        _subIds = subs.Select(s => s.Id).ToList();
     }
+
+    private List<Guid> _subIds = new();
+
+    // ─── PRODUCTS ─────────────────────────────────────────────────────────────
+
+    private record ProductSeed(
+        string Name,
+        decimal Price,
+        int Stock,
+        int SubIdx,
+        string Brand,
+        string Tags,
+        string Description,
+        string Specifications,
+        decimal? DiscountPrice = null,
+        decimal? DiscountPct = null,
+        bool IsOnSale = false);
+
     private async Task SeedProductsAsync()
     {
         if (_context.Products.Any()) return;
 
-        var categories = await _context.Categories.ToListAsync();
-
-        var products = new List<ProductEntity>
+        var seeds = new List<ProductSeed>
         {
-            new() { Name = "USB Кабель Type-C", Price = 10, StockQuantity = 100, CategoryId = categories[0].Id ,Brand = "Baseus",
-            Tags = "4K,Video,HDMI 2.1"
-        },
-            new() { Name = "HDMI Кабель 2m", Price = 15, StockQuantity = 80, CategoryId = categories[0].Id
-            ,Brand = "Ugreen",
-            Tags = "LAN,Мережа,Інтернет"
-        },
-            new() { Name = "Ethernet Кабель Cat6", Price = 12, StockQuantity = 120, CategoryId = categories[0].Id,Brand = "Philips",
-            Tags = "E27,Економна,Тепле світло"
-        },
+            // ── [0] Силовий кабель ─────────────────────────────────────────────
+            new("Кабель ВВГнг-LS 3×2.5 мм² (1м)", 38, 500, 0, "Кабельний завод «Південкабель»",
+                "ВВГ,Силовий кабель,3x2.5",
+                "Кабель ВВГнг-LS 3×2.5 мм² призначений для стаціонарної прокладки в жилих та комерційних приміщеннях. Знижений рівень димовиділення при горінні (LS). Відповідає ДСТУ. Продається пометрово.",
+                Specs(("Тип", "ВВГнг-LS"), ("Кількість жил", "3"), ("Переріз жили", "2.5 мм²"), ("Напруга", "0.66/1 кВ"), ("Ізоляція", "ПВХ знижений дим"), ("Стандарт", "ДСТУ 4809"), ("Температурний діапазон", "−40 … +70 °C"))),
 
-            new() { Name = "LED Лампа 10W", Price = 5, StockQuantity = 200, CategoryId = categories[1].Id },
-            new() { Name = "Настільна лампа", Price = 25, StockQuantity = 50, CategoryId = categories[1].Id,Brand = "Xiaomi",
-            Tags = "Smart,Освітлення,Робота"
-        },
+            new("Кабель NYM 3×1.5 мм² (1м)", 28, 600, 0, "Nexans",
+                "NYM,Силовий,Монтаж",
+                "Кабель NYM 3×1.5 мм² — аналог ВВГ з підвищеним захистом. Оболонка стійка до UV-випромінювання, підходить для прокладки в штробах, трубах та зовні. Гарантована безпека прокладки без умов.",
+                Specs(("Тип", "NYM"), ("Кількість жил", "3"), ("Переріз", "1.5 мм²"), ("Напруга", "300/500 В"), ("Стандарт", "DIN VDE 0250"), ("Зовнішній діаметр", "9.8 мм"), ("Колір оболонки", "Сірий"))),
 
-            new() { Name = "Одинарний вимикач", Price = 3, StockQuantity = 150, CategoryId = categories[2].Id,Brand = "Schneider Electric",
-            Tags = "Фурнітура,Білий,Classic"
-        },
+            new("Кабель ПВС 2×0.75 мм² (1м)", 12, 800, 0, "Одескабель",
+                "ПВС,Гнучкий,Двожильний",
+                "Гнучкий мідний кабель ПВС 2×0.75 мм² для підключення побутових електроприладів малої потужності (світильники, дрібна техніка). Відрізна ціна за 1 м.",
+                Specs(("Кількість жил", "2"), ("Переріз", "0.75 мм²"), ("Матеріал жили", "Мідь"), ("Гнучкість", "Гнучкий"), ("Напруга", "300/500 В"), ("Температура", "−15 … +60 °C"))),
 
-            new() { Name = "Настінна мережева розетка EU", Price = 4, StockQuantity = 160, CategoryId = categories[3].Id,Brand = "Legrand",
-            Tags = "Розетка,Заземлення,Монтаж"
-        },
+            // ── [1] Кручена пара (LAN) ─────────────────────────────────────────
+            new("Патч-корд UTP Cat6 2м (сірий)", 85, 200, 1, "Vention",
+                "Cat6,LAN,Патч-корд",
+                "Патч-корд RJ-45 UTP Cat6 довжиною 2 м для підключення комп'ютерів, роутерів та свічів. Литий з'єднувач захищає від перегинів. Підтримує Gigabit Ethernet та PoE.",
+                Specs(("Категорія", "Cat6"), ("Довжина", "2 м"), ("Тип", "UTP"), ("Колір", "Сірий"), ("Конектор", "RJ-45 литий"), ("Швидкість", "1 Гбіт/с"), ("Стандарт", "IEEE 802.3ab"))),
 
-            new() { Name = "Тестер рівня напруги", Price = 8, StockQuantity = 70, CategoryId = categories[4].Id,Brand = "UNI-T",
-            Tags = "Вимірювання,Електрика,Інструмент"
-        },
+            new("Кабель UTP Cat5e 305м CCA бухта", 1290, 30, 1, "OK-net",
+                "Cat5e,Бухта,Мережа",
+                "Бухта UTP Cat5e 305 м з алюмомідним провідником (CCA). Оптимальне рішення для монтажу локальних мереж у офісах та домах. Відповідає вимогам 100 Мбіт/с та PoE.",
+                Specs(("Категорія", "Cat5e"), ("Довжина бухти", "305 м"), ("Провідник", "CCA (алюмомідь)"), ("Діаметр", "0.5 мм"), ("Оболонка", "PVC"), ("Опір", "≤ 100 Ом/км"), ("Температура монтажу", "0 … +60 °C"))),
 
-            new() { Name = "Датчик затоплення ZigBee", Price = 480, StockQuantity = 60, CategoryId = categories[5].Id,Brand = "Aqara",
-            Tags = "Smart Home,ZigBee,Безпека"
-        },
-            new() { Name = "Датчик відкриття дверей/вікна", Price = 320, StockQuantity = 100, CategoryId = categories[5].Id, Brand = "Sonoff",
-            Tags = "WiFi,Безпека,Розумний дім"
-        },
+            // ── [2] Кабель-канали та лотки ─────────────────────────────────────
+            new("Кабель-канал 25×16 мм 2м (білий)", 45, 300, 2, "DKC",
+                "Кабель-канал,ПВХ,Монтаж",
+                "Кабель-канал ПВХ 25×16 мм, довжина 2 м. Призначений для відкритого прокладання кабелів у приміщеннях. Кришка фіксується клацанням без інструменту. Колір RAL 9010 (білий).",
+                Specs(("Розміри", "25×16 мм"), ("Довжина секції", "2 м"), ("Матеріал", "ПВХ"), ("Колір", "Білий RAL 9010"), ("Ступінь захисту", "IP40"), ("Горючість", "V-0"), ("Сумісність", "DKC серія Quadro"))),
 
-           new() { Name = "Автомат 1P 16A Type C 6kA", Price = 115, StockQuantity = 120, CategoryId = categories[6].Id, Brand = "Eaton",
-                DiscountPercentage = 20, IsOnSale = false,  
-                Tags = "Захист,Автоматика,Щит" },
+            new("Кабель-канал 60×40 мм 2м (білий)", 98, 150, 2, "Legrand",
+                "Кабель-канал,60x40,Офіс",
+                "Широкий кабель-канал Legrand 60×40 мм для офісів та промислових об'єктів. Витримує вагу до 80 г/м проводів. Сумісний з аксесуарами серії DLP.",
+                Specs(("Розміри", "60×40 мм"), ("Довжина секції", "2 м"), ("Матеріал", "ПВХ"), ("Колір", "Білий"), ("Навантаження", "до 80 г/м"), ("Серія", "DLP Legrand"))),
 
-            new() { Name = "Автомат 1P 25A Type C 6kA", Price = 115, StockQuantity = 80, CategoryId = categories[6].Id, Brand = "ABB",
-                DiscountPercentage = 20, IsOnSale = true,
-                DiscountPrice = Math.Round(115 * (1 - 20m / 100), 2),
-                Tags = "Захист,Надійність,Professional" },
+            // ── [3] HDMI / DisplayPort ─────────────────────────────────────────
+            new("HDMI кабель 2.1 8K 2м", 320, 120, 3, "Ugreen",
+                "HDMI 2.1,8K,Gaming",
+                "Кабель HDMI 2.1 підтримує роздільну здатність 8K@60Гц та 4K@120Гц, ідеальний для ігрових приставок PS5, Xbox Series X та моніторів з частотою 144 Гц. Позолочені конектори.",
+                Specs(("Стандарт", "HDMI 2.1"), ("Роздільна здатність", "8K@60 Гц / 4K@120 Гц"), ("Довжина", "2 м"), ("Конектори", "Позолочені"), ("Пропускна здатність", "48 Гбіт/с"), ("HDR", "Так"), ("ARC/eARC", "Так")),
+                DiscountPrice: 272, DiscountPct: 15, IsOnSale: true),
 
-            new() { Name = "Сенсорний вимикач 1-клавішний WiFi", Price = 650, StockQuantity = 45, CategoryId = categories[7].Id, Brand = "Livolo",
-                DiscountPercentage = 20, IsOnSale = true,
-                DiscountPrice = Math.Round(650 * (1 - 20m / 100), 2),  
-                Tags = "Сенсор,WiFi,Modern" },
+            new("DisplayPort 1.4 кабель 1.8м", 280, 90, 3, "Vention",
+                "DisplayPort,144Hz,4K",
+                "Кабель DisplayPort 1.4 для підключення ПК до монітора. Підтримує 4K@165Гц та 2K@240Гц — ідеально для геймерів та дизайнерів.",
+                Specs(("Стандарт", "DisplayPort 1.4"), ("Роздільна здатність", "4K@165 Гц"), ("Довжина", "1.8 м"), ("Пропускна здатність", "32.4 Гбіт/с"), ("HDR", "Так"), ("Блокування", "Клацаючий фіксатор"))),
+
+            // ── [4] LED лампи ──────────────────────────────────────────────────
+            new("LED лампа A60 E27 12W 4000K", 89, 500, 4, "Philips",
+                "LED,E27,Нейтральне світло",
+                "Енергоощадна LED лампа Philips A60, цоколь E27, потужність 12 Вт. Замінює лампу розжарювання 100 Вт. Нейтральне біле світло 4000K, термін служби 15 000 годин.",
+                Specs(("Цоколь", "E27"), ("Потужність", "12 Вт"), ("Световий потік", "1200 лм"), ("Колірна температура", "4000 К (нейтральна)"), ("Кут розсіювання", "200°"), ("Термін служби", "15 000 год"), ("Індекс CRI", "≥ 80"))),
+
+            new("LED лампа G9 5W 3000K (10 шт)", 295, 200, 4, "Osram",
+                "G9,Галогенна заміна,Тепле світло",
+                "Набір 10 штук LED ламп G9 5 Вт. Пряма заміна галогенних ламп G9 25-40 Вт. Тепле світло 3000K підходить для декоративних люстр і бра. Без мерехтіння.",
+                Specs(("Цоколь", "G9"), ("Потужність", "5 Вт"), ("Световий потік", "400 лм"), ("Колірна температура", "3000 К"), ("Напруга", "220–240 В"), ("Мерехтіння", "Відсутнє"), ("Кількість у наборі", "10 шт"))),
+
+            new("LED лампа GU10 7W 6500K", 75, 350, 4, "Feron",
+                "GU10,Холодне світло,Трекова",
+                "LED лампа GU10 7 Вт для трекових і вбудованих світильників. Холодне денне світло 6500K. Кут 38°, ідеальна для акцентного освітлення.",
+                Specs(("Цоколь", "GU10"), ("Потужність", "7 Вт"), ("Световий потік", "600 лм"), ("Колірна температура", "6500 К"), ("Кут", "38°"), ("Термін служби", "30 000 год"))),
+
+            // ── [5] LED стрічки ────────────────────────────────────────────────
+            new("LED стрічка SMD 5050 RGB 5м 14.4W/м IP20", 450, 150, 5, "Biom",
+                "RGB,5050,Підсвічування",
+                "Кольорова LED стрічка SMD 5050 RGB, 60 діодів на метр, IP20 (для внутрішнього застосування). Підключається до RGB-контролера. 5 метрів у рулоні.",
+                Specs(("Чіп", "SMD 5050"), ("Кількість діодів", "60 шт/м"), ("Потужність", "14.4 Вт/м"), ("Напруга", "12 В DC"), ("Ступінь захисту", "IP20"), ("Кольори", "RGB"), ("Довжина", "5 м")),
+                DiscountPrice: 382, DiscountPct: 15, IsOnSale: true),
+
+            new("LED стрічка SMD 2835 4000K 5м 9.6W/м IP65", 380, 200, 5, "Feron",
+                "2835,Нейтральна,Вологозахист",
+                "LED стрічка SMD 2835 з нейтральним білим світлом 4000K у силіконовій оболонці IP65. Підходить для кухні, ванної та балкону.",
+                Specs(("Чіп", "SMD 2835"), ("Потужність", "9.6 Вт/м"), ("Колірна температура", "4000 К"), ("Ступінь захисту", "IP65"), ("Напруга", "12 В"), ("Довжина", "5 м"))),
+
+            new("Блок керування LED стрічкою RGB WiFi 12А", 320, 100, 5, "MiBoxer",
+                "RGB контролер,WiFi,Alexa",
+                "WiFi-контролер для RGB LED стрічок на 12 А (144 Вт при 12 В). Підтримує Amazon Alexa, Google Home, управління через додаток. Кольорові сцени, таймер, розклад.",
+                Specs(("Струм", "12 А"), ("Напруга", "12–24 В DC"), ("Потужність", "до 288 Вт"), ("Протокол", "WiFi 2.4 ГГц"), ("Сумісність", "Alexa, Google Home"), ("Управління", "Додаток MiBoxer"))),
+
+            // ── [6] Прожектори ────────────────────────────────────────────────
+            new("LED прожектор 50W 6500K IP65 (чорний)", 790, 80, 6, "Feron",
+                "Прожектор,50W,Вуличний",
+                "Вуличний LED прожектор 50 Вт, холодне світло 6500K. Корпус із ливарного алюмінію. Захист IP65 від пилу та дощу. Підходить для освітлення фасадів, парковок та стадіонів.",
+                Specs(("Потужність", "50 Вт"), ("Световий потік", "4500 лм"), ("Колірна температура", "6500 К"), ("Ступінь захисту", "IP65"), ("Матеріал корпусу", "Алюміній"), ("Кут освітлення", "120°"), ("Термін служби", "50 000 год"))),
+
+            new("LED прожектор 100W 4000K IP66 Slim", 1350, 45, 6, "Eurosvet",
+                "Прожектор,100W,Slim",
+                "Тонкий LED прожектор 100 Вт у slim-корпусі, нейтральне світло 4000K. Підвищений захист IP66. Ідеальний для складів, спортивних залів та великих фасадів.",
+                Specs(("Потужність", "100 Вт"), ("Световий потік", "9000 лм"), ("Колірна температура", "4000 К"), ("Ступінь захисту", "IP66"), ("Розміри", "340×240×30 мм"), ("Термін служби", "60 000 год"))),
+
+            // ── [7] Аварійне освітлення ────────────────────────────────────────
+            new("Аварійний світильник 3W 3H IP20", 680, 60, 7, "Elcor",
+                "Аварійне,Евакуація,3 години",
+                "Аварійний LED світильник з автономним живленням 3 години від вбудованого акумулятора Ni-Cd. Автоматично вмикається при відключенні мережі. Тест-кнопка.",
+                Specs(("Потужність", "3 Вт"), ("Автономність", "3 год"), ("Акумулятор", "Ni-Cd 3.6 В 1600 мАг"), ("Ступінь захисту", "IP20"), ("Монтаж", "Стельовий/настінний"), ("Тест-кнопка", "Так"))),
+
+            // ── [8] Вимірювальні прилади ───────────────────────────────────────
+            new("Мультиметр цифровий DT-830B", 195, 150, 8, "UNI-T",
+                "Мультиметр,Цифровий,Вольтметр",
+                "Компактний цифровий мультиметр для вимірювання напруги (AC/DC до 750 В), струму до 10 А, опору та тестування діодів. Рідкокристалічний дисплей, автоматичний вибір полярності.",
+                Specs(("Вимірювання АС", "до 750 В"), ("Вимірювання DC", "до 1000 В"), ("Струм", "до 10 А DC"), ("Опір", "до 2 МОм"), ("Захист", "Запобіжник"), ("Дисплей", "LCD 3.5 розряди"), ("Живлення", "9 В (крона)"))),
+
+            new("Токовимірювальні кліщі CEM DT-3340", 1890, 40, 8, "CEM",
+                "Кліщі,Токовимірювачі,AC/DC",
+                "Прецизійні токовимірювальні кліщі для вимірювання змінного та постійного струму до 400 А без розриву кола. Функція HOLD, підсвічування дисплея, захист CAT III 600 В.",
+                Specs(("Струм AC", "до 400 А"), ("Струм DC", "до 400 А"), ("Напруга AC/DC", "до 600 В"), ("Категорія", "CAT III 600 В"), ("Підсвічування", "Так"), ("HOLD", "Так"), ("Живлення", "2×1.5 В AAA"))),
+
+            new("Індикаторна викрутка 100-500В", 65, 400, 8, "Stanley",
+                "Індикатор,Фазний,Безпека",
+                "Ручна індикаторна викрутка для визначення фази у мережах 100-500 В. Вбудований неоновий індикатор, ізольована ручка, жало шліцевого типу. Обов'язковий інструмент електрика.",
+                Specs(("Діапазон напруги", "100–500 В"), ("Тип індикатора", "Неоновий"), ("Довжина жала", "65 мм"), ("Ізоляція ручки", "До 1000 В"), ("Тип шліцу", "Прямий"), ("Матеріал", "ABS + сталь"))),
+
+            // ── [9] Монтажний інструмент ───────────────────────────────────────
+            new("Кримпер для RJ-45 / RJ-11 з тестером", 520, 70, 9, "Rexant",
+                "Кримпер,RJ-45,Мережа",
+                "Обжимний інструмент (кримпер) для RJ-45 та RJ-11 з вбудованим кабельним тестером. Ножиці для зачистки кабелю, стриппер для UTP/FTP. Пружинний механізм полегшує роботу.",
+                Specs(("Підтримувані роз'єми", "RJ-45, RJ-11"), ("Тестер", "Вбудований"), ("Довжина", "195 мм"), ("Матеріал", "Сталь + ABS"), ("Зачистка", "0.5–2.5 мм"), ("Стриппер", "UTP/FTP"), ("Вага", "280 г"))),
+
+            new("Стриппер для зачистки кабелю 0.2–6 мм²", 380, 90, 9, "Knipex",
+                "Стриппер,Зачистка,Knipex",
+                "Автоматичний стриппер Knipex для зачистки проводів перерізом 0.2–6 мм² без налаштування. Самозатискний механізм, змінні ножі. Ергономічні ручки з м'яким покриттям.",
+                Specs(("Переріз", "0.2–6 мм²"), ("Механізм", "Автоматичний"), ("Довжина зачистки", "до 25 мм"), ("Змінні ножі", "Так"), ("Матеріал ручки", "двокомпонентна гума"), ("Довжина", "190 мм"), ("Вага", "260 г")),
+                DiscountPrice: 323, DiscountPct: 15, IsOnSale: true),
+
+            // ── [10] Датчики руху та витоку ────────────────────────────────────
+            new("Датчик затоплення ZigBee Aqara", 480, 60, 10, "Aqara",
+                "ZigBee,Датчик затоплення,Smart Home",
+                "Датчик протікання/затоплення Aqara на протоколі ZigBee 3.0. Підключається до хабу Aqara, Xiaomi, Apple HomeKit, Amazon Alexa. Звуковий сигнал при виявленні води. Компактний та вологостійкий.",
+                Specs(("Протокол", "ZigBee 3.0"), ("Дальність", "до 40 м від хабу"), ("Живлення", "CR2032"), ("Термін роботи батареї", "до 2 років"), ("Сумісність", "Aqara Hub, Apple HomeKit, Alexa"), ("Звуковий сигнал", "85 дБ"), ("IP-клас сенсора", "IPX5"))),
+
+            new("Датчик руху PIR 12V для сигналізації", 220, 100, 10, "Crow",
+                "PIR,Датчик руху,Сигналізація",
+                "Пасивний інфрачервоний датчик руху Crow Runner 85 для охоронних систем. Кут огляду 85°, дальність 12 м. Малий кут нахилу для монтажу в кутах приміщення.",
+                Specs(("Кут огляду", "85°"), ("Дальність", "12 м"), ("Живлення", "12 В DC"), ("Виходи", "NC реле"), ("Монтаж", "Кутовий/настінний"), ("Захист від маніпуляцій", "Tamper"), ("Температура", "−10 … +50 °C"))),
+
+            new("Датчик відкриття дверей ZigBee Sonoff", 320, 100, 10, "Sonoff",
+                "ZigBee,Датчик дверей,Sonoff",
+                "Магнітний датчик відкриття дверей/вікон ZigBee. Підключається до хабу Sonoff Zigbee Bridge. Сповіщення у додатку eWeLink при відкритті. Компактний корпус, монтаж без інструменту.",
+                Specs(("Протокол", "ZigBee 3.0"), ("Живлення", "CR2032"), ("Термін роботи батареї", "до 18 місяців"), ("Відстань спрацьовування", "≤ 15 мм"), ("Монтаж", "Двостороння стрічка"), ("Сумісність", "eWeLink, Alexa, Google Home"))),
+
+            // ── [11] Розумні реле та хаби ──────────────────────────────────────
+            new("Розумне реле Sonoff Mini R2 WiFi 10А", 450, 80, 11, "Sonoff",
+                "WiFi реле,Sonoff Mini,DIY",
+                "Мінімалістичне WiFi-реле Sonoff Mini R2 для монтажу в підрозетник. Підтримує режим DIY для локального управління без хмари. Сумісне з Google Home, Alexa. Навантаження до 2200 Вт.",
+                Specs(("Струм", "10 А"), ("Потужність", "2200 Вт"), ("Напруга", "100–240 В AC"), ("Протокол", "WiFi 2.4 ГГц"), ("DIY режим", "Так"), ("Розміри", "40×40×19 мм"), ("Сумісність", "Alexa, Google Home"))),
+
+            new("Zigbee хаб Aqara M2 з LAN портом", 1850, 30, 11, "Aqara",
+                "Zigbee хаб,LAN,Apple HomeKit",
+                "Центральний хаб розумного дому Aqara M2. Підключення через LAN (Ethernet). Підтримує до 128 ZigBee пристроїв, Apple HomeKit, Google Home, Amazon Alexa. Вбудований динамік для сповіщень.",
+                Specs(("Підключення", "LAN (Ethernet) + WiFi"), ("Протокол", "Zigbee 3.0"), ("Кількість пристроїв", "до 128"), ("Сумісність", "HomeKit, Alexa, Google Home"), ("Динамік", "Вбудований"), ("Живлення", "5 В USB-C"))),
+
+            // ── [12] Системи відеоспостереження ────────────────────────────────
+            new("IP камера Dahua 4MP 2.8mm PoE IPC-HDW2849H", 2200, 25, 12, "Dahua",
+                "IP камера,4MP,PoE,Вуличне відео",
+                "Вулична IP-камера 4 Мп з фіксованим об'єктивом 2.8 мм. Живлення PoE (IEEE 802.3af). ІЧ-підсвітка до 30 м. Запис H.265+. Захист IP67. WDR 120 дБ для складних умов освітлення.",
+                Specs(("Роздільна здатність", "4 Мп (2688×1520)"), ("Об'єктив", "2.8 мм f/1.6"), ("ІЧ-підсвітка", "до 30 м"), ("Кодек", "H.265+ / H.264+"), ("Живлення", "PoE IEEE 802.3af / 12 В DC"), ("Ступінь захисту", "IP67"), ("WDR", "120 дБ"))),
+
+            new("Відеореєстратор Dahua NVR 8-канальний PoE", 4800, 15, 12, "Dahua",
+                "NVR,PoE,8 каналів",
+                "Мережевий відеореєстратор Dahua NVR2108HS-8P-I2 на 8 PoE-камер. AI-аналітика (детекція людей, авто). До 8 Тб HDD. Доступ через мобільний додаток DMSS.",
+                Specs(("Канали", "8"), ("PoE порти", "8 × IEEE 802.3af/at"), ("Запис", "до 8 Мп"), ("HDD", "до 8 Тб (1× SATA)"), ("Вихід", "HDMI + VGA"), ("AI аналітика", "Так"), ("Протокол", "H.265+"))),
+
+            // ── [13] Внутрішні розетки ─────────────────────────────────────────
+            new("Розетка Legrand Valena Life 2P+Z USB-A 16А (біла)", 490, 120, 13, "Legrand",
+                "Розетка,USB,Legrand Valena",
+                "Розетка Legrand Valena Life з заземленням та USB-A портом 5 В 2.1 А. Дизайнерський вигляд, покриття white silk. Підходить для механізмів серії Valena Life. Монтаж у підрозетник 60 мм.",
+                Specs(("Струм", "16 А"), ("Напруга", "250 В"), ("USB-A порт", "5 В / 2.1 А"), ("Ступінь захисту", "IP20"), ("Розмір", "стандарт EU"), ("Колір", "Білий"), ("Серія", "Legrand Valena Life"))),
+
+            new("Розетка Schneider Unica Pure 16А 2P+Z IP44 (біла)", 580, 80, 13, "Schneider Electric",
+                "IP44,Розетка з кришкою,Вологозахист",
+                "Розетка Schneider Unica Pure з вологозахисною кришкою IP44 для ванних кімнат, кухонь та балконів. Заземлення, матовий білий корпус. Монтаж у підрозетник Ø60 мм.",
+                Specs(("Струм", "16 А"), ("Ступінь захисту", "IP44"), ("Заземлення", "Є"), ("Кришка", "Захисна"), ("Серія", "Unica Pure"), ("Монтаж", "підрозетник Ø60 мм"), ("Колір", "Матовий білий"))),
+
+            // ── [14] Сенсорні вимикачі ─────────────────────────────────────────
+            new("Сенсорний вимикач Livolo 1-клавішний WiFi (білий)", 650, 45, 14, "Livolo",
+                "Сенсор,WiFi,Smart вимикач",
+                "Сенсорний одноклавішний WiFi-вимикач Livolo. Управління через додаток Smart Life, сумісний з Alexa та Google Home. Скляна панель, монтаж у стандартний підрозетник 60 мм.",
+                Specs(("Тип", "1-клавішний сенсорний"), ("Протокол", "WiFi 2.4 ГГц"), ("Навантаження", "до 600 Вт"), ("Живлення", "100–240 В"), ("Панель", "Загартоване скло"), ("Сумісність", "Smart Life, Alexa, Google Home")),
+                DiscountPrice: 520, DiscountPct: 20, IsOnSale: true),
+
+            new("Сенсорний вимикач Livolo 2-клавішний ZigBee (чорний)", 820, 35, 14, "Livolo",
+                "ZigBee,2-клавішний,Чорний",
+                "Двоклавішний ZigBee сенсорний вимикач Livolo у чорному кольорі. Підключення до ZigBee хабу (Tuya, Aqara, Sonoff). Скляна панель, тактильний відгук.",
+                Specs(("Тип", "2-клавішний сенсорний"), ("Протокол", "ZigBee 3.0"), ("Навантаження", "2×300 Вт"), ("Живлення", "100–240 В"), ("Панель", "Чорне скло"), ("Монтаж", "підрозетник 60 мм"))),
+
+            // ── [15] Рамки та аксесуари ────────────────────────────────────────
+            new("Рамка подвійна Schneider Unica Pure (матово-біла)", 185, 200, 15, "Schneider Electric",
+                "Рамка,Unica,Подвійна",
+                "Декоративна подвійна рамка серії Unica Pure для суміщення двох механізмів EU. Матовий білий пластик, фіксація кліпсами. Сумісна з усіма механізмами серії Unica.",
+                Specs(("Кількість постів", "2"), ("Серія", "Unica Pure"), ("Матеріал", "ABS пластик"), ("Колір", "Матовий білий"), ("Монтаж", "Кліпси"), ("Сумісність", "Механізми Unica"))),
+
+            // ── [16] Автоматичні вимикачі ──────────────────────────────────────
+            new("Автоматичний вимикач ABB SH201 1P 16А тип C", 185, 300, 16, "ABB",
+                "Автомат,ABB,16А,1P",
+                "Однополюсний автоматичний вимикач ABB SH201 16 А характеристика C. Відключаюча здатність 6 кА. Для захисту освітлення та розеток. Монтаж на DIN-рейку 35 мм.",
+                Specs(("Полюсність", "1P"), ("Номінальний струм", "16 А"), ("Характеристика спрацьовування", "C"), ("Відключаюча здатність", "6 кА"), ("Монтаж", "DIN-рейка 35 мм"), ("Стандарт", "IEC 60898-1"), ("Серія", "ABB SH200"))),
+
+            new("Автоматичний вимикач Eaton PL6 1P 25А тип B", 210, 200, 16, "Eaton",
+                "Автомат,Eaton,25А,тип B",
+                "Однополюсний автомат Eaton PL6 25 А, характеристика B (захист довгих кабельних ліній). Відключаюча здатність 6 кА. Сертифіковано за IEC 60898-1.",
+                Specs(("Полюсність", "1P"), ("Номінальний струм", "25 А"), ("Характеристика", "B"), ("Відключаюча здатність", "6 кА"), ("Монтаж", "DIN-рейка"), ("Стандарт", "IEC 60898-1"), ("Серія", "Eaton PL6"))),
+
+            new("Автоматичний вимикач Schneider Easy9 3P 32А тип C", 680, 80, 16, "Schneider Electric",
+                "Трифазний,32А,Schneider",
+                "Трифазний автоматичний вимикач Schneider Easy9 32 А, тип C. Відключаюча здатність 4.5 кА. Призначений для захисту трифазних споживачів (двигуни, нагріваючі елементи). DIN-рейка.",
+                Specs(("Полюсність", "3P"), ("Номінальний струм", "32 А"), ("Характеристика", "C"), ("Відключаюча здатність", "4.5 кА"), ("Монтаж", "DIN-рейка"), ("Серія", "Easy9")),
+                DiscountPrice: 578, DiscountPct: 15, IsOnSale: true),
+
+            // ── [17] ПЗВ / диференційні автомати ──────────────────────────────
+            new("ПЗВ ABB F202 2P 25A 30мА тип AC", 920, 60, 17, "ABB",
+                "ПЗВ,30мА,2P,ABB",
+                "Пристрій захисного вимкнення ABB F202 двополюсний 25 А, чутливість 30 мА, тип AC. Захист від витоку струму при прямому та непрямому дотику. DIN-рейка. Стандарт IEC 61008.",
+                Specs(("Полюсність", "2P"), ("Номінальний струм", "25 А"), ("Струм витоку", "30 мА"), ("Тип", "AC"), ("Відключаюча здатність", "6 кА"), ("Монтаж", "DIN-рейка"), ("Стандарт", "IEC 61008"))),
+
+            new("Дифавтомат Eaton PFL6 1P+N 16A 30мА тип A", 1250, 40, 17, "Eaton",
+                "Дифавтомат,тип A,16А",
+                "Диференційний автоматичний вимикач Eaton PFL6 16 А + N, 30 мА, тип A (захист від пульсуючого постійного струму). Комбінація автомата C16 та ПЗВ 30 мА в одному корпусі.",
+                Specs(("Полюсність", "1P+N"), ("Номінальний струм", "16 А"), ("Струм витоку", "30 мА"), ("Тип ПЗВ", "A"), ("Характеристика автомата", "C"), ("Ширина", "2 модулі DIN"), ("Стандарт", "IEC 61009"))),
+
+            // ── [18] Електричні щити та бокси ──────────────────────────────────
+            new("Щит накладний пластиковий 12 модулів ABB MISTRAL41W", 780, 50, 18, "ABB",
+                "Щит,12 модулів,Пластиковий,Накладний",
+                "Пластиковий навісний розподільний щит ABB MISTRAL41W на 12 модулів (1 ряд). IP41. Прозора замкова двері. DIN-рейка та нульова шина в комплекті. Кабельні вводи зверху та знизу.",
+                Specs(("Кількість модулів", "12 (1 ряд)"), ("Ступінь захисту", "IP41"), ("Монтаж", "Накладний"), ("Матеріал", "ABS пластик"), ("Двері", "Прозорі, із замком"), ("У комплекті", "DIN-рейка, шина N"), ("Серія", "ABB MISTRAL41W"))),
+
+            new("Щит вбудований металевий 24 модулі Schneider Pragma", 1450, 30, 18, "Schneider Electric",
+                "Щит,24 модулі,Металевий,Вбудований",
+                "Металевий вбудований розподільний щит Schneider Pragma 24 модулі (2 ряди). IP40. Двері з замком. Щит в комплекті з DIN-рейками, нульовими та заземлюючими шинами.",
+                Specs(("Кількість модулів", "24 (2 ряди)"), ("Ступінь захисту", "IP40"), ("Монтаж", "Вбудований"), ("Матеріал", "Сталь"), ("Двері", "Металеві, із замком"), ("У комплекті", "DIN-рейки, шини N+PE"), ("Серія", "Schneider Pragma"))),
+
+            // ── [19] ДБЖ ──────────────────────────────────────────────────────
+            new("ДБЖ APC Back-UPS 650VA 400W (BX650LI)", 3200, 25, 19, "APC",
+                "ДБЖ,650VA,APC,Back-UPS",
+                "Джерело безперебійного живлення APC BX650LI 650 ВА / 400 Вт. 6 виходів Schuko. Автоматична регулювання напруги (AVR). Захист від стрибків. Підтримка ПК від 10 до 15 хвилин при 100 Вт.",
+                Specs(("Потужність", "650 ВА / 400 Вт"), ("Виходи", "6 × Schuko"), ("АКБ", "12 В 7 Аг (внутрішня)"), ("AVR", "Так"), ("Час роботи (100 Вт)", "~10–15 хв"), ("Захист лінії", "Є"), ("Маса", "7.9 кг"))),
+
+            new("ДБЖ Eaton 5E 1100 USB DIN 1100VA 660W", 4500, 15, 19, "Eaton",
+                "ДБЖ,1100VA,Eaton,DIN розетки",
+                "ДБЖ Eaton 5E 1100VA для захисту серверів, NAS та мережевого обладнання. Виходи DIN та Schuko. USB-зв'язок з ПК для коректного завершення роботи. Замінна батарея.",
+                Specs(("Потужність", "1100 ВА / 660 Вт"), ("Виходи", "4 × DIN + 4 × Schuko"), ("АКБ", "12 В 9 Аг"), ("USB", "Так"), ("Замінна батарея", "Так"), ("Форм-фактор", "Tower"), ("Вага", "10.5 кг"))),
+
+            // ── [20] Блоки живлення для LED ────────────────────────────────────
+            new("Блок живлення 12V 5A 60W IP20 для LED", 320, 120, 20, "Biom",
+                "БЖ,12V,60W,LED",
+                "Імпульсний блок живлення 12 В 5 А 60 Вт для LED стрічок та освітлення. Вбудований захист від короткого замикання та перегріву. Монтаж у сухих приміщеннях (IP20).",
+                Specs(("Вихідна напруга", "12 В DC"), ("Струм", "5 А"), ("Потужність", "60 Вт"), ("Вхідна напруга", "100–240 В AC"), ("ККД", "≥ 88%"), ("Ступінь захисту", "IP20"), ("Захист", "КЗ, перегрів, перевантаження"))),
+
+            new("Блок живлення 24V 10A 240W IP67 герметичний", 1150, 50, 20, "MeanWell",
+                "МінВел,24V,240W,IP67",
+                "Герметичний блок живлення MeanWell LPV-200-24 24 В 10 А 240 Вт. Клас захисту IP67 дозволяє встановлювати на вулиці та в умовах вологості. Активне охолодження. PFC.",
+                Specs(("Вихідна напруга", "24 В DC"), ("Струм", "10 А"), ("Потужність", "240 Вт"), ("Ступінь захисту", "IP67"), ("PFC", "Активний"), ("Охолодження", "Вентилятор"), ("Сертифікати", "CE, UL, TÜV"))),
+
+            // ── [21] USB зарядні станції ────────────────────────────────────────
+            new("Зарядна станція Baseus 6 портів USB+C 65W GaN", 1890, 60, 21, "Baseus",
+                "GaN,65W,6 портів,USB-C",
+                "Компактна GaN-зарядна станція Baseus 65 Вт з 6 портами: 2×USB-C (PD 65 Вт), 4×USB-A (QC3.0). Одночасна зарядка 6 пристроїв. Розмір — менше ніж стандартний зарядний пристрій ноутбука.",
+                Specs(("Порти USB-C", "2 × PD 65 Вт"), ("Порти USB-A", "4 × QC 3.0 18 Вт"), ("Сумарна потужність", "65 Вт"), ("Технологія", "GaN"), ("Вхідна напруга", "100–240 В"), ("Розміри", "75×60×35 мм"), ("Сертифікати", "CE, FCC"))),
+
+            new("Мережевий фільтр Sven SF-05LU 5 розеток 2м USB", 580, 100, 21, "Sven",
+                "Мережевий фільтр,USB,Sven",
+                "Мережевий фільтр Sven SF-05LU 5 розеток з заземленням + 2 USB-A (5 В 2.1 А). Кабель 2 м. Кнопка з індикатором. Захист від перенапруги 250 Дж.",
+                Specs(("Розетки", "5 × Schuko + заземлення"), ("USB порти", "2 × USB-A 5В/2.1А"), ("Кабель", "2 м"), ("Захист від перенапруги", "250 Дж"), ("Кнопка", "Є"), ("Колір", "Чорний"))),
+
+            // ── [22] Клемні колодки WAGO ────────────────────────────────────────
+            new("Клемник WAGO 221-412 2-провідний 0.14–4 мм² (100шт)", 650, 80, 22, "WAGO",
+                "WAGO,221,2-провідний,Клемник",
+                "Набір 100 штук компактних з'єднувачів WAGO 221-412 для з'єднання 2 проводів перерізом 0.14–4 мм². Монтаж без інструменту, важіль відкриває затиск. Підходить для проводів з ізоляцією та без.",
+                Specs(("Модель", "WAGO 221-412"), ("Кількість провідників", "2"), ("Переріз провідника", "0.14–4 мм²"), ("Напруга", "до 450 В"), ("Струм", "до 32 А"), ("Кількість у упаковці", "100 шт"), ("Стандарт", "IEC 60998"))),
+
+            new("Клемник WAGO 222-413 3-провідний 0.08–2.5 мм² (50шт)", 490, 100, 22, "WAGO",
+                "WAGO,222,3-провідний,Монтаж",
+                "Компактні 3-провідні клемники WAGO 222-413 для монтажу в розподільних коробках. 50 штук у наборі. Прозорий корпус для візуального контролю.",
+                Specs(("Модель", "WAGO 222-413"), ("Кількість провідників", "3"), ("Переріз", "0.08–2.5 мм²"), ("Напруга", "до 450 В"), ("Струм", "до 24 А"), ("Упаковка", "50 шт"), ("Корпус", "Прозорий ABS"))),
+
+            // ── [23] Обжимні наконечники ────────────────────────────────────────
+            new("Набір гільз для обжимки 0.5–16 мм² (200шт у кейсі)", 480, 70, 23, "Rexant",
+                "Гільзи,НШВИ,Наконечники,Набір",
+                "Набір з 200 мідних лудованих гільз НШВИ для обжимки проводів: перерізи 0.5 / 1.0 / 1.5 / 2.5 / 4 / 6 / 10 / 16 мм². Зберігання у пластиковому сортувальному кейсі.",
+                Specs(("Тип", "НШВИ (мідь лудована)"), ("Перерізи", "0.5 / 1.0 / 1.5 / 2.5 / 4 / 6 / 10 / 16 мм²"), ("Кількість", "200 шт"), ("Матеріал", "Мідь + олово"), ("Ізоляція", "Різнокольорова поліетиленова"), ("Зберігання", "Пластиковий кейс"))),
         };
 
-        await _context.Products.AddRangeAsync(products);
+        var entities = seeds.Select(s => new ProductEntity
+        {
+            Name = s.Name,
+            Price = s.Price,
+            StockQuantity = s.Stock,
+            CategoryId = _subIds[s.SubIdx],
+            Brand = s.Brand,
+            Tags = s.Tags,
+            Description = s.Description,
+            Specifications = s.Specifications,
+            DiscountPrice = s.DiscountPrice ?? 0,
+            DiscountPercentage = s.DiscountPct.HasValue ? (int?)Convert.ToInt32(s.DiscountPct.Value) : null,
+            IsOnSale = s.IsOnSale
+        }).ToList();
+
+        await _context.Products.AddRangeAsync(entities);
         await _context.SaveChangesAsync();
+
+        _products = entities;
     }
+
+    private List<ProductEntity> _products = new();
+
+    // ─── PRODUCT IMAGES ───────────────────────────────────────────────────────
 
     private async Task SeedProductImagesAsync()
     {
         if (_context.ProductImages.Any()) return;
 
-        var products = await _context.Products.ToListAsync();
-
-        var images = products.Select((p, i) => new ProductImageEntity
+        var imageMap = new Dictionary<string, string[]>
         {
-            ProductId = p.Id,
-            Image = $"https://picsum.photos/seed/{i}/400/300",
-            DisplayOrder = 0
-        });
+            // Силовий кабель
+            ["ВВГнг"] = new[]
+            {
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600",
+                "https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=600"
+            },
+            ["NYM"] = new[]
+            {
+                "https://meganom.kiev.ua/wp-content/uploads/2020/11/260201_032500000000-104B.png",
+                "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600"
+            },
+            ["ПВС"] = new[]
+            {
+                "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTKcl2br7ClxMOSSwuXUESgqkkRaoHy53i7qOVXGQcYH3KRYET5NK1xl9nhppjmHPdHkrbpIV7b6nRooodxfrCuaexGO4_kkw"
+            },
 
-        await _context.ProductImages.AddRangeAsync(images);
+            ["Патч-корд"] = new[]
+            {
+                "https://api.e-server.com.ua/storage/59881/rs/1___rs_660_659.jpg",
+                "https://api.e-server.com.ua/storage/59883/rs/3___rs_660_660.jpg",
+                "https://api.e-server.com.ua/storage/59884/rs/4___rs_660_660.jpg",
+                "https://api.e-server.com.ua/storage/59885/rs/5___rs_660_660.jpg",
+            },
+            ["Бухта"] = new[]
+            {
+                "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600"
+            },
+            // Кабель-канали
+            ["Кабель-канал 25"] = new[]
+            {
+                "https://images.prom.ua/7185716935_w640_h640_kabelnij-kanal-z.jpg"
+            },
+            ["Кабель-канал 60"] = new[]
+            {
+                "https://amperok.com.ua/image/catalog/korob/korob_kopos_60kh40kh2000mm_lhd-19087_amperok_1.jpg",
+                "https://amperok.com.ua/image/catalog/korob/korob_kopos_60kh40kh2000mm_lhd-19087_amperok_2.jpg",
+                "https://amperok.com.ua/image/catalog/korob/montaz_2_11_0.jpg",
+                "https://amperok.com.ua/image/catalog/korob/montaz_2_12_0.jpg"
+            },
+            // HDMI
+            ["HDMI кабель"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/614687839.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/614687840.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/614687843.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/614687848.jpg"
+            },
+            ["DisplayPort"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/660330909.png",
+                "https://content.rozetka.com.ua/goods/images/big/660330912.png",
+                "https://content1.rozetka.com.ua/goods/images/big/660330914.png"
+            },
+            // LED лампи
+            ["LED лампа A60"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/18413299.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/18413326.jpg"
+            },
+            ["LED лампа G9"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/562220779.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/562220788.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/562220762.jpg"
+            },
+            ["LED лампа GU10"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/553958633.jpg"
+            },
+            // LED стрічки
+            ["LED стрічка SMD 5050"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/598576288.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/598576296.jpg"
+            },
+            ["LED стрічка SMD 2835"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/495083165.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/495083169.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/495083166.jpg"
+            },
+            ["Блок керування LED"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/610096306.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/610096321.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/610096389.png"
+            },
+            // Прожектори
+            ["LED прожектор 50W"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/396531117.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/396531116.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/396531119.jpg"
+            },
+            ["LED прожектор 100W"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/625464376.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/625464385.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/625464391.jpg"
+            },
+            // Інструменти
+            ["Мультиметр"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/11360078.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/11360085.jpg"
+            },
+            ["Токовимірювальні"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/662623881.webp",
+                "https://content2.rozetka.com.ua/goods/images/big/662623891.webp"
+            },
+            ["Кримпер"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/470678588.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/470678595.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/470678620.jpg",
+            },
+            ["Стриппер"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/664567478.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/664567481.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/664567479.jpg"
+            },
+            // Датчики
+            ["Датчик затоплення"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/593823756.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/593823764.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/593823772.jpg"
+            },
+            ["Датчик руху PIR"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/659391979.png",
+                "https://content2.rozetka.com.ua/goods/images/big/659391987.png",
+                "https://content2.rozetka.com.ua/goods/images/big/659391995.png",
+            },
+            ["Датчик відкриття"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/639251866.jpg",
+            },
+            // Реле та хаби
+            ["Розумне реле"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/499993664.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/499993675.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/499993720.jpg"
+            },
+            // Відеоспостереження
+            ["IP камера"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/23032949.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/23032959.jpg"
+            },
+            ["Відеореєстратор"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/532752761.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/532752763.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/532752765.jpg"
+            },
+            // Розетки
+            ["Розетка Legrand"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/246918164.jpg",
+            },
+            ["Розетка Schneider"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/519957222.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/519957248.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/519957257.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/519957278.jpg"
+            },
+            // Вимикачі
+            ["Сенсорний вимикач Livolo 1"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/292802744.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/292724288.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/292691875.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/292691877.jpg"
+            },
+            ["Сенсорний вимикач Livolo 2"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/292786214.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/292786218.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/292691934.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/292691943.jpg"
+            },
+          
+            // Автоматика
+            ["Автоматичний вимикач ABB"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/12874617.jpg"
+            },
+            ["Автоматичний вимикач Eaton"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/519433346.jpg"
+            },
+            ["Автоматичний вимикач Schneider"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/190387789.jpg"
+            },
+            ["ПЗВ ABB"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/652057113.jpg"
+            },
+            ["Дифавтомат"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/559066455.jpg"
+            },
+            ["Щит накладний"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/29155060.jpg",
+            },
+            ["Щит вбудований"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/29234676.jpg"
+            },
+            // ДБЖ
+            ["ДБЖ APC"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/197217427.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/197217430.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/197217428.jpg"
+            },
+            ["ДБЖ Eaton"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/618418528.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/618418529.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/618418530.jpg"
+            },
+            // БЖ LED
+            ["Блок живлення 12V"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/588421462.jpg"
+            },
+            ["Блок живлення 24V"] = new[]
+            {
+                "https://content1.rozetka.com.ua/goods/images/big/559254481.png",
+            },
+            // USB / мережеві фільтри
+            ["Зарядна станція"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/619937276.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/619937277.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/619937278.jpg"
+            },
+            ["Мережевий фільтр"] = new[]
+            {
+                "https://content.rozetka.com.ua/goods/images/big/591984877.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/591985180.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/591985185.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/591985198.jpg"
+            },
+            // WAGO
+            ["WAGO 221"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/537882025.webp",
+            },
+            ["WAGO 222"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/348375993.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/348375997.jpg"
+            },
+            // Наконечники
+            ["Набір гільз"] = new[]
+            {
+                "https://content2.rozetka.com.ua/goods/images/big/444539545.jpg",
+                "https://content1.rozetka.com.ua/goods/images/big/444539549.jpg",
+                "https://content.rozetka.com.ua/goods/images/big/444539551.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/444539554.jpg",
+                "https://content2.rozetka.com.ua/goods/images/big/444539571.jpg"
+            },
+        };
+
+        // fallback image
+        const string fallback = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsrGS4gCi1t_OKtlUFXwoXq0Z1yJBkNagHOsgoPa1N-A&s";
+
+        var imageEntities = new List<ProductImageEntity>();
+
+        foreach (var product in _products)
+        {
+            // find best matching key
+            var key = imageMap.Keys.FirstOrDefault(k => product.Name.StartsWith(k, StringComparison.OrdinalIgnoreCase));
+            var urls = key != null ? imageMap[key] : new[] { fallback };
+
+            for (int i = 0; i < urls.Length; i++)
+            {
+                imageEntities.Add(new ProductImageEntity
+                {
+                    ProductId = product.Id,
+                    Image = urls[i],
+                    DisplayOrder = (short)i
+                });
+            }
+        }
+
+        await _context.ProductImages.AddRangeAsync(imageEntities);
         await _context.SaveChangesAsync();
     }
 }
