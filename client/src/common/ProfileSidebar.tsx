@@ -69,7 +69,7 @@ export const ProfileSidebar = ({ className = "" }: { className?: string }) => {
       <nav className="flex flex-col text-sm font-montserrat">
         <NavItem
           icon={<LayoutDashboard size={20} />}
-          label="Панель керування"
+          label="Профіль"
           href="/profile"
           active={isActive("/profile")}
         />
