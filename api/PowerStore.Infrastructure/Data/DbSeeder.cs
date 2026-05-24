@@ -72,8 +72,15 @@ public class DbSeeder
     // ─── Helpers ──────────────────────────────────────────────────────────────
 
     private static string Specs(params (string key, string val)[] pairs)
-        => System.Text.Json.JsonSerializer.Serialize(
-            pairs.Select(p => new { name = p.key, value = p.val }).ToArray());
+    {
+        var specs = pairs.Select(p => new
+        {
+            Name = p.key,
+            Value = p.val
+        });
+
+        return System.Text.Json.JsonSerializer.Serialize(specs);
+    }
 
     // ─── CATEGORIES ───────────────────────────────────────────────────────────
 
