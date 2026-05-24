@@ -1,7 +1,12 @@
 import { Modal } from "antd";
-import { Calendar, CreditCard, Package, Minus } from "lucide-react";
+import {
+  Calendar,
+  CreditCard,
+  Package,
+  Minus,
+  ShoppingBag,
+} from "lucide-react";
 import type { OrderDto, OrderItemDto } from "../types/order";
-import { PLACEHOLDER_IMAGE_URL } from "../api/api";
 
 interface OrderDetailsModalProps {
   order: OrderDto | null;
@@ -83,11 +88,7 @@ export const OrderDetailsModal = ({
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                    <img
-                      src={item.image || PLACEHOLDER_IMAGE_URL}
-                      alt=""
-                      className="object-cover w-full h-full"
-                    />
+                    <ShoppingBag className="text-gray-700" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-gray-800 line-clamp-1">

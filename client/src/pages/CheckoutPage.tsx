@@ -449,7 +449,7 @@ export const CheckoutPage = () => {
                               -{item.discountPercentage}%
                             </span>
                           )}
-                          <span className="absolute -top-2 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white z-10">
+                          <span className="absolute -top-0.5 -right-2 bg-gray-900 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
                             {item.quantity}
                           </span>
                         </div>

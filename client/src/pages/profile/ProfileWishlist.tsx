@@ -254,11 +254,11 @@ export const ProfileWishlist = () => {
                   <div className="flex justify-between items-center w-full mb-4 mt-auto">
                     <div>
                       {!isOutOfStock ? (
-                        <span className="inline-block px-2.5 py-2.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 flex items-center gap-1">
+                        <span className="px-2.5 py-2.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 flex items-center gap-1">
                           <PackageCheck size={14} strokeWidth={2} />
                         </span>
                       ) : (
-                        <span className="inline-block px-2.5 py-2.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 flex items-center gap-1">
+                        <span className="px-2.5 py-2.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 flex items-center gap-1">
                           <PackageX size={14} strokeWidth={2} />
                           <span>Немає</span>
                         </span>

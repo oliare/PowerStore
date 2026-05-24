@@ -227,7 +227,7 @@ export default function Header() {
               >
                 <div className="flex items-center gap-2 cursor-pointer group">
                   {user.image ? (
-                    <Avatar src={`${IMAGE_BASE_URL}/avatars/${user.image}`} />
+                    <Avatar src={`${IMAGE_BASE_URL}/${user.image}`} />
                   ) : (
                     <Avatar
                       style={{

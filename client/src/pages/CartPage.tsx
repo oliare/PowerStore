@@ -65,7 +65,7 @@ export const CartPage = () => {
           Перегляньте наш каталог, щоб знайти найкращі пропозиції!
         </p>
         <Link
-          to="/"
+          to="/shop"
           className="flex items-center gap-2 px-10 py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg shadow-brand-primary/20 hover:bg-brand-dark transition-all active:scale-[0.95]"
         >
           <ArrowLeft size={20} />

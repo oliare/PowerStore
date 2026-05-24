@@ -11,19 +11,21 @@ export const ProfileCart = () => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state: RootState) => state.cart.items);
 
-  
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getItemActualPrice = (item: any) => {
+    const isProductOnSale = item.isOnSale || !!item.discountPercentage;
+
     return getActualPrice({
       ...item,
-      isOnSale: item.isOnSale ?? false,
-      discountPrice: item.discountPrice ?? null,
+      price: item.price,
+      isOnSale: isProductOnSale,
+      discountPrice: isProductOnSale ? item.price : null,
     });
   };
 
   const totalPrice = cartItems.reduce(
     (sum, item) => sum + getItemActualPrice(item) * item.quantity,
-    0
+    0,
   );
 
   const handleUpdateQuantity = (productId: string, newQuantity: number) => {
@@ -38,11 +40,19 @@ export const ProfileCart = () => {
         <div className="relative mb-8">
           <div className="absolute inset-0 bg-brand-primary/10 blur-[50px] rounded-full" />
           <div className="relative bg-white p-8 rounded-full shadow-sm border border-gray-50 flex items-center justify-center">
-            <ShoppingBasket size={56} className="text-brand-primary/20" strokeWidth={1} />
+            <ShoppingBasket
+              size={56}
+              className="text-brand-primary/40"
+              strokeWidth={1}
+            />
           </div>
         </div>
-        <h3 className="text-2xl font-semibold text-gray-900 mb-3">Ваш кошик порожній</h3>
-        <p className="text-gray-400 mb-8 max-w-[300px] text-sm">Здається, ви ще нічого не додали.</p>
+        <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+          Ваш кошик порожній
+        </h3>
+        <p className="text-gray-400 mb-8 max-w-[300px] text-sm">
+          Здається, ви ще нічого не додали.
+        </p>
         <Link
           to="/"
           className="flex items-center gap-2 px-12 py-2 bg-brand-primary text-white rounded-full font-medium shadow-lg hover:bg-brand-dark transition-all"
@@ -62,12 +72,13 @@ export const ProfileCart = () => {
         <div className="grid grid-cols-1 gap-3 mb-10">
           {cartItems.map((item) => {
             const isOutOfStock = item.stockQuantity <= 0;
-            
-            // Вирішення помилки "undefined is not assignable to number | null"
+            const isProductOnSale = item.isOnSale || !!item.discountPercentage;
+
             const safeItem = {
               ...item,
-              isOnSale: item.isOnSale ?? false,
-              discountPrice: item.discountPrice ?? null,
+              price: isProductOnSale ? item.price + 150 : item.price,
+              isOnSale: isProductOnSale,
+              discountPrice: isProductOnSale ? item.price : null,
             };
 
             const hasDiscount = hasActiveDiscount(safeItem);
@@ -78,7 +89,6 @@ export const ProfileCart = () => {
                 key={item.productId}
                 className="group flex flex-col sm:flex-row items-center gap-6 bg-white p-4 rounded-[24px] border border-gray-100 hover:shadow-[0_15px_40px_rgba(0,0,0,0.04)] transition-all duration-300"
               >
-                {/* Зображення */}
                 <div className="relative w-16 h-16 shrink-0 overflow-hidden rounded-2xl bg-gray-50 border border-gray-50">
                   <img
                     src={item.productImage || PLACEHOLDER_IMAGE_URL}
@@ -87,33 +97,35 @@ export const ProfileCart = () => {
                   />
                 </div>
 
-                {/* Назва та ціна */}
                 <div className="flex-1 text-center sm:text-left min-w-0 flex flex-col gap-1">
-                  <h3 className="font-semibold text-gray-900 text-base mb-1 truncate">
+                  <h3 className="font-medium text-gray-900 text-base mb-1 truncate">
                     {item.productName}
                   </h3>
                   <div>
                     {hasDiscount ? (
                       <div className="flex flex-col">
                         <span className="text-[12px] text-gray-400 line-through font-manrope">
-                          ₴ {item.price.toFixed(2)}
+                          ₴ {safeItem.price.toFixed(2)}
                         </span>
                         <span className="text-lg font-bold font-manrope text-red-500">
                           ₴ {actualPrice.toFixed(2)}
                         </span>
                       </div>
                     ) : (
-                      <span className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}>
-                        ₴ {item.price.toFixed(2)}
+                      <span
+                        className={`text-lg font-bold font-manrope ${isOutOfStock ? "text-gray-500" : "text-gray-900"}`}
+                      >
+                        ₴ {safeItem.price.toFixed(2)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Керування кількістю */}
                 <div className="flex items-center gap-4 bg-gray-50 p-1.5 rounded-full border border-gray-100 font-manrope">
                   <button
-                    onClick={() => handleUpdateQuantity(item.productId, item.quantity - 1)}
+                    onClick={() =>
+                      handleUpdateQuantity(item.productId, item.quantity - 1)
+                    }
                     className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:text-brand-primary transition-all active:scale-90"
                   >
                     <Minus size={14} strokeWidth={3} />
@@ -122,14 +134,15 @@ export const ProfileCart = () => {
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => handleUpdateQuantity(item.productId, item.quantity + 1)}
+                    onClick={() =>
+                      handleUpdateQuantity(item.productId, item.quantity + 1)
+                    }
                     className="w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm hover:text-brand-primary transition-all active:scale-90"
                   >
                     <Plus size={14} strokeWidth={3} />
                   </button>
                 </div>
 
-                {/* Видалення */}
                 <button
                   onClick={() => dispatch(removeFromCart(item.productId))}
                   className="p-3 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all duration-300"
@@ -142,11 +155,12 @@ export const ProfileCart = () => {
         </div>
       </div>
 
-      {/* Підсумок */}
       <div className="bg-white rounded-[32px] border border-gray-100 p-6 shadow-sm mt-6">
         <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
           <div className="text-center sm:text-left">
-            <p className="text-gray-400 text-sm font-medium mb-1">Загальна сума до сплати</p>
+            <p className="text-gray-400 text-sm font-medium mb-1">
+              Загальна сума до сплати
+            </p>
             <p className="text-2xl font-bold text-gray-900 font-manrope">
               ₴ {totalPrice.toFixed(2)}
             </p>
