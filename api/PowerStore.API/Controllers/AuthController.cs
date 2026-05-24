@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PowerStore.Api.Services;
 using PowerStore.API.Extensions;
 using PowerStore.API.Helpers;
+using PowerStore.Application.DTOs;
 using PowerStore.Application.DTOs.Auth;
 using PowerStore.Application.Interfaces;
 
@@ -13,11 +15,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly IWebHostEnvironment _environment;
+    private readonly INewsletterService _nlService;
 
-    public AuthController(IAuthService authService, IWebHostEnvironment environment)
+    public AuthController(IAuthService authService, IWebHostEnvironment environment, INewsletterService nlService)
     {
         _authService = authService;
         _environment = environment;
+        _nlService = nlService;
     }
 
     [HttpPost("register")]
@@ -95,5 +99,15 @@ public class AuthController : ControllerBase
             return forwarded.FirstOrDefault()?.Split(',')[0].Trim();
 
         return HttpContext.Connection.RemoteIpAddress?.MapToIPv4().ToString();
+    }
+
+    [HttpPost("subscribe-newsletter")]
+    public async Task<IActionResult> SubscribeNewsletter([FromBody] SubscribeNewsletterDto dto)
+    {
+        var (isSuccess, message) = await _nlService.SubscribeAsync(dto);
+
+        if (!isSuccess) return BadRequest(new { message });
+
+        return Ok(new { message });
     }
 }

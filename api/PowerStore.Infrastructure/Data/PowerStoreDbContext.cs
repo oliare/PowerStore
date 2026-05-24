@@ -21,7 +21,7 @@ public class PowerStoreDbContext : IdentityDbContext<UserEntity, RoleEntity, Gui
     public DbSet<ContactMessageEntity> ContactMessages { get; set; }
     public DbSet<ProductReviewEntity> ProductReviews { get; set; }
     public DbSet<RefreshTokenEntity> RefreshTokens { get; set; }
-
+    public DbSet<NewsletterSubscription> NewsletterSubscriptions { get; set; }
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

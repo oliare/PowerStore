@@ -49,7 +49,7 @@ export const CategoriesSection = ({
 
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-semibold z-10">Популярні категорії</h2>
+          <h2 className="text-3xl font-semibold z-10">Категорії</h2>
           {!isLoading && !error && (
             <Link
               to="/shop"
@@ -153,13 +153,13 @@ export const CategoriesSection = ({
                 </span>
               </p>
             </div>
-            <button className="flex items-center justify-start gap-3 px-8 py-2 mt-4 w-min min-w-max rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
+            <Link to="/shop" className="flex items-center justify-start gap-3 px-8 py-2 mt-4 w-min min-w-max rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
               <span className="text-white font-semibold ">До покупок</span>
               <ArrowRight
                 color="white"
                 className="group-hover:translate-x-2 transition-transform"
               />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

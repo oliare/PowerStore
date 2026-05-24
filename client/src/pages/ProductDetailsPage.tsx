@@ -122,7 +122,7 @@ const ProductDetailsPage = () => {
       productId: product.id,
       productName: product.name,
       productImage: finalImage,
-      price: getActualPrice(product), // ВИПРАВЛЕНО: фактична ціна
+      price: getActualPrice(product),
       quantity: selectedQuantity,
       stockQuantity: product.stockQuantity,
       isOnSale: product.isOnSale,

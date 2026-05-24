@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PowerStore.Api.Services;
 using PowerStore.API.Middleware;
 using PowerStore.Application.DTOs;
 using PowerStore.Application.Interfaces;
@@ -35,6 +36,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<INewsletterService, NewsletterService>();
 
 builder.Services.AddScoped<DbSeeder>();
 
@@ -132,7 +134,6 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await db.Database.MigrateAsync();
-        await DatabaseSchemaBootstrap.EnsureRefreshTokensTableAsync(db);
         await seeder.SeedAsync();
         Console.WriteLine("Database ready");
     }

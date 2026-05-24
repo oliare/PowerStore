@@ -8,14 +8,15 @@ import {
 } from "lucide-react";
 import { PhotoCarousel } from "../../common/Carousel";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const heroImages = [
-    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1400",
+    "https://media.istockphoto.com/id/479574216/uk/%D1%84%D0%BE%D1%82%D0%BE/%D0%BC%D0%BE%D0%BB%D0%BE%D0%B4%D0%B8%D0%B9-%D0%BA%D1%80%D0%B0%D1%81%D0%B5%D0%BD%D1%8C-%D0%BF%D0%B0%D1%8F%D1%94-%D0%B4%D0%BE%D1%88%D0%BA%D1%83.jpg?s=612x612&w=0&k=20&c=FRGBMbDoAQFl_pB3PbDkXwq9fKfmn1s90xf3fZaneCU=",
+    "https://media.istockphoto.com/id/1358222840/uk/%D1%84%D0%BE%D1%82%D0%BE/%D1%80%D1%96%D0%B7%D0%BD%D1%96-%D0%B5%D0%BB%D0%B5%D0%BA%D1%82%D1%80%D0%BE%D1%96%D0%BD%D1%81%D1%82%D1%80%D1%83%D0%BC%D0%B5%D0%BD%D1%82%D0%B8-%D1%82%D0%B0-%D0%BE%D0%B1%D0%BB%D0%B0%D0%B4%D0%BD%D0%B0%D0%BD%D0%BD%D1%8F-%D0%BD%D0%B0-%D1%81%D1%96%D1%80%D0%BE%D0%BC%D1%83-%D1%82%D0%BB%D1%96-%D0%B2%D0%B8%D0%B4-%D0%B7%D0%B2%D0%B5%D1%80%D1%85%D1%83.jpg?s=612x612&w=0&k=20&c=IXGocOqFp687AsmFv8L3hQiAAKElgyG4xaYThrff1s8=",
     "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=1400",
-    "https://images.unsplash.com/photo-1558402529-d26c8a7023e9?q=80&w=1400",
   ];
 
   const nextSlide = () =>
@@ -76,13 +77,18 @@ export const HeroSection = () => {
               Надійне електрообладнання для вашої безпеки. Безкоштовна доставка
               на всі замовлення.
             </p>
-            <button className="flex items-center gap-3 px-10 py-2 rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group">
-              <span className="text-white font-semibold text-md">До покупок</span>
+            <Link
+              to="/shop"
+              className="flex items-center gap-3 px-10 py-2 rounded-full bg-brand-primary hover:bg-brand-dark transition-all shadow-xl shadow-brand-primary/20 group"
+            >
+              <span className="text-white font-semibold text-md">
+                До покупок
+              </span>
               <ArrowRight
                 color="white"
                 className="group-hover:translate-x-2 transition-transform"
               />
-            </button>
+            </Link>
           </div>
         </div>
       </div>

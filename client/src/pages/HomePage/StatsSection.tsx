@@ -1,9 +1,9 @@
 export const StatsSection = () => {
   const stats = [
-    { value: "10+", label: "Років на ринку" },
-    { value: "50к+", label: "Задоволених клієнтів" },
-    { value: "25", label: "Сертифікатів якості" },
-    { value: "100к+", label: "Замовлень щомісяця" },
+    { value: "5+", label: "Років на ринку" },
+    { value: "20к+", label: "Задоволених клієнтів" },
+    { value: "17", label: "Сертифікатів якості" },
+    { value: "50к+", label: "Замовлень щомісяця" },
   ];
 
   return (
