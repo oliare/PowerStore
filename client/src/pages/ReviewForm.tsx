@@ -38,7 +38,6 @@ export const ReviewForm = ({
     return true;
   };
 
-  // Функція валідації
   const validateForm = (
     currentRating: number,
     currentComment: string,
